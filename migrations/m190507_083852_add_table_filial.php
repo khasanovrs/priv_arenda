@@ -12,7 +12,7 @@ class m190507_083852_add_table_filial extends Migration
      */
     public function safeUp()
     {
-        $this->execute("CREATE TABLE `branchs` (
+        $this->execute("CREATE TABLE `branch` (
           `id` INT(11) NOT NULL AUTO_INCREMENT,
           `name` VARCHAR(150) NOT NULL,
           PRIMARY KEY (`id`));

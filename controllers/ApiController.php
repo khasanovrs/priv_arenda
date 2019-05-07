@@ -49,6 +49,12 @@ class ApiController extends Controller
             ],
             'change-ur-client' => [
                 'class' => 'app\components\actions\client\ChangeUrClientAction',
+            ],
+            /**
+             * Управление филиалами
+             */
+            'add-branch' => [
+                'class' => 'app\components\actions\branch\AddBranchAction',
             ]
         ];
     }
