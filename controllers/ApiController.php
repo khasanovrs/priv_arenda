@@ -45,16 +45,16 @@ class ApiController extends Controller
              * Управление клиентами
              */
             'add-ur-client' => [
-                'class' => 'app\components\actions\login\PassRestAction',
+                'class' => 'app\components\actions\client\AddUrClientAction',
             ],
             'change-ur-client' => [
-                'class' => 'app\components\actions\login\ChangeUserAction',
+                'class' => 'app\components\actions\client\ChangeUserAction',
             ],
             'add-fiz-client' => [
-                'class' => 'app\components\actions\login\PassRestAction',
+                'class' => 'app\components\actions\client\PassRestAction',
             ],
             'change-fiz-client' => [
-                'class' => 'app\components\actions\login\ChangeUserAction',
+                'class' => 'app\components\actions\client\ChangeUserAction',
             ]
         ];
     }

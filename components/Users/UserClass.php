@@ -8,7 +8,7 @@ namespace app\components\Users;
 use app\models\Users;
 use Yii;
 
-class MibUserClass
+class UserClass
 {
 
     /**
