@@ -5,6 +5,8 @@
 
 namespace app\components\Clients;
 
+use app\models\ClientSource;
+use app\models\ClientStatus;
 use app\models\ClientUr;
 use Yii;
 
@@ -96,6 +98,28 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Ни передана скида',
+            ];
+        }
+
+        $check_source = ClientSource::find()->where('id=:id', [':id' => $source])->one();
+
+        if (!is_object($check_source)) {
+            Yii::error('Передан некорректный источник, source:' . serialize($source), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указанный источник не существует',
+            ];
+        }
+
+        $check_status = ClientStatus::find()->where('id=:id', [':id' => $status])->one();
+
+        if (!is_object($check_status)) {
+            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный статус',
             ];
         }
 
@@ -237,6 +261,28 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Организация ни найдена',
+            ];
+        }
+
+        $check_source = ClientSource::find()->where('id=:id', [':id' => $source])->one();
+
+        if (!is_object($check_source)) {
+            Yii::error('Передан некорректный источник, source:' . serialize($source), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указанный источник не существует',
+            ];
+        }
+
+        $check_status = ClientStatus::find()->where('id=:id', [':id' => $status])->one();
+
+        if (!is_object($check_status)) {
+            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный статус',
             ];
         }
 

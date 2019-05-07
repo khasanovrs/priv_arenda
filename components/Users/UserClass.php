@@ -5,7 +5,9 @@
 
 namespace app\components\Users;
 
+use app\models\Branch;
 use app\models\Users;
+use app\models\UsersRole;
 use Yii;
 
 class UserClass
@@ -89,6 +91,28 @@ class UserClass
             ];
         }
 
+        $check_role = UsersRole::find()->where('id=:id', [':id' => $user_type])->one();
+
+        if (!is_object($check_role)) {
+            Yii::error('Передан некорректный идентификтор роли, user_type:' . serialize($user_type), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указанная роль не существует',
+            ];
+        }
+
+        $check_branch = Branch::find()->where('id=:id', [':id' => $branch_id])->one();
+
+        if (!is_object($check_branch)) {
+            Yii::error('Передан некорректный идентификтор филиала, branch_id:' . serialize($branch_id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указанный филиал не существует',
+            ];
+        }
+
         $user = new Users();
         $user->fio = $fio;
         $user->telephone = $phone;
@@ -125,7 +149,7 @@ class UserClass
      * @param $fio ,
      * @param $status ,
      * @param $email ,
-     * @param $user_type,
+     * @param $user_type ,
      * @param $branch_id
      * @return bool|array
      */
@@ -207,6 +231,28 @@ class UserClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Пользователь ни найден',
+            ];
+        }
+
+        $check_role = UsersRole::find()->where('id=:id', [':id' => $user_type])->one();
+
+        if (!is_object($check_role)) {
+            Yii::error('Передан некорректный идентификтор роли, user_type:' . serialize($user_type), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указанная роль не существует',
+            ];
+        }
+
+        $check_branch = Branch::find()->where('id=:id', [':id' => $branch_id])->one();
+
+        if (!is_object($check_branch)) {
+            Yii::error('Передан некорректный идентификтор филиала, branch_id:' . serialize($branch_id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указанный филиал не существует',
             ];
         }
 
