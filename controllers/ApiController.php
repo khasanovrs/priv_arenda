@@ -82,6 +82,15 @@ class ApiController extends Controller
             ],
             'delete-ur-source' => [
                 'class' => 'app\components\actions\sourceUr\DeleteUrSourceAction',
+            ],
+            /**
+             * Управление складами
+             */
+            'add-stock' => [
+                'class' => 'app\components\actions\stock\AddStockAction',
+            ],
+            'delete-stock' => [
+                'class' => 'app\components\actions\stock\DeleteStockAction',
             ]
         ];
     }
