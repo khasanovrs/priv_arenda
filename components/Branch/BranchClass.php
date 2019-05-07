@@ -130,6 +130,8 @@ class BranchClass
             ];
         }
 
+        //@todo Проверка на наличие связки данного филиала с другими таблицами
+
         try {
             Branch::deleteAll('id=:id', array(':id' => $id));
         } catch (\Exception $e) {

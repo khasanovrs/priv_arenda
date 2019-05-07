@@ -70,6 +70,15 @@ class ApiController extends Controller
             ],
             'delete-ur-status' => [
                 'class' => 'app\components\actions\statusUr\DeleteUrStatusAction',
+            ],
+            /**
+             * Управление источниками
+             */
+            'add-ur-source' => [
+                'class' => 'app\components\actions\sourceUr\AddUrSourceAction',
+            ],
+            'delete-ur-source' => [
+                'class' => 'app\components\actions\sourceUr\DeleteUrSourceAction',
             ]
         ];
     }
