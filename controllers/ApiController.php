@@ -49,12 +49,6 @@ class ApiController extends Controller
             ],
             'change-ur-client' => [
                 'class' => 'app\components\actions\client\ChangeUrClientAction',
-            ],
-            'add-fiz-client' => [
-                'class' => 'app\components\actions\client\PassRestAction',
-            ],
-            'change-fiz-client' => [
-                'class' => 'app\components\actions\client\ChangeUserAction',
             ]
         ];
     }

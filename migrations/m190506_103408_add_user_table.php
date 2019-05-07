@@ -19,15 +19,18 @@ class m190506_103408_add_user_table extends Migration
             `status` varchar(45) COLLATE utf8_bin NOT NULL DEFAULT '0',
             `user_type` int(11) NOT NULL,
             `email` varchar(45) COLLATE utf8_bin DEFAULT NULL,
+            `branch_id` int(11) NOT NULL COMMENT 'филиал',
             `password` varchar(45) COLLATE utf8_bin NOT NULL COMMENT 'пароль пользователя',
             `date_create` datetime DEFAULT NULL COMMENT 'дата создания записи',
             `date_update` varchar(45) CHARACTER SET utf8 DEFAULT NULL COMMENT 'тип роли',
             PRIMARY KEY (`id`),
             KEY `index2` (`telephone`),
             KEY `fk_users_1_idx` (`user_type`),
-            CONSTRAINT `fk_users_1` FOREIGN KEY (`user_type`) REFERENCES `users_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+            KEY `fk_users_2_idx` (`branch_id`),
+            CONSTRAINT `fk_users_1` FOREIGN KEY (`user_type`) REFERENCES `users_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+            CONSTRAINT `fk_users_2` FOREIGN KEY (`branch_id`) REFERENCES `branchs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-        ");
+     ");
     }
 
     /**
