@@ -52,6 +52,7 @@ class BranchClass
 
     /**
      * Редактирование филиала
+     * @param $id
      * @param $name ,
      * @return bool|array
      */
@@ -108,6 +109,39 @@ class BranchClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Филиал успешно изменен'
+        ];
+    }
+
+    /**
+     * Удаление филиала
+     * @param $id
+     * @return bool|array
+     */
+    public static function DeleteBranch($id)
+    {
+        Yii::info('Запуск функции удаления филиала', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передан идентификатор филиала, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор филиала',
+            ];
+        }
+
+        try {
+            Branch::deleteAll('id=:id', array(':id' => $id));
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении филиала: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Филиал успешно удален', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Филиал успешно удален'
         ];
     }
 }

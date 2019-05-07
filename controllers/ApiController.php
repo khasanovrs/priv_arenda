@@ -61,6 +61,15 @@ class ApiController extends Controller
             ],
             'delete-branch' => [
                 'class' => 'app\components\actions\branch\DeleteBranchAction',
+            ],
+            /**
+             * Управление статусами для юр.лиц
+             */
+            'add-ur-status' => [
+                'class' => 'app\components\actions\statusUr\AddUrStatusAction',
+            ],
+            'delete-ur-status' => [
+                'class' => 'app\components\actions\statusUr\DeleteUrStatusAction',
             ]
         ];
     }

@@ -25,7 +25,7 @@ class PassRestAction extends Action
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при обновлении пароля пользователя', __METHOD__);
 
-            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'SUCCESS') {
+            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
                 return $resultChange;
             }
 
