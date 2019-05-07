@@ -33,15 +33,27 @@ class ApiController extends Controller
                 'class' => 'app\components\actions\login\AuthAction',
             ],
             /**
-             * смена пароля
+             * Управление пользователями
              */
             'pass-reset' => [
                 'class' => 'app\components\actions\login\PassRestAction',
             ],
-            /**
-             * редактирование пользователя
-             */
             'change-user' => [
+                'class' => 'app\components\actions\login\ChangeUserAction',
+            ],
+            /**
+             * Управление клиентами
+             */
+            'add-ur-client' => [
+                'class' => 'app\components\actions\login\PassRestAction',
+            ],
+            'change-ur-client' => [
+                'class' => 'app\components\actions\login\ChangeUserAction',
+            ],
+            'add-fiz-client' => [
+                'class' => 'app\components\actions\login\PassRestAction',
+            ],
+            'change-fiz-client' => [
                 'class' => 'app\components\actions\login\ChangeUserAction',
             ]
         ];

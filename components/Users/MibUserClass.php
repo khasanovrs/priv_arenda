@@ -96,8 +96,8 @@ class MibUserClass
         $user->telephone = $phone;
         $user->fio = $fio;
         $user->status = $status;
-        $user->status = $email;
-        $user->status = $user_type;
+        $user->email = $email;
+        $user->user_type = $user_type;
 
         try {
             if (!$user->save(false)) {
