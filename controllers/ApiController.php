@@ -55,6 +55,12 @@ class ApiController extends Controller
              */
             'add-branch' => [
                 'class' => 'app\components\actions\branch\AddBranchAction',
+            ],
+            'change-branch' => [
+                'class' => 'app\components\actions\branch\ChangeBranchAction',
+            ],
+            'delete-branch' => [
+                'class' => 'app\components\actions\branch\DeleteBranchAction',
             ]
         ];
     }
