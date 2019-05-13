@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $user_id
  * @property string $session_date дата создания сессии
+ * @property string $session_date_end
  * @property string $session_id
  * @property string $status статус сессии
  *
@@ -31,12 +32,11 @@ class Session extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'user_id'], 'required'],
-            [['id', 'user_id'], 'integer'],
+            [['user_id'], 'required'],
+            [['user_id'], 'integer'],
             [['session_date'], 'safe'],
+            [['session_date_end', 'status'], 'string', 'max' => 45],
             [['session_id'], 'string', 'max' => 250],
-            [['status'], 'string', 'max' => 45],
-            [['id'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -50,6 +50,7 @@ class Session extends \yii\db\ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'session_date' => 'Session Date',
+            'session_date_end' => 'Session Date End',
             'session_id' => 'Session ID',
             'status' => 'Status',
         ];

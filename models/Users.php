@@ -16,7 +16,7 @@ use Yii;
  * @property int $branch_id филиал
  * @property string $password пароль пользователя
  * @property string $date_create дата создания записи
- * @property string $date_update тип роли
+ * @property string $date_update Время последнего запроса sms-кода
  *
  * @property Session[] $sessions
  * @property UsersRole $userType

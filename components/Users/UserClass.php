@@ -120,7 +120,7 @@ class UserClass
         $user->user_type = $user_type;
         $user->email = $email;
         $user->branch_id = $branch_id;
-        $user->password = hash('sha256', $pass);
+        $user->password = password_hash($pass, PASSWORD_DEFAULT);
         $user->date_create = date('Y-m-d H:i:s');
         $user->date_update = date('Y-m-d H:i:s');
 

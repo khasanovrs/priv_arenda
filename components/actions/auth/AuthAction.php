@@ -3,8 +3,9 @@
  * Авторизация пользователя
  */
 
-namespace app\components\actions\login;
+namespace app\components\actions\auth;
 
+use app\components\Session\SessionClass;
 use app\models\Users;
 use Yii;
 use yii\base\Action;
@@ -25,7 +26,7 @@ class AuthAction extends Action
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при проверке номера телефона'
+                'msg' => 'Укажите корректный номер телефона'
             ];
         }
 
@@ -61,8 +62,22 @@ class AuthAction extends Action
             ];
         }
 
+        $resultSession = SessionClass::AddNewSession($user->id);
+
+        if (!is_array($resultSession) || !isset($resultSession['status']) || $resultSession['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при установке активной сессии', __METHOD__);
+
+            if (is_array($resultSession) && isset($resultSession['status']) && $resultSession['status'] === 'ERROR') {
+                return $resultSession;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при установке сессии',
+            ];
+        }
+
         Yii::info('Авторизация прошла успешно', __METHOD__);
-        //@todo запись сессии, token
 
         return [
             'status' => 'OK',

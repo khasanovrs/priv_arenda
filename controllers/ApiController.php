@@ -30,7 +30,7 @@ class ApiController extends Controller
              * авторизация
              */
             'auth' => [
-                'class' => 'app\components\actions\login\AuthAction',
+                'class' => 'app\components\actions\auth\AuthAction',
             ],
             /**
              * Управление пользователями
@@ -95,12 +95,31 @@ class ApiController extends Controller
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'SessionFilter' => [
+                'class' => 'app\components\filters\SessionFilter',
+            ],
+            'PrBlockFilter' => [
+                'class' => 'app\components\filters\PrBlockFilter',
+            ]
+        ];
+    }
+
     public function beforeAction($action)
     {
         // отключаем Csrf валидацию
         $this->enableCsrfValidation = false;
 
         Yii::info('Начало запроса', 'BeginRequest');
+
+        $request = Yii::$app->request;
+        $data = $request->getBodyParam('data');
+        $request->setBodyParams($data);
 
         return parent::beforeAction($action);
     }
