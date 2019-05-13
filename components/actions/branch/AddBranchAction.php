@@ -37,7 +37,7 @@ class AddBranchAction extends Action
         Yii::info('Филиал успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Филиал успешно добавлен',
         ];
     }
