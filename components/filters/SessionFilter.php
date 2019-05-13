@@ -5,7 +5,7 @@
 
 namespace app\components\filters;
 
-use app\components\Session\SessionClass;
+use app\components\Session\Sessions;
 use app\models\Session;
 use Yii;
 use yii\base\ActionFilter;
@@ -58,15 +58,15 @@ class SessionFilter extends ActionFilter
         Yii::info('Сессия найдена: id=' . serialize($session->id), __METHOD__);
 
         /**
-         * @var SessionClass $SessionClass
+         * @var Sessions $Sessions
          */
         try {
-            $SessionClass = Yii::$app->get('SessionClass');
+            $Sessions = Yii::$app->get('Sessions');
         } catch (\Exception $e) {
             Yii::error('Не смогли найти компонент Session: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
-        $SessionClass->setSession($session);
+        $Sessions->setSession($session);
 
         return true;
     }

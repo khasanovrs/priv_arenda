@@ -40,6 +40,18 @@ class SessionClass extends Component
             return false;
         }
 
+        /**
+         * @var Sessions $Sessions
+         */
+        try {
+            $Sessions = Yii::$app->get('Sessions');
+        } catch (\Exception $e) {
+            Yii::error('Не смогли найти компонент Session: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+        $Sessions->setSession($newSession);
+
+
         Yii::info('Сессия успешно сохранена', __METHOD__);
 
         return [

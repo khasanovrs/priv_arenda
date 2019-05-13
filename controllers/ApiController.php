@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\components\Session\Sessions;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -117,10 +118,6 @@ class ApiController extends Controller
 
         Yii::info('Начало запроса', 'BeginRequest');
 
-        $request = Yii::$app->request;
-        $data = $request->getBodyParam('data');
-        $request->setBodyParams($data);
-
         return parent::beforeAction($action);
     }
 
@@ -129,6 +126,27 @@ class ApiController extends Controller
         if (!is_array($result) || !isset($result['status']) || !isset($result['msg'])) {
             Yii::error('Неверный результат выполнения!' . serialize($result), __METHOD__);
             $result = ['status' => 'ERROR', 'msg' => 'ERROR'];
+        }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        try {
+            $Sessions = Yii::$app->get('Sessions');
+        } catch (\Exception $e) {
+            Yii::error('Не смогли найти компонент MibSession: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        $session = $Sessions->getSession();
+
+        Yii::info('Результат запроса: ' . serialize($session), 'EndRequest');
+
+        $result['session_id'] = $session->session_id;
+
+        if (isset($result['data'])) {
+            $result['data'] = json_encode($result['data']);
+            $result['data'] = base64_encode($result['data']);
         }
 
         Yii::info('Результат запроса: ' . serialize($result), 'EndRequest');
