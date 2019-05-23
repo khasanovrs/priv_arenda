@@ -3,7 +3,7 @@
  * Смена пароля
  */
 
-namespace app\components\actions\login;
+namespace app\components\actions\users;
 
 use app\components\Users\UserClass;
 use Yii;

@@ -343,4 +343,60 @@ class UserClass
             'msg' => 'Пароль успешно обновлен'
         ];
     }
+
+    /**
+     * Получение списка пользователей
+     * @param $branch ,
+     * @return bool|array
+     */
+    public static function GetUsers($branch)
+    {
+        Yii::info('Запуск функции GetUsers', __METHOD__);
+
+        $result = [];
+
+        if ($branch === '' || !is_int($branch)) {
+            Yii::error('Ни передан идентификатор филиала, branch:' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор филиала',
+            ];
+        }
+
+        $users = Users::find()->where('branch_id=:branch_id', [':branch_id' => $branch])->all();
+
+        if (empty($users)) {
+            Yii::info('Пользователей нет', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Пользователей нет',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var Users $user
+         */
+        foreach ($users as $user) {
+            $result[] = [
+                'fio' => $user->fio,
+                'phone' => $user->telephone,
+                'status' => $user->status,
+                'user_type' => $user->user_type,
+                'email' => $user->email,
+                'branch_id' => $user->branch_id,
+                'date_create' => date('d.m.Y h:i:s',strtotime($user->date_create))
+            ];
+        }
+
+        Yii::info('Пользователи успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Пользователи успешно получены',
+            'data' => $result
+        ];
+    }
 }

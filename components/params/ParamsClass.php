@@ -5,6 +5,7 @@
 
 namespace app\components\params;
 
+use app\models\Branch;
 use app\models\ClientSource;
 use app\models\ClientStatus;
 use Yii;
@@ -100,7 +101,7 @@ class ParamsClass
         Yii::info('Запуск функции GetBranch', __METHOD__);
         $result = [];
 
-        $branchList = ClientSource::find()->all();
+        $branchList = Branch::find()->all();
 
         if (!is_array($branchList)) {
             Yii::error('Список филиалов пуст', __METHOD__);
@@ -113,7 +114,7 @@ class ParamsClass
         }
 
         /**
-         * @var ClientSource $value
+         * @var Branch $value
          */
         foreach ($branchList as $value) {
             $result[] = [

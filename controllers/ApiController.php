@@ -36,14 +36,17 @@ class ApiController extends Controller
             /**
              * Управление пользователями
              */
+            'get-users' => [
+                'class' => 'app\components\actions\users\GetUserAction',
+            ],
             'add-user' => [
-                'class' => 'app\components\actions\login\AddUserAction',
+                'class' => 'app\components\actions\users\AddUserAction',
             ],
             'pass-reset' => [
-                'class' => 'app\components\actions\login\PassRestAction',
+                'class' => 'app\components\actions\users\PassRestAction',
             ],
             'change-user' => [
-                'class' => 'app\components\actions\login\ChangeUserAction',
+                'class' => 'app\components\actions\users\ChangeUserAction',
             ],
             /**
              * Управление клиентами

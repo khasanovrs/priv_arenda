@@ -14,6 +14,7 @@ return [
         'api/get-source',
         'api/search-ur-client',
         'api/get-branch',
-        'api/update-status-ur-client'
+        'api/update-status-ur-client',
+        'api/get-users'
     ],
 ];
