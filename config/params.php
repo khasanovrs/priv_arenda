@@ -7,6 +7,11 @@ return [
 
     // запросы у которых не проверяется сессия
     'openMethods' => [
-        'api/auth'
+        'api/auth',
+
+        'api/get-ur-client',
+        'api/get-status',
+        'api/get-source',
+        'api/search-ur-client'
     ],
 ];

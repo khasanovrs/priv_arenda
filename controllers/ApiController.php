@@ -48,6 +48,12 @@ class ApiController extends Controller
             /**
              * Управление клиентами
              */
+            'get-ur-client' => [
+                'class' => 'app\components\actions\client\GetUrClientAction',
+            ],
+            'search-ur-client' => [
+                'class' => 'app\components\actions\client\SearchUrClientAction',
+            ],
             'add-ur-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',
             ],
@@ -92,7 +98,16 @@ class ApiController extends Controller
             ],
             'delete-stock' => [
                 'class' => 'app\components\actions\stock\DeleteStockAction',
-            ]
+            ],
+            /**
+             * Управление дополнительными параметрами
+             */
+            'get-status' => [
+                'class' => 'app\components\actions\params\GetStatusAction',
+            ],
+            'get-source' => [
+                'class' => 'app\components\actions\params\GetSourceAction',
+            ],
         ];
     }
 
@@ -142,7 +157,7 @@ class ApiController extends Controller
 
         Yii::info('Результат запроса: ' . serialize($session), 'EndRequest');
 
-        $result['session_id'] = $session->session_id;
+        //$result['session_id'] = $session->session_id;
 
         if (isset($result['data'])) {
             $result['data'] = json_encode($result['data']);

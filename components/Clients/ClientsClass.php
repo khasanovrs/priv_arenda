@@ -313,4 +313,109 @@ class ClientsClass
             'msg' => 'Юр. клиент успешно изменен'
         ];
     }
+
+    /**
+     * Получение списка юр. клиентов
+     * @return bool|array
+     */
+    public static function GetClientUr()
+    {
+        Yii::info('Запуск функции GetClientUr', __METHOD__);
+        $result = [];
+
+        /**
+         * @var ClientUr $client_ur
+         */
+        $client_ur = ClientUr::find()->all();
+
+        if (!is_array($client_ur)) {
+            Yii::error('Список юр. лиц пуст', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Список юр. лиц пуст',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var ClientUr $value
+         */
+        foreach ($client_ur as $value) {
+            $source = $value->source0;
+
+            $result[] = [
+                'name' => $value->name_org,
+                'phone' => $value->phone,
+                'status' => $value->status,
+                'date_create' => date('d.m.Y', strtotime($value->date_create)),
+                'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
+                'source' => ['id' => $source->id, 'name' => $source->name],
+                'rentals' => $value->rentals,
+                'dohod' => $value->dohod,
+                'sale' => $value->sale,
+            ];
+        }
+
+        Yii::info('Список юр. клиентов успешно получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список юр. клиентов успешно получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Поиск юр. клиентов
+     * @param $params
+     * @return bool|array
+     */
+    public static function SearchClientUr($params)
+    {
+        Yii::info('Запуск функции SearchClientUr', __METHOD__);
+        $result = [];
+
+        /**
+         * @var ClientUr $client_ur
+         */
+        $client_ur = ClientUr::find()->andFilterWhere(['like', 'name_org', $params])->all();
+
+        if (!is_array($client_ur)) {
+            Yii::error('Список юр. лиц пуст', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Список юр. лиц пуст',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var ClientUr $value
+         */
+        foreach ($client_ur as $value) {
+            $source = $value->source0;
+
+            $result[] = [
+                'name' => $value->name_org,
+                'phone' => $value->phone,
+                'status' => $value->status,
+                'date_create' => date('d.m.Y', strtotime($value->date_create)),
+                'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
+                'source' => ['id' => $source->id, 'name' => $source->name],
+                'rentals' => $value->rentals,
+                'dohod' => $value->dohod,
+                'sale' => $value->sale,
+            ];
+        }
+
+        Yii::info('Список юр. клиентов успешно получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список юр. клиентов успешно получен',
+            'data' => $result
+        ];
+    }
 }
