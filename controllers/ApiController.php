@@ -120,6 +120,9 @@ class ApiController extends Controller
             'get-roles' => [
                 'class' => 'app\components\actions\params\GetRolesAction',
             ],
+            'get-rights' => [
+                'class' => 'app\components\actions\params\GetRightsAction',
+            ],
         ];
     }
 

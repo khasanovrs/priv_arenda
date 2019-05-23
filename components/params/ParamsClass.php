@@ -8,6 +8,7 @@ namespace app\components\params;
 use app\models\Branch;
 use app\models\ClientSource;
 use app\models\ClientStatus;
+use app\models\UsersRights;
 use app\models\UsersRole;
 use Yii;
 
@@ -169,6 +170,46 @@ class ParamsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Роли успешно получены',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение прав
+     * @return bool|array
+     */
+    public static function GetRights()
+    {
+        Yii::info('Запуск функции GetRights', __METHOD__);
+        $result = [];
+
+        $branchList = UsersRights::find()->all();
+
+        if (!is_array($branchList)) {
+            Yii::error('Список ролей пуст', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Список ролей пуст',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var UsersRights $value
+         */
+        foreach ($branchList as $value) {
+            $result[] = [
+                'val' => $value->id,
+                'name' => $value->name,
+            ];
+        }
+
+        Yii::info('Права успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Права успешно получены',
             'data' => $result
         ];
     }

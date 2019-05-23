@@ -16,6 +16,7 @@ return [
         'api/get-branch',
         'api/update-status-ur-client',
         'api/get-users',
-        'api/get-roles'
+        'api/get-roles',
+        'api/get-rights'
     ],
 ];
