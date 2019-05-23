@@ -117,6 +117,9 @@ class ApiController extends Controller
             'get-branch' => [
                 'class' => 'app\components\actions\params\GetBranchAction',
             ],
+            'get-roles' => [
+                'class' => 'app\components\actions\params\GetRolesAction',
+            ],
         ];
     }
 
