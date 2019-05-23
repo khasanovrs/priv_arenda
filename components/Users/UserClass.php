@@ -6,6 +6,7 @@
 namespace app\components\Users;
 
 use app\models\Branch;
+use app\models\BunchUserRight;
 use app\models\Users;
 use app\models\UsersRole;
 use Yii;
@@ -16,15 +17,16 @@ class UserClass
     /**
      * Добавление нового пользователя
      * @param $phone ,
-     * @param $fio ,
-     * @param $status ,
+     * @param $name ,
+     * @param $lastName ,
      * @param $email ,
      * @param $user_type
      * @param $pass
      * @param $branch_id
+     * @param $user_right
      * @return bool|array
      */
-    public static function AddUser($phone, $fio, $status, $email, $user_type, $pass, $branch_id)
+    public static function AddUser($phone, $name, $lastName, $email, $user_type, $pass, $branch_id, $user_right)
     {
         Yii::info('Запуск функции обновления персональных данных пользователя', __METHOD__);
 
@@ -37,8 +39,8 @@ class UserClass
             ];
         }
 
-        if ($fio === '') {
-            Yii::error('Ошибка при проверке фио, fio:' . serialize($fio), __METHOD__);
+        if ($name === '') {
+            Yii::error('Ошибка при проверке name, fio:' . serialize($name), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -55,8 +57,8 @@ class UserClass
             ];
         }
 
-        if ($status === '') {
-            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
+        if ($lastName === '') {
+            Yii::error('Передан некорректная фамилия, status:' . serialize($lastName), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -64,7 +66,7 @@ class UserClass
             ];
         }
 
-        if ($email === '' || !preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", $email)) {
+        if ($email != '' && !preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", $email)) {
             Yii::error('Передан некорректный email, email:' . serialize($email), __METHOD__);
 
             return [
@@ -113,10 +115,25 @@ class UserClass
             ];
         }
 
+        Yii::info('Проверка номера телефона на уникальность', __METHOD__);
+
+        /**
+         * @var Users $check_user
+         */
+        $check_user = Users::find()->where('telephone=:telephone', [':telephone' => $phone])->one();
+
+        if (is_object($check_user)) {
+            Yii::error('Данный номер телефона уже зарегестрирован, phone:' . serialize($phone), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный номер телефона уже зарегестрирован',
+            ];
+        }
+
         $user = new Users();
-        $user->fio = $fio;
+        $user->fio = $name . ' ' . $lastName;
         $user->telephone = $phone;
-        $user->status = $status;
         $user->user_type = $user_type;
         $user->email = $email;
         $user->branch_id = $branch_id;
@@ -132,6 +149,39 @@ class UserClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при добавлении нового пользователя: ' . serialize($e->getMessage()), __METHOD__);
             return false;
+        }
+
+        Yii::info('Проверяем права для пользователя', __METHOD__);
+
+        if (!empty($user_right)) {
+            Yii::info('Есть специальные права для пользователя', __METHOD__);
+
+            $check_user = Users::find()->where('telephone=:telephone', [':telephone' => $phone])->one();
+
+            if (!is_object($check_user)) {
+                Yii::error('Ошибка при установке прав для пользователя, phone:' . serialize($phone), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при установке прав для пользователя',
+                ];
+            }
+
+            foreach ($user_right as $value) {
+                $newRight = new BunchUserRight();
+                $newRight->user_id = $check_user->id;
+                $newRight->right_id = $value;
+
+                try {
+                    if (!$newRight->save(false)) {
+                        Yii::error('Ошибка при добавлении прав для пользователя: ' . serialize($newRight->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при добавлении прав для пользователя: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+            }
         }
 
         Yii::info('Пользователь успешно добавлен', __METHOD__);
@@ -387,7 +437,7 @@ class UserClass
                 'user_type' => $user->user_type,
                 'email' => $user->email,
                 'branch_id' => $user->branch_id,
-                'date_create' => date('d.m.Y h:i:s',strtotime($user->date_create))
+                'date_create' => date('d.m.Y h:i:s', strtotime($user->date_create))
             ];
         }
 

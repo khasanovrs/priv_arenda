@@ -202,6 +202,7 @@ class ParamsClass
             $result[] = [
                 'val' => $value->id,
                 'name' => $value->name,
+                'checked' => false
             ];
         }
 

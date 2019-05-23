@@ -17,6 +17,7 @@ return [
         'api/update-status-ur-client',
         'api/get-users',
         'api/get-roles',
-        'api/get-rights'
+        'api/get-rights',
+        'api/add-users'
     ],
 ];

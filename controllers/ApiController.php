@@ -39,7 +39,7 @@ class ApiController extends Controller
             'get-users' => [
                 'class' => 'app\components\actions\users\GetUserAction',
             ],
-            'add-user' => [
+            'add-users' => [
                 'class' => 'app\components\actions\users\AddUserAction',
             ],
             'pass-reset' => [

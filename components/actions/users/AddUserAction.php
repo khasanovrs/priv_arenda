@@ -17,15 +17,16 @@ class AddUserAction extends Action
 
         $request = Yii::$app->request;
 
-        $phone = $request->getBodyParam('phone');
+        $name = $request->getBodyParam('name');
+        $lastName = $request->getBodyParam('lastName');
         $password = $request->getBodyParam('password');
-        $fio = $request->getBodyParam('fio');
-        $status = $request->getBodyParam('status');
-        $email = $request->getBodyParam('email');
         $user_type = $request->getBodyParam('user_type');
         $branch_id = $request->getBodyParam('branch_id');
+        $email = $request->getBodyParam('email');
+        $phone = $request->getBodyParam('phone');
+        $user_right = $request->getBodyParam('user_right');
 
-        $resultChange = UserClass::AddUser($phone, $fio, $status, $email, $user_type, $password, $branch_id);
+        $resultChange = UserClass::AddUser($phone, $name, $lastName, $email, $user_type, $password, $branch_id, $user_right);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового пользователя', __METHOD__);
@@ -43,7 +44,7 @@ class AddUserAction extends Action
         Yii::info('Новый пользователь успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Новый пользователь успешно добавлен',
         ];
     }
