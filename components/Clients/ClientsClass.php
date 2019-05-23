@@ -326,7 +326,7 @@ class ClientsClass
         /**
          * @var ClientUr $client_ur
          */
-        $client_ur = ClientUr::find()->all();
+        $client_ur = ClientUr::find()->orderBy('last_contact desc')->all();
 
         if (!is_array($client_ur)) {
             Yii::error('Список юр. лиц пуст', __METHOD__);
