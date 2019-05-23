@@ -60,6 +60,9 @@ class ApiController extends Controller
             'change-ur-client' => [
                 'class' => 'app\components\actions\client\ChangeUrClientAction',
             ],
+            'update-status-ur-client' => [
+                'class' => 'app\components\actions\client\UpdateStatusUrClientAction',
+            ],
             /**
              * Управление филиалами
              */
@@ -107,6 +110,9 @@ class ApiController extends Controller
             ],
             'get-source' => [
                 'class' => 'app\components\actions\params\GetSourceAction',
+            ],
+            'get-branch' => [
+                'class' => 'app\components\actions\params\GetBranchAction',
             ],
         ];
     }
