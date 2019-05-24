@@ -247,27 +247,92 @@ class ClientsClass
      * Получение списка юр. клиентов
      * @param $type
      * @param $like
+     * @param $source ,
+     * @param $status ,
+     * @param $date_start ,
+     * @param $date_end ,
+     * @param $rentals_start ,
+     * @param $rentals_end ,
+     * @param $dohod_start ,
+     * @param $dohod_end
      * @return bool|array
      */
-    public static function GetClient($type, $like)
+    public static function GetClient($type, $like, $source, $status, $date_start, $date_end, $rentals_start, $rentals_end, $dohod_start, $dohod_end)
     {
         Yii::info('Запуск функции GetClientUr', __METHOD__);
 
         $client_ur = ClientUr::find();
         $client_fiz = ClientFiz::find();
+        $listUr = [];
+        $listFiz = [];
+
+        $params = [];
 
         $resultUr = [];
         $resultFiz = [];
 
-        if ($like !== '') {
+        if ($like !== '' and $source !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
-            $client_ur->andFilterWhere(['like', 'name_org', $like]);
-            $client_fiz->andFilterWhere(['like', 'fio', $like]);
+            $like = '%' . $like . '%';
+            $listUr[] = 'name_org like :like';
+            $listFiz[] = 'fio like :like';
+            $params[':like'] = $like;
         }
 
+        if ($source !== '' and $source !== null) {
+            Yii::info('Параметр source: ' . serialize($source), __METHOD__);
+            $listFiz[] = $listUr[] = 'source=:source';
+            $params[':source'] = $source;
+        }
+
+        if ($status !== '' and $status !== null) {
+            Yii::info('Параметр status: ' . serialize($status), __METHOD__);
+            $listFiz[] = $listUr[] = 'status=:status';
+            $params[':status'] = $status;
+        }
+
+        if ($date_start !== '' and $date_start !== null) {
+            Yii::info('Параметр date_start: ' . serialize($date_start), __METHOD__);
+            $listFiz[] = $listUr[] = 'last_contact>:date_start';
+            $params[':date_start'] = $date_start . ' 00:00:00';
+        }
+
+        if ($date_end !== '' and $date_end !== null) {
+            Yii::info('Параметр date_end: ' . serialize($date_end), __METHOD__);
+            $listFiz[] = $listUr[] = 'last_contact<:date_end';
+            $params[':date_end'] = $date_end . ' 23:59:59';
+        }
+
+        if ($rentals_start !== '' and $rentals_start !== null) {
+            Yii::info('Параметр rentals_start: ' . serialize($rentals_start), __METHOD__);
+            $listFiz[] = $listUr[] = 'rentals>=:rentals_start';
+            $params[':rentals_start'] = $rentals_start;
+        }
+
+        if ($rentals_end !== '' and $rentals_end !== null) {
+            Yii::info('Параметр rentals_end: ' . serialize($rentals_end), __METHOD__);
+            $listFiz[] = $listUr[] = 'rentals<=:rentals_end';
+            $params[':rentals_end'] = $rentals_end;
+        }
+
+        if ($dohod_start !== '' and $dohod_start !== null) {
+            Yii::info('Параметр dohod_start: ' . serialize($dohod_start), __METHOD__);
+            $listFiz[] = $listUr[] = 'dohod>=:dohod_start';
+            $params[':dohod_start'] = $dohod_start;
+        }
+
+        if ($dohod_end !== '' and $dohod_end !== null) {
+            Yii::info('Параметр dohod_end: ' . serialize($dohod_end), __METHOD__);
+            $listFiz[] = $listUr[] = 'dohod<=:dohod_end';
+            $params[':dohod_end'] = $dohod_end;
+        }
 
         if ($type === 'all' || $type === 'ur') {
-            $client_ur = $client_ur->orderBy('last_contact desc')->all();
+            if (!empty($listUr)) {
+                $client_ur = $client_ur->where(implode(" and ", $listUr), $params)->orderBy('last_contact desc')->all();
+            } else {
+                $client_ur = $client_ur->orderBy('last_contact desc')->all();
+            }
 
             if (is_array($client_ur)) {
                 /**
@@ -295,7 +360,11 @@ class ClientsClass
         }
 
         if ($type === 'all' || $type === 'fiz') {
-            $client_fiz = $client_fiz->orderBy('last_contact desc')->all();
+            if (!empty($listFiz)) {
+                $client_fiz = $client_fiz->where(implode(" and ", $listFiz), $params)->orderBy('last_contact desc')->all();
+            } else {
+                $client_fiz = $client_fiz->orderBy('last_contact desc')->all();
+            }
 
             if (is_array($client_fiz)) {
                 /**
