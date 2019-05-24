@@ -5,6 +5,7 @@
 
 namespace app\components\Clients;
 
+use app\models\ClientFiz;
 use app\models\ClientSource;
 use app\models\ClientStatus;
 use app\models\ClientUr;
@@ -156,9 +157,10 @@ class ClientsClass
      * Изменение статуса юр. клиента
      * @param $id
      * @param $status
+     * @param $client_type
      * @return bool|array
      */
-    public static function UpdateStatusClientUr($id, $status)
+    public static function UpdateStatusClientUr($id, $status, $client_type)
     {
         Yii::info('Запуск функции UpdateStatusClientUr', __METHOD__);
 
@@ -180,20 +182,6 @@ class ClientsClass
             ];
         }
 
-        /**
-         * @var ClientUr $client_ur
-         */
-        $client_ur = ClientUr::find()->where('id=:id', [':id' => $id])->one();
-
-        if (!is_object($client_ur)) {
-            Yii::error('По данному идентификатору ни найдена организация, id' . serialize($id), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Организация ни найдена',
-            ];
-        }
-
         $check_status = ClientStatus::find()->where('id=:id', [':id' => $status])->one();
 
         if (!is_object($check_status)) {
@@ -205,11 +193,41 @@ class ClientsClass
             ];
         }
 
-        $client_ur->status = $status;
+        if ($client_type === 'ur') {
+            /**
+             * @var ClientUr $client
+             */
+            $client = ClientUr::find()->where('id=:id', [':id' => $id])->one();
+
+            if (!is_object($client)) {
+                Yii::error('По данному идентификатору ни найдена организация, id' . serialize($id), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Организация ни найдена',
+                ];
+            }
+        } else {
+            /**
+             * @var ClientFiz $client
+             */
+            $client = ClientFiz::find()->where('id=:id', [':id' => $id])->one();
+
+            if (!is_object($client)) {
+                Yii::error('По данному идентификатору ни найдена организация, id' . serialize($id), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Организация ни найдена',
+                ];
+            }
+        }
+
+        $client->status = $status;
 
         try {
-            if (!$client_ur->save(false)) {
-                Yii::error('Ошибка при обновлении статуса юр. клиента: ' . serialize($client_ur->getErrors()), __METHOD__);
+            if (!$client->save(false)) {
+                Yii::error('Ошибка при обновлении статуса юр. клиента: ' . serialize($client->getErrors()), __METHOD__);
                 return false;
             }
         } catch (\Exception $e) {
@@ -227,53 +245,91 @@ class ClientsClass
 
     /**
      * Получение списка юр. клиентов
+     * @param $type
+     * @param $like
      * @return bool|array
      */
-    public static function GetClientUr()
+    public static function GetClient($type, $like)
     {
         Yii::info('Запуск функции GetClientUr', __METHOD__);
-        $result = [];
 
-        /**
-         * @var ClientUr $client_ur
-         */
-        $client_ur = ClientUr::find()->orderBy('last_contact desc')->all();
+        $client_ur = ClientUr::find();
+        $client_fiz = ClientFiz::find();
 
-        if (!is_array($client_ur)) {
-            Yii::error('Список юр. лиц пуст', __METHOD__);
+        $resultUr = [];
+        $resultFiz = [];
 
-            return [
-                'status' => 'SUCCESS',
-                'msg' => 'Список юр. лиц пуст',
-                'data' => $result
-            ];
+        if ($like !== '') {
+            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $client_ur->andFilterWhere(['like', 'name_org', $like]);
+            $client_fiz->andFilterWhere(['like', 'fio', $like]);
         }
 
-        /**
-         * @var ClientUr $value
-         */
-        foreach ($client_ur as $value) {
-            $source = $value->source0;
 
-            $result[] = [
-                'id' => $value->id,
-                'name' => $value->name_org,
-                'phone' => $value->phone,
-                'status' => $value->status,
-                'date_create' => date('d.m.Y', strtotime($value->date_create)),
-                'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
-                'source' => ['id' => $source->id, 'name' => $source->name],
-                'rentals' => $value->rentals,
-                'dohod' => $value->dohod,
-                'sale' => $value->sale,
-            ];
+        if ($type === 'all' || $type === 'ur') {
+            $client_ur = $client_ur->orderBy('last_contact desc')->all();
+
+            if (is_array($client_ur)) {
+                /**
+                 * @var ClientUr $value
+                 */
+                foreach ($client_ur as $value) {
+                    $source = $value->source0;
+
+                    $resultUr[] = [
+                        'id' => $value->id,
+                        'fio' => '',
+                        'org' => $value->name_org,
+                        'phone' => $value->phone,
+                        'status' => $value->status,
+                        'date_create' => date('d.m.Y', strtotime($value->date_create)),
+                        'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
+                        'source' => ['id' => $source->id, 'name' => $source->name],
+                        'rentals' => $value->rentals,
+                        'dohod' => $value->dohod,
+                        'sale' => $value->sale,
+                        'type' => 'ur'
+                    ];
+                }
+            }
         }
 
-        Yii::info('Список юр. клиентов успешно получен', __METHOD__);
+        if ($type === 'all' || $type === 'fiz') {
+            $client_fiz = $client_fiz->orderBy('last_contact desc')->all();
+
+            if (is_array($client_fiz)) {
+                /**
+                 * @var ClientFiz $value
+                 */
+                foreach ($client_fiz as $value) {
+                    $source = $value->source0;
+                    $org = $value->org_id ? $value->org->name_org : '';
+
+                    $resultFiz[] = [
+                        'id' => $value->id,
+                        'fio' => $value->fio,
+                        'org' => $org,
+                        'phone' => $value->phone,
+                        'status' => $value->status,
+                        'date_create' => date('d.m.Y', strtotime($value->date_create)),
+                        'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
+                        'source' => ['id' => $source->id, 'name' => $source->name],
+                        'rentals' => $value->rentals,
+                        'dohod' => $value->dohod,
+                        'sale' => $value->sale,
+                        'type' => 'fiz'
+                    ];
+                }
+            }
+        }
+
+        $result = array_merge($resultUr, $resultFiz);
+
+        Yii::info('Список клиентов успешно получен' . serialize($result), __METHOD__);
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Список юр. клиентов успешно получен',
+            'msg' => 'Список клиентов успешно получен',
             'data' => $result
         ];
     }

@@ -19,8 +19,9 @@ class UpdateStatusUrClientAction extends Action
 
         $client_id = $request->getBodyParam('client_id');
         $client_status = $request->getBodyParam('client_status');
+        $client_type = $request->getBodyParam('client_type');
 
-        $resultChange = ClientsClass::UpdateStatusClientUr($client_id, $client_status);
+        $resultChange = ClientsClass::UpdateStatusClientUr($client_id, $client_status, $client_type);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменения статуса юр.клиента', __METHOD__);
@@ -38,8 +39,9 @@ class UpdateStatusUrClientAction extends Action
         Yii::info('Статус успешно изменен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Статус успешно изменен',
+
         ];
     }
 }

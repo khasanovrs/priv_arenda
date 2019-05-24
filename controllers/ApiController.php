@@ -51,11 +51,8 @@ class ApiController extends Controller
             /**
              * Управление клиентами
              */
-            'get-ur-client' => [
+            'get-client' => [
                 'class' => 'app\components\actions\client\GetUrClientAction',
-            ],
-            'search-ur-client' => [
-                'class' => 'app\components\actions\client\SearchUrClientAction',
             ],
             'add-ur-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',

@@ -9,10 +9,10 @@ return [
     'openMethods' => [
         'api/auth',
 
-        'api/get-ur-client',
+        'api/get-client',
         'api/get-status',
         'api/get-source',
-        'api/search-ur-client',
+        'api/search-client',
         'api/get-branch',
         'api/update-status-ur-client',
         'api/get-users',
