@@ -18,6 +18,8 @@ return [
         'api/get-users',
         'api/get-roles',
         'api/get-rights',
-        'api/add-users'
+        'api/add-users',
+        'api/get-client-fields',
+        'api/change-client-fields'
     ],
 ];

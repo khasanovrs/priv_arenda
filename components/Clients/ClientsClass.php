@@ -9,6 +9,7 @@ use app\models\ClientFiz;
 use app\models\ClientSource;
 use app\models\ClientStatus;
 use app\models\ClientUr;
+use app\models\ShowFieldClient;
 use Yii;
 
 class ClientsClass
@@ -453,6 +454,87 @@ class ClientsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список юр. клиентов успешно получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение списка полей
+     * @return bool|array
+     */
+    public static function GetFields()
+    {
+        Yii::info('Запуск функции GetFields', __METHOD__);
+        $result = [];
+
+        $showFieldClient = ShowFieldClient::find()->all();
+
+        if (!is_array($showFieldClient)) {
+            Yii::error('Список полей пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении полей'
+            ];
+        }
+
+        /**
+         * @var ShowFieldClient $value
+         */
+        foreach ($showFieldClient as $value) {
+            $result[] = [
+                'code' => $value->code,
+                'name' => $value->name,
+                'flag' => (int)$value->flag
+            ];
+        }
+
+        Yii::info('Список полей успешно получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список полей успешно получен',
+            'data' => $result
+        ];
+    }
+
+
+    /**
+     * Изменение списка отображаемых полей для таблицы "Клиенты"
+     * @return bool|array
+     */
+    public static function ChangeFields($name_org)
+    {
+        Yii::info('Запуск функции ChangeFields', __METHOD__);
+        $result = [];
+
+        $showFieldClient = ShowFieldClient::find()->all();
+
+        if (!is_array($showFieldClient)) {
+            Yii::error('Список полей пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении полей'
+            ];
+        }
+
+        /**
+         * @var ShowFieldClient $value
+         */
+        foreach ($showFieldClient as $value) {
+            $result[] = [
+                'code' => $value->code,
+                'name' => $value->name,
+                'flag' => (int)$value->flag
+            ];
+        }
+
+        Yii::info('Список полей успешно получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список полей успешно получен',
             'data' => $result
         ];
     }
