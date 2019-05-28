@@ -60,7 +60,7 @@ class ApiController extends Controller
             'get-client-fields' => [
                 'class' => 'app\components\actions\client\GetFieldsClientAction',
             ],
-            'api/change-client-fields' => [
+            'change-client-fields' => [
                 'class' => 'app\components\actions\client\ChangeFieldsClientAction',
             ],
             'change-ur-client' => [

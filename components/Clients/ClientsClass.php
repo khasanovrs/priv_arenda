@@ -501,41 +501,35 @@ class ClientsClass
 
     /**
      * Изменение списка отображаемых полей для таблицы "Клиенты"
+     * @param $params
      * @return bool|array
      */
-    public static function ChangeFields($name_org)
+    public static function ChangeFields($params)
     {
-        Yii::info('Запуск функции ChangeFields', __METHOD__);
-        $result = [];
+        Yii::info('Запуск функции ChangeFields'.serialize($params), __METHOD__);
 
-        $showFieldClient = ShowFieldClient::find()->all();
-
-        if (!is_array($showFieldClient)) {
-            Yii::error('Список полей пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при получении полей'
-            ];
+        if (!is_array($params) || empty($params)) {
+            Yii::error('Не пришли параметры для изменения', __METHOD__);
         }
 
         /**
          * @var ShowFieldClient $value
          */
-        foreach ($showFieldClient as $value) {
-            $result[] = [
-                'code' => $value->code,
-                'name' => $value->name,
-                'flag' => (int)$value->flag
-            ];
+        foreach ($params as $value) {
+            try {
+                ShowFieldClient::updateAll(['flag' => $value->flag], 'code= :code', [':code' => $value->code]);
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при обновлении флага отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+
+                return false;
+            }
         }
 
-        Yii::info('Список полей успешно получен', __METHOD__);
+        Yii::info('Список полей успешно изменен', __METHOD__);
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Список полей успешно получен',
-            'data' => $result
+            'msg' => 'Список полей успешно изменен'
         ];
     }
 }

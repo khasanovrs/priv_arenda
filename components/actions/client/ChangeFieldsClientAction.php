@@ -17,9 +17,9 @@ class ChangeFieldsClientAction extends Action
 
         $request = Yii::$app->request;
 
-        $name_org = $request->getBodyParam('name_org');
+        $params = $request->getBodyParam('data');
 
-        $result = ClientsClass::ChangeFields($name_org);
+        $result = ClientsClass::ChangeFields($params);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении списка отображаемых полей для таблицы "клиенты"', __METHOD__);
@@ -35,7 +35,7 @@ class ChangeFieldsClientAction extends Action
         return [
             'status' => 'OK',
             'msg' => 'Список полей успешно изменен',
-            'data' => $result['data']
+            'data' => []
         ];
     }
 }
