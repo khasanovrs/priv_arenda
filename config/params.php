@@ -13,7 +13,7 @@ return [
         'api/get-source',
         'api/search-client',
         'api/get-branch',
-        'api/update-status-ur-client',
+        'api/update-status-client',
         'api/get-roles',
         'api/get-rights',
         'api/get-discount',

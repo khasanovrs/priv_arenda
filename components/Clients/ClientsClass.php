@@ -701,15 +701,13 @@ class ClientsClass
     {
         Yii::info('Запуск функции GetClientUr', __METHOD__);
 
-        $client_ur = ClientUr::find();
-        $client_fiz = ClientFiz::find();
         $listUr = [];
         $listFiz = [];
         $params = [];
         $resultUr = [];
         $resultFiz = [];
 
-        if ($like !== '' and $source !== null) {
+        if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = '%' . $like . '%';
             $listUr[] = 'name_org like :like';
@@ -743,9 +741,9 @@ class ClientsClass
 
         if ($type === 'all' || $type === 'ur') {
             if (!empty($listUr)) {
-                $client_ur = $client_ur->with('clientUrInfos')->where(implode(" and ", $listUr), $params)->orderBy('last_contact desc')->all();
+                $client_ur = ClientUr::find()->with('clientUrInfos')->where(implode(" and ", $listUr), $params)->orderBy('last_contact desc')->all();
             } else {
-                $client_ur = $client_ur->with('clientUrInfos')->orderBy('last_contact desc')->all();
+                $client_ur = ClientUr::find()->with('clientUrInfos')->orderBy('last_contact desc')->all();
             }
 
             if (is_array($client_ur)) {
@@ -798,9 +796,9 @@ class ClientsClass
 
         if ($type === 'all' || $type === 'fiz') {
             if (!empty($listFiz)) {
-                $client_fiz = $client_fiz->with('clientFizInfos')->where(implode(" and ", $listFiz), $params)->orderBy('last_contact desc')->all();
+                $client_fiz = ClientFiz::find()->with('clientFizInfos')->where(implode(" and ", $listFiz), $params)->orderBy('last_contact desc')->all();
             } else {
-                $client_fiz = $client_fiz->with('clientFizInfos')->orderBy('last_contact desc')->all();
+                $client_fiz = ClientFiz::find()->with('clientFizInfos')->orderBy('last_contact desc')->all();
             }
 
             if (is_array($client_fiz)) {
