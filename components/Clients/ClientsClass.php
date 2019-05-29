@@ -397,6 +397,7 @@ class ClientsClass
      * @param $like
      * @param $source ,
      * @param $status ,
+     * @param $branch ,
      * @param $date_start ,
      * @param $date_end ,
      * @param $rentals_start ,
@@ -405,7 +406,7 @@ class ClientsClass
      * @param $dohod_end
      * @return bool|array
      */
-    public static function GetClient($type, $like, $source, $status, $date_start, $date_end, $rentals_start, $rentals_end, $dohod_start, $dohod_end)
+    public static function GetClient($type, $like, $source, $status, $branch, $date_start, $date_end, $rentals_start, $rentals_end, $dohod_start, $dohod_end)
     {
         Yii::info('Запуск функции GetClientUr', __METHOD__);
 

@@ -21,6 +21,7 @@ class GetUrClientAction extends Action
         $like = $request->getBodyParam('like');
         $source = $request->getBodyParam('source');
         $status = $request->getBodyParam('status');
+        $branch = $request->getBodyParam('branch');
         $date_start = $request->getBodyParam('date_start');
         $date_end = $request->getBodyParam('date_end');
         $rentals_start = $request->getBodyParam('rentals_start');
@@ -28,7 +29,7 @@ class GetUrClientAction extends Action
         $dohod_start = $request->getBodyParam('dohod_start');
         $dohod_end = $request->getBodyParam('dohod_end');
 
-        $resultChange = ClientsClass::GetClient($type, $like, $source, $status, $date_start, $date_end, $rentals_start, $rentals_end, $dohod_start, $dohod_end);
+        $resultChange = ClientsClass::GetClient($type, $like, $source, $status, $branch, $date_start, $date_end, $rentals_start, $rentals_end, $dohod_start, $dohod_end);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении клиентов', __METHOD__);
