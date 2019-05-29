@@ -426,10 +426,10 @@ class ClientsClass
             $params[':like'] = $like;
         }
 
-        if ($source !== '' and $source !== null) {
-            Yii::info('Параметр source: ' . serialize($source), __METHOD__);
-            $listFiz[] = $listUr[] = 'source=:source';
-            $params[':source'] = $source;
+        if ($branch !== '' and $branch !== null) {
+            Yii::info('Параметр branch: ' . serialize($branch), __METHOD__);
+            $listFiz[] = $listUr[] = 'branch_id=:branch';
+            $params[':branch'] = $branch;
         }
 
         if ($status !== '' and $status !== null) {
@@ -450,50 +450,42 @@ class ClientsClass
             $params[':date_end'] = $date_end . ' 23:59:59';
         }
 
-        if ($rentals_start !== '' and $rentals_start !== null) {
-            Yii::info('Параметр rentals_start: ' . serialize($rentals_start), __METHOD__);
-            $listFiz[] = $listUr[] = 'rentals>=:rentals_start';
-            $params[':rentals_start'] = $rentals_start;
-        }
-
-        if ($rentals_end !== '' and $rentals_end !== null) {
-            Yii::info('Параметр rentals_end: ' . serialize($rentals_end), __METHOD__);
-            $listFiz[] = $listUr[] = 'rentals<=:rentals_end';
-            $params[':rentals_end'] = $rentals_end;
-        }
-
-        if ($dohod_start !== '' and $dohod_start !== null) {
-            Yii::info('Параметр dohod_start: ' . serialize($dohod_start), __METHOD__);
-            $listFiz[] = $listUr[] = 'dohod>=:dohod_start';
-            $params[':dohod_start'] = $dohod_start;
-        }
-
-        if ($dohod_end !== '' and $dohod_end !== null) {
-            Yii::info('Параметр dohod_end: ' . serialize($dohod_end), __METHOD__);
-            $listFiz[] = $listUr[] = 'dohod<=:dohod_end';
-            $params[':dohod_end'] = $dohod_end;
-        }
-
         if ($type === 'all' || $type === 'ur') {
             if (!empty($listUr)) {
-                $client_ur = $client_ur->where(implode(" and ", $listUr), $params)->orderBy('last_contact desc')->all();
+                $client_ur = $client_ur->with('clientUrInfos')->where(implode(" and ", $listUr), $params)->orderBy('last_contact desc')->all();
             } else {
-                $client_ur = $client_ur->orderBy('last_contact desc')->all();
+                $client_ur = $client_ur->with('clientUrInfos')->orderBy('last_contact desc')->all();
             }
 
             if (is_array($client_ur)) {
-
                 /**
                  * @var ClientUr $value
                  */
                 foreach ($client_ur as $value) {
-                    /**
-                     * @var ClientUrInfo $client_info
-                     */
-                    $client_info = $value->clientUrInfos;
+                    $sourceBD = $value->clientUrInfos[0]->source0;
+                    $discount = $value->clientUrInfos[0]->sale0;
+                    $rentalsBD = $value->clientUrInfos[0]->rentals;
+                    $dohodBD = $value->clientUrInfos[0]->dohod;
 
-                    $source = $client_info[0]->source0;
-                    $discount = $client_info[0]->sale0;
+                    if ($source !== '' && $source !== null && $source !== $sourceBD) {
+                        continue;
+                    }
+
+                    if ($rentals_start !== '' && $rentals_start !== null && $rentals_start > $rentalsBD) {
+                        continue;
+                    }
+
+                    if ($rentals_end !== '' && $rentals_end !== null && $rentals_end < $rentalsBD) {
+                        continue;
+                    }
+
+                    if ($dohod_start !== '' && $dohod_start !== null && $dohod_start > $dohodBD) {
+                        continue;
+                    }
+
+                    if ($dohod_end !== '' && $dohod_end !== null && $dohod_end < $dohodBD) {
+                        continue;
+                    }
 
                     $resultUr[] = [
                         'id' => $value->id,
@@ -503,9 +495,9 @@ class ClientsClass
                         'status' => $value->status,
                         'date_create' => date('d.m.Y', strtotime($value->date_create)),
                         'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
-                        'source' => ['id' => $source->id, 'name' => $source->name],
-                        'rentals' => $client_info[0]->rentals,
-                        'dohod' => $client_info[0]->dohod,
+                        'source' => ['id' => $sourceBD->id, 'name' => $sourceBD->name],
+                        'rentals' => $rentalsBD,
+                        'dohod' => $dohodBD,
                         'sale' => ['code' => $discount->code, 'name' => $discount->name],
                         'type' => 'ur'
                     ];
@@ -515,9 +507,9 @@ class ClientsClass
 
         if ($type === 'all' || $type === 'fiz') {
             if (!empty($listFiz)) {
-                $client_fiz = $client_fiz->where(implode(" and ", $listFiz), $params)->orderBy('last_contact desc')->all();
+                $client_fiz = $client_fiz->with('clientFizInfos')->where(implode(" and ", $listFiz), $params)->orderBy('last_contact desc')->all();
             } else {
-                $client_fiz = $client_fiz->orderBy('last_contact desc')->all();
+                $client_fiz = $client_fiz->with('clientFizInfos')->orderBy('last_contact desc')->all();
             }
 
             if (is_array($client_fiz)) {
@@ -525,13 +517,30 @@ class ClientsClass
                  * @var ClientFiz $value
                  */
                 foreach ($client_fiz as $value) {
-                    /**
-                     * @var ClientFizInfo $client_info
-                     */
-                    $client_info = $value->clientFizInfos;
+                    $sourceBD = $value->clientFizInfos[0]->source0;
+                    $discount = $value->clientFizInfos[0]->sale0;
+                    $rentalsBD = $value->clientFizInfos[0]->rentals;
+                    $dohodBD = $value->clientFizInfos[0]->dohod;
 
-                    $source = $client_info[0]->source0;
-                    $discount = $client_info[0]->sale0;
+                    if ($source !== '' && $source !== null && $source !== $sourceBD) {
+                        continue;
+                    }
+
+                    if ($rentals_start !== '' && $rentals_start !== null && $rentals_start > $rentalsBD) {
+                        continue;
+                    }
+
+                    if ($rentals_end !== '' && $rentals_end !== null && $rentals_end < $rentalsBD) {
+                        continue;
+                    }
+
+                    if ($dohod_start !== '' && $dohod_start !== null && $dohod_start > $dohodBD) {
+                        continue;
+                    }
+
+                    if ($dohod_end !== '' && $dohod_end !== null && $dohod_end < $dohodBD) {
+                        continue;
+                    }
 
                     $resultFiz[] = [
                         'id' => $value->id,
@@ -540,9 +549,9 @@ class ClientsClass
                         'status' => $value->status,
                         'date_create' => date('d.m.Y', strtotime($value->date_create)),
                         'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
-                        'source' => ['id' => $source->id, 'name' => $source->name],
-                        'rentals' => $client_info[0]->rentals,
-                        'dohod' => $client_info[0]->dohod,
+                        'source' => ['id' => $sourceBD->id, 'name' => $sourceBD->name],
+                        'rentals' => $rentalsBD,
+                        'dohod' => $dohodBD,
                         'sale' => ['code' => $discount->code, 'name' => $discount->name],
                         'type' => 'fiz'
                     ];
