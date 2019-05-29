@@ -413,9 +413,7 @@ class ClientsClass
         $client_fiz = ClientFiz::find();
         $listUr = [];
         $listFiz = [];
-
         $params = [];
-
         $resultUr = [];
         $resultFiz = [];
 
@@ -483,12 +481,18 @@ class ClientsClass
             }
 
             if (is_array($client_ur)) {
+
                 /**
                  * @var ClientUr $value
                  */
                 foreach ($client_ur as $value) {
-                    $source = $value->source0;
-                    $discount = $value->sale0;
+                    /**
+                     * @var ClientUrInfo $client_info
+                     */
+                    $client_info = $value->clientUrInfos;
+
+                    $source = $client_info[0]->source0;
+                    $discount = $client_info[0]->sale0;
 
                     $resultUr[] = [
                         'id' => $value->id,
@@ -499,8 +503,8 @@ class ClientsClass
                         'date_create' => date('d.m.Y', strtotime($value->date_create)),
                         'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
                         'source' => ['id' => $source->id, 'name' => $source->name],
-                        'rentals' => $value->rentals,
-                        'dohod' => $value->dohod,
+                        'rentals' => $client_info[0]->rentals,
+                        'dohod' => $client_info[0]->dohod,
                         'sale' => ['code' => $discount->code, 'name' => $discount->name],
                         'type' => 'ur'
                     ];
@@ -520,21 +524,24 @@ class ClientsClass
                  * @var ClientFiz $value
                  */
                 foreach ($client_fiz as $value) {
-                    $source = $value->source0;
-                    $discount = $value->sale0;
-                    $org = $value->org_id ? $value->org->name_org : '';
+                    /**
+                     * @var ClientFizInfo $client_info
+                     */
+                    $client_info = $value->clientFizInfos;
+
+                    $source = $client_info[0]->source0;
+                    $discount = $client_info[0]->sale0;
 
                     $resultFiz[] = [
                         'id' => $value->id,
                         'fio' => $value->fio,
-                        'org' => $org,
                         'phone' => $value->phone,
                         'status' => $value->status,
                         'date_create' => date('d.m.Y', strtotime($value->date_create)),
                         'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
                         'source' => ['id' => $source->id, 'name' => $source->name],
-                        'rentals' => $value->rentals,
-                        'dohod' => $value->dohod,
+                        'rentals' => $client_info[0]->rentals,
+                        'dohod' => $client_info[0]->dohod,
                         'sale' => ['code' => $discount->code, 'name' => $discount->name],
                         'type' => 'fiz'
                     ];
