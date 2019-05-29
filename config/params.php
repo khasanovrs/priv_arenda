@@ -14,13 +14,15 @@ return [
         'api/search-client',
         'api/get-branch',
         'api/update-status-ur-client',
-        'api/get-users',
         'api/get-roles',
         'api/get-rights',
+        'api/get-discount',
+        'api/get-users',
         'api/add-users',
         'api/get-client-fields',
+        'api/add-client',
+        'api/get-client-info',
         'api/change-client-fields',
-        'api/get-discount',
-        'api/add-client'
+        'api/update-client-info'
     ],
 ];

@@ -57,6 +57,12 @@ class ApiController extends Controller
             'add-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',
             ],
+            'get-client-info' => [
+                'class' => 'app\components\actions\client\GetClientInfoAction',
+            ],
+            'update-client-info' => [
+                'class' => 'app\components\actions\client\UpdateClientInfoAction',
+            ],
             'get-client-fields' => [
                 'class' => 'app\components\actions\client\GetFieldsClientAction',
             ],
