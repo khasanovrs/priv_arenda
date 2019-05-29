@@ -10,18 +10,14 @@ use Yii;
  * @property int $id
  * @property string $fio
  * @property string $phone
- * @property int $org_id
  * @property int $status
+ * @property int $branch_id
  * @property string $last_contact последний контакт
- * @property int $source источник
- * @property int $rentals прокаты
- * @property int $dohod доход
- * @property int $sale скидки
  * @property string $date_create дата создания записи
  *
- * @property ClientUr $org
- * @property ClientSource $source0
+ * @property Branch $branch
  * @property ClientStatus $status0
+ * @property ClientFizInfo[] $clientFizInfos
  */
 class ClientFiz extends \yii\db\ActiveRecord
 {
@@ -39,13 +35,12 @@ class ClientFiz extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fio', 'phone', 'status', 'last_contact', 'source', 'rentals', 'dohod', 'sale', 'date_create'], 'required'],
-            [['org_id', 'status', 'source', 'rentals', 'dohod', 'sale'], 'integer'],
+            [['fio', 'phone', 'status', 'last_contact', 'date_create'], 'required'],
+            [['status', 'branch_id'], 'integer'],
             [['last_contact', 'date_create'], 'safe'],
             [['fio'], 'string', 'max' => 150],
             [['phone'], 'string', 'max' => 11],
-            [['org_id'], 'exist', 'skipOnError' => true, 'targetClass' => ClientUr::className(), 'targetAttribute' => ['org_id' => 'id']],
-            [['source'], 'exist', 'skipOnError' => true, 'targetClass' => ClientSource::className(), 'targetAttribute' => ['source' => 'id']],
+            [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => ClientStatus::className(), 'targetAttribute' => ['status' => 'id']],
         ];
     }
@@ -59,13 +54,9 @@ class ClientFiz extends \yii\db\ActiveRecord
             'id' => 'ID',
             'fio' => 'Fio',
             'phone' => 'Phone',
-            'org_id' => 'Org ID',
             'status' => 'Status',
+            'branch_id' => 'Branch ID',
             'last_contact' => 'Last Contact',
-            'source' => 'Source',
-            'rentals' => 'Rentals',
-            'dohod' => 'Dohod',
-            'sale' => 'Sale',
             'date_create' => 'Date Create',
         ];
     }
@@ -73,17 +64,9 @@ class ClientFiz extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrg()
+    public function getBranch()
     {
-        return $this->hasOne(ClientUr::className(), ['id' => 'org_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSource0()
-    {
-        return $this->hasOne(ClientSource::className(), ['id' => 'source']);
+        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
     }
 
     /**
@@ -92,5 +75,13 @@ class ClientFiz extends \yii\db\ActiveRecord
     public function getStatus0()
     {
         return $this->hasOne(ClientStatus::className(), ['id' => 'status']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientFizInfos()
+    {
+        return $this->hasMany(ClientFizInfo::className(), ['client_id' => 'id']);
     }
 }

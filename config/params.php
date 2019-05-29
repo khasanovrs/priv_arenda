@@ -8,7 +8,6 @@ return [
     // запросы у которых не проверяется сессия
     'openMethods' => [
         'api/auth',
-
         'api/get-client',
         'api/get-status',
         'api/get-source',
@@ -20,6 +19,8 @@ return [
         'api/get-rights',
         'api/add-users',
         'api/get-client-fields',
-        'api/change-client-fields'
+        'api/change-client-fields',
+        'api/get-discount',
+        'api/add-client'
     ],
 ];

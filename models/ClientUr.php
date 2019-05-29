@@ -9,17 +9,16 @@ use Yii;
  *
  * @property int $id
  * @property string $name_org
- * @property int $phone
+ * @property string $phone
  * @property int $status
+ * @property int $branch_id
  * @property string $last_contact последний контакт
- * @property int $source источник
- * @property int $rentals прокаты
- * @property int $dohod доход
- * @property int $sale скидки
  * @property string $date_create дата создания записи
  *
- * @property ClientSource $source0
+ * @property ClientFiz[] $clientFizs
+ * @property Branch $branch
  * @property ClientStatus $status0
+ * @property ClientUrInfo[] $clientUrInfos
  */
 class ClientUr extends \yii\db\ActiveRecord
 {
@@ -37,10 +36,11 @@ class ClientUr extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['phone', 'status', 'source', 'rentals', 'dohod', 'sale'], 'integer'],
+            [['status', 'branch_id'], 'integer'],
             [['last_contact', 'date_create'], 'safe'],
             [['name_org'], 'string', 'max' => 150],
-            [['source'], 'exist', 'skipOnError' => true, 'targetClass' => ClientSource::className(), 'targetAttribute' => ['source' => 'id']],
+            [['phone'], 'string', 'max' => 11],
+            [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => ClientStatus::className(), 'targetAttribute' => ['status' => 'id']],
         ];
     }
@@ -55,11 +55,8 @@ class ClientUr extends \yii\db\ActiveRecord
             'name_org' => 'Name Org',
             'phone' => 'Phone',
             'status' => 'Status',
+            'branch_id' => 'Branch ID',
             'last_contact' => 'Last Contact',
-            'source' => 'Source',
-            'rentals' => 'Rentals',
-            'dohod' => 'Dohod',
-            'sale' => 'Sale',
             'date_create' => 'Date Create',
         ];
     }
@@ -67,9 +64,17 @@ class ClientUr extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSource0()
+    public function getClientFizs()
     {
-        return $this->hasOne(ClientSource::className(), ['id' => 'source']);
+        return $this->hasMany(ClientFiz::className(), ['org_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBranch()
+    {
+        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
     }
 
     /**
@@ -78,5 +83,13 @@ class ClientUr extends \yii\db\ActiveRecord
     public function getStatus0()
     {
         return $this->hasOne(ClientStatus::className(), ['id' => 'status']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientUrInfos()
+    {
+        return $this->hasMany(ClientUrInfo::className(), ['client_id' => 'id']);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Добавление клиента юр.лица
+ * Добавление клиента
  */
 
 namespace app\components\actions\client;
@@ -17,19 +17,27 @@ class AddUrClientAction extends Action
 
         $request = Yii::$app->request;
 
-        $name_org = $request->getBodyParam('name_org');
-        $phone = $request->getBodyParam('phone');
-        $status = $request->getBodyParam('status');
-        $last_contact = $request->getBodyParam('last_contact');
-        $source = $request->getBodyParam('source');
-        $rentals = $request->getBodyParam('rentals');
-        $dohod = $request->getBodyParam('dohod');
         $sale = $request->getBodyParam('sale');
+        $branch = $request->getBodyParam('branch');
+        $status = $request->getBodyParam('status');
+        $source = $request->getBodyParam('source');
+        $name = $request->getBodyParam('name');
+        $inn = $request->getBodyParam('inn');
+        $occupation = $request->getBodyParam('occupation');
+        $address = $request->getBodyParam('address');
+        $ogrn = $request->getBodyParam('ogrn');
+        $bic = $request->getBodyParam('bic');
+        $kpp = $request->getBodyParam('kpp');
+        $schet = $request->getBodyParam('schet');
+        $name_chief = $request->getBodyParam('name_chief');
+        $phone_chief = $request->getBodyParam('phone_chief');
+        $phone = $request->getBodyParam('phone');
+        $phone_2 = $request->getBodyParam('phone_2');
 
-        $resultChange = ClientsClass::AddClientUr($name_org, $phone, $status, $last_contact, $source, $rentals, $dohod, $sale);
+        $resultChange = ClientsClass::AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при добавлении нового пользователя', __METHOD__);
+            Yii::error('Ошибка при добавлении нового клиента', __METHOD__);
 
             if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
                 return $resultChange;
@@ -37,14 +45,14 @@ class AddUrClientAction extends Action
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при добавлении нового пользователя',
+                'msg' => 'Ошибка при добавлении нового клинета',
             ];
         }
 
         Yii::info('Клиент успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Клиент успешно добавлен',
         ];
     }

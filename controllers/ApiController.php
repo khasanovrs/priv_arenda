@@ -54,7 +54,7 @@ class ApiController extends Controller
             'get-client' => [
                 'class' => 'app\components\actions\client\GetUrClientAction',
             ],
-            'add-ur-client' => [
+            'add-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',
             ],
             'get-client-fields' => [
@@ -125,6 +125,9 @@ class ApiController extends Controller
             ],
             'get-rights' => [
                 'class' => 'app\components\actions\params\GetRightsAction',
+            ],
+            'get-discount' => [
+                'class' => 'app\components\actions\params\GetDiscountAction',
             ],
         ];
     }

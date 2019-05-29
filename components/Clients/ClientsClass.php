@@ -5,10 +5,14 @@
 
 namespace app\components\Clients;
 
+use app\models\Branch;
 use app\models\ClientFiz;
+use app\models\ClientFizInfo;
 use app\models\ClientSource;
 use app\models\ClientStatus;
 use app\models\ClientUr;
+use app\models\ClientUrInfo;
+use app\models\Discount;
 use app\models\ShowFieldClient;
 use Yii;
 
@@ -16,101 +20,99 @@ class ClientsClass
 {
 
     /**
-     * Добавление нового юр. клиента
-     * @param $name_org ,
-     * @param $phone ,
-     * @param $status ,
-     * @param $last_contact ,
-     * @param $source ,
-     * @param $rentals ,
-     * @param $dohod ,
+     * Добавление нового клиента
      * @param $sale ,
+     * @param $branch ,
+     * @param $status ,
+     * @param $source ,
+     * @param $name ,
+     * @param $inn ,
+     * @param $occupation ,
+     * @param $address ,
+     * @param $ogrn ,
+     * @param $bic ,
+     * @param $kpp ,
+     * @param $schet ,
+     * @param $name_chief ,
+     * @param $phone_chief ,
+     * @param $phone ,
      * @return bool|array
      */
-    public static function AddClientUr($name_org, $phone, $status, $last_contact, $source, $rentals, $dohod, $sale)
+    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2)
     {
-        Yii::info('Запуск функции добавления юридического клиента', __METHOD__);
+        Yii::info('Запуск функции добавления глвлшл клиента', __METHOD__);
 
-        if ($name_org === '') {
-            Yii::error('Ни передано наименование организации, name_org: ' . serialize($name_org), __METHOD__);
+        if ($sale === '') {
+            Yii::error('Ни передано значение скидки, sale: ' . serialize($sale), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передано наименование организации',
+                'msg' => 'Не передано значение скидки',
             ];
         }
 
-        if ($phone === '' || strlen($phone) !== 11) {
-            Yii::error('Ошибка при проверке номера телефона, phone: ' . serialize($phone), __METHOD__);
+        if ($branch === '') {
+            Yii::error('Ни передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при проверке номера телефона'
-            ];
-        }
-
-        if ($last_contact === '') {
-            Yii::error('Ни передано дата последнего контакта, last_contact: ' . serialize($last_contact), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ни передано дата последнего контакта',
+                'msg' => 'Не передан идентификатор филиала'
             ];
         }
 
         if ($status === '') {
-            Yii::error('Передан некорректный статус, status: ' . serialize($status), __METHOD__);
+            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
+                'msg' => 'Не передан идентификатор статуса',
             ];
         }
 
         if ($source === '') {
-            Yii::error('Ни передан источник, source: ' . serialize($source), __METHOD__);
+            Yii::error('Ни передан идентификатор источника, source: ' . serialize($source), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан источник',
+                'msg' => 'Не передан идентификатор источника',
             ];
         }
 
-        if ($rentals === '') {
-            Yii::error('Ни передано количество прокатов, rentals: ' . serialize($rentals), __METHOD__);
+        if ($phone_chief === '' && $phone === '' && $phone_2 === '') {
+            Yii::error('Ни передан номер телефона', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передано количество прокатов',
+                'msg' => 'Ни передан номер телефона',
+            ];
+        } else if (($phone_chief !== '' && strlen($phone_chief) !== 11) || ($phone !== '' && strlen($phone) !== 11) || ($phone_2 !== '' && strlen($phone_2) !== 11)) {
+            Yii::error('Указан некорректный номер телефона', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Указан некорректный номер телефона',
             ];
         }
 
-        if ($dohod === '') {
-            Yii::error('Ни передан доход, dohod: ' . serialize($dohod), __METHOD__);
+        $check_branch = Branch::find()->where('id=:id', [':id' => $branch])->one();
+
+        if (!is_object($check_branch)) {
+            Yii::error('Передан некорректный идентификатор филиала, branch:' . serialize($branch), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан доход',
+                'msg' => 'Передан некорректный идентификатор филиала',
             ];
         }
 
-        if ($sale === '') {
-            Yii::error('Ни передана скида, sale: ' . serialize($sale), __METHOD__);
+        $check_discount = Discount::find()->where('id=:id', [':id' => $sale])->one();
+
+        if (!is_object($check_discount)) {
+            Yii::error('Передан некорректный идентификатор скидки, sale:' . serialize($sale), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передана скида',
-            ];
-        }
-
-        $check_source = ClientSource::find()->where('id=:id', [':id' => $source])->one();
-
-        if (!is_object($check_source)) {
-            Yii::error('Передан некорректный источник, source:' . serialize($source), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Указанный источник не существует',
+                'msg' => 'Передан некорректный идентификатор скидки',
             ];
         }
 
@@ -125,32 +127,177 @@ class ClientsClass
             ];
         }
 
-        $client_ur = new ClientUr();
-        $client_ur->name_org = $name_org;
-        $client_ur->phone = $phone;
-        $client_ur->status = $status;
-        $client_ur->last_contact = $last_contact;
-        $client_ur->source = $source;
-        $client_ur->rentals = $rentals;
-        $client_ur->dohod = $dohod;
-        $client_ur->sale = $sale;
-        $client_ur->date_create = date('Y-m-d H:i:s');
+        $check_source = ClientSource::find()->where('id=:id', [':id' => $source])->one();
 
-        try {
-            if (!$client_ur->save(false)) {
-                Yii::error('Ошибка при добавлении юр. клиента: ' . serialize($client_ur->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при добавлении юр. клиента: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
+        if (!is_object($check_source)) {
+            Yii::error('Передан некорректный исчтоник, :' . serialize($source), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный исчтоник',
+            ];
         }
 
-        Yii::info('Юр. клиент успешно добавлен', __METHOD__);
+        Yii::info('Добавляем нового клиента', __METHOD__);
+
+        if ($name !== '') {
+            Yii::info('Заводим клиента как юр. лицо', __METHOD__);
+
+            $check_phone = ClientUr::find()->where('phone=:phone', [':phone' => $phone])->one();
+
+            if (is_object($check_phone)) {
+                Yii::error('Клиент с данным номер телефона уже зарегестрирован, phone:' . serialize($phone), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Клиент с данным номер телефона уже зарегестрирован',
+                ];
+            }
+
+            $newClientUr = new ClientUr();
+            $newClientUr->name_org = $name;
+            $newClientUr->phone = $phone;
+            $newClientUr->status = $status;
+            $newClientUr->branch_id = $branch;
+            $newClientUr->last_contact = date('Y-m-d H:i:s');
+            $newClientUr->date_create = date('Y-m-d H:i:s');
+
+            try {
+                if (!$newClientUr->save(false)) {
+                    Yii::error('Ошибка при добавлении юр. клиента: ' . serialize($newClientUr->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении юр. клиента: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
+            /**
+             * @var ClientUr $client
+             */
+            $client = ClientUr::find()->where('phone=:phone', [':phone' => $phone])->one();
+
+            if (!is_object($client)) {
+                Yii::error('Клиент с данным номер телефона ни найден, phone:' . serialize($phone), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при сохранени нового клиента',
+                ];
+            }
+
+            $newClientUrInfo = new ClientUrInfo();
+            $newClientUrInfo->client_id = $client->id;
+            $newClientUrInfo->source = $source;
+            $newClientUrInfo->rentals = 0;
+            $newClientUrInfo->dohod = 0;
+            $newClientUrInfo->sale = $sale;
+            $newClientUrInfo->address = $address;
+            $newClientUrInfo->name_org = $name;
+            $newClientUrInfo->inn = $inn;
+            $newClientUrInfo->occupation = $occupation;
+            $newClientUrInfo->ogrn = $ogrn;
+            $newClientUrInfo->bic = $bic;
+            $newClientUrInfo->kpp = $kpp;
+            $newClientUrInfo->schet = $schet;
+            $newClientUrInfo->name_chief = $name_chief;
+            $newClientUrInfo->phone_chief = $phone_chief;
+            $newClientUrInfo->phone_second = $phone_2;
+            $newClientUrInfo->date_create = date('Y-m-d H:i:s');
+            $newClientUrInfo->date_update = date('Y-m-d H:i:s');
+
+            try {
+                if (!$newClientUrInfo->save(false)) {
+                    Yii::error('Ошибка при добавлении дополнительной информации о юр. клиенте: ' . serialize($newClientUrInfo->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении дополнительной информации о юр. клиенте: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
+        } else {
+            if ($name_chief === '') {
+                Yii::error('Необхродимо указать наименование организации или фио', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Необхродимо указать "наименование организации" или "фио клиента"',
+                ];
+            }
+
+            Yii::info('Заводим клиента как физ. лицо', __METHOD__);
+
+            $check_phone = ClientFiz::find()->where('phone=:phone', [':phone' => $phone])->one();
+
+            if (is_object($check_phone)) {
+                Yii::error('Клиент с данным номер телефона уже зарегестрирован, phone:' . serialize($phone), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Клиент с данным номер телефона уже зарегестрирован',
+                ];
+            }
+
+            $newClientFiz = new ClientFiz();
+            $newClientFiz->fio = $name_chief;
+            $newClientFiz->phone = $phone;
+            $newClientFiz->status = $status;
+            $newClientFiz->branch_id = $branch;
+            $newClientFiz->last_contact = date('Y-m-d H:i:s');
+            $newClientFiz->date_create = date('Y-m-d H:i:s');
+
+            try {
+                if (!$newClientFiz->save(false)) {
+                    Yii::error('Ошибка при добавлении физ. клиента: ' . serialize($newClientFiz->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении физ. клиента: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
+            /**
+             * @var ClientFiz $client
+             */
+            $client = ClientFiz::find()->where('phone=:phone', [':phone' => $phone])->one();
+
+            if (!is_object($client)) {
+                Yii::error('Клиент с данным номер телефона ни найден, phone:' . serialize($phone), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при сохранени нового клиента',
+                ];
+            }
+
+            $newClientFizInfo = new ClientFizInfo();
+            $newClientFizInfo->client_id = $client->id;
+            $newClientFizInfo->source = $source;
+            $newClientFizInfo->rentals = 0;
+            $newClientFizInfo->dohod = 0;
+            $newClientFizInfo->sale = $sale;
+            $newClientFizInfo->phone_chief = $phone_chief;
+            $newClientFizInfo->phone_second = $phone_2;
+            $newClientFizInfo->date_create = date('Y-m-d H:i:s');
+            $newClientFizInfo->date_update = date('Y-m-d H:i:s');
+
+            try {
+                if (!$newClientFizInfo->save(false)) {
+                    Yii::error('Ошибка при добавлении дополнительной информации о физ. клиенте: ' . serialize($newClientFizInfo->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении дополнительной информации о физ. клиенте: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+        }
+
+        Yii::info('Клиент успешно добавлен', __METHOD__);
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Юр. клиент успешно добавлен'
+            'msg' => 'Клиент успешно добавлен'
         ];
     }
 
@@ -341,6 +488,7 @@ class ClientsClass
                  */
                 foreach ($client_ur as $value) {
                     $source = $value->source0;
+                    $discount = $value->sale0;
 
                     $resultUr[] = [
                         'id' => $value->id,
@@ -353,7 +501,7 @@ class ClientsClass
                         'source' => ['id' => $source->id, 'name' => $source->name],
                         'rentals' => $value->rentals,
                         'dohod' => $value->dohod,
-                        'sale' => $value->sale,
+                        'sale' => ['code' => $discount->code, 'name' => $discount->name],
                         'type' => 'ur'
                     ];
                 }
@@ -373,6 +521,7 @@ class ClientsClass
                  */
                 foreach ($client_fiz as $value) {
                     $source = $value->source0;
+                    $discount = $value->sale0;
                     $org = $value->org_id ? $value->org->name_org : '';
 
                     $resultFiz[] = [
@@ -386,7 +535,7 @@ class ClientsClass
                         'source' => ['id' => $source->id, 'name' => $source->name],
                         'rentals' => $value->rentals,
                         'dohod' => $value->dohod,
-                        'sale' => $value->sale,
+                        'sale' => ['code' => $discount->code, 'name' => $discount->name],
                         'type' => 'fiz'
                     ];
                 }
@@ -506,7 +655,7 @@ class ClientsClass
      */
     public static function ChangeFields($params)
     {
-        Yii::info('Запуск функции ChangeFields'.serialize($params), __METHOD__);
+        Yii::info('Запуск функции ChangeFields' . serialize($params), __METHOD__);
 
         if (!is_array($params) || empty($params)) {
             Yii::error('Не пришли параметры для изменения', __METHOD__);
