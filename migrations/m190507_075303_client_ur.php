@@ -12,30 +12,21 @@ class m190507_075303_client_ur extends Migration
      */
     public function safeUp()
     {
-        $this->execute("CREATE TABLE `client_ur` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `name_org` VARCHAR(150) NULL,
-  `phone` INT(11) NULL,
-  `status` INT(11) NULL,
-  `last_contact` DATETIME NULL DEFAULT NULL COMMENT 'последний контакт',
-  `source` INT(11) NULL COMMENT 'источник',
-  `rentals` INT(11) NULL COMMENT 'прокаты',
-  `dohod` INT(100) NULL COMMENT 'доход',
-  `sale` INT(11) NULL COMMENT 'скидки',
-  `date_create` DATETIME NULL DEFAULT NULL COMMENT 'дата создания записи',
-  INDEX `fk_client_ur_1_idx` (`source` ASC),
-  INDEX `fk_client_ur_2_idx` (`status` ASC),
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_client_ur_1`
-    FOREIGN KEY (`source`)
-    REFERENCES `client_source` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_client_ur_2`
-    FOREIGN KEY (`status`)
-    REFERENCES `client_status` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+        $this->execute("CREATE TABLE `clients` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` varchar(150) CHARACTER SET utf8 NOT NULL,
+            `type` int(5) NOT NULL DEFAULT '1' COMMENT 'тип клиента,1-физ. лицо, 2-юр. лицо',
+            `phone` varchar(11) CHARACTER SET utf8 NOT NULL,
+            `status` int(11) NOT NULL,
+            `branch_id` int(11) NOT NULL,
+            `last_contact` datetime DEFAULT NULL COMMENT 'последний контакт',
+            `date_create` datetime DEFAULT NULL COMMENT 'дата создания записи',
+            PRIMARY KEY (`id`),
+            KEY `fk_clients_1_idx` (`branch_id`),
+            KEY `fk_clients_2_idx` (`status`),
+            CONSTRAINT `fk_clients_1` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+            CONSTRAINT `fk_clients_2` FOREIGN KEY (`status`) REFERENCES `client_status` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
     }
 

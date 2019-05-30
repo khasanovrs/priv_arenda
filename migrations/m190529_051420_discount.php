@@ -13,10 +13,11 @@ class m190529_051420_discount extends Migration
     public function safeUp()
     {
         $this->execute("CREATE TABLE `discount` (
-          `id` INT(11) NOT NULL AUTO_INCREMENT,
-          `code` VARCHAR(45) NULL,
-          `name` VARCHAR(45) NULL,
-          PRIMARY KEY (`id`));
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `code` varchar(45) CHARACTER SET utf8 NOT NULL,
+            `name` varchar(45) CHARACTER SET utf8 NOT NULL,
+            PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
     }
 
