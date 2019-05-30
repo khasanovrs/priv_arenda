@@ -35,9 +35,10 @@ class ClientsClass
      * @param $name_chief ,
      * @param $phone_chief ,
      * @param $phone ,
+     * @param $email ,
      * @return bool|array
      */
-    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2)
+    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -90,6 +91,15 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Указан некорректный номер телефона',
+            ];
+        }
+
+        if ($email != '' && !preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", $email)) {
+            Yii::error('Передан некорректный email, email:' . serialize($email), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный email',
             ];
         }
 
@@ -187,6 +197,7 @@ class ClientsClass
 
             $newClientUrInfo = new ClientUrInfo();
             $newClientUrInfo->client_id = $client->id;
+            $newClientUrInfo->email = $email;
             $newClientUrInfo->source = $source;
             $newClientUrInfo->rentals = 0;
             $newClientUrInfo->dohod = 0;
@@ -272,6 +283,7 @@ class ClientsClass
 
             $newClientFizInfo = new ClientFizInfo();
             $newClientFizInfo->client_id = $client->id;
+            $newClientFizInfo->email = $email;
             $newClientFizInfo->source = $source;
             $newClientFizInfo->rentals = 0;
             $newClientFizInfo->dohod = 0;
@@ -319,9 +331,10 @@ class ClientsClass
      * @param $name_chief ,
      * @param $phone_chief ,
      * @param $phone ,
+     * @param $email ,
      * @return bool|array
      */
-    public static function UpdateClientInfo($clientId, $clientType, $sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2)
+    public static function UpdateClientInfo($clientId, $clientType, $sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email)
     {
         Yii::info('Запуск функции изменений детальной информации клиента', __METHOD__);
 
@@ -392,6 +405,15 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Указан некорректный номер телефона',
+            ];
+        }
+
+        if ($email != '' && !preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", $email)) {
+            Yii::error('Передан некорректный email, email:' . serialize($email), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный email',
             ];
         }
 
@@ -489,6 +511,7 @@ class ClientsClass
 
             $newClientUrInfo->source = $source;
             $newClientUrInfo->sale = $sale;
+            $newClientUrInfo->email = $email;
             $newClientUrInfo->address = $address;
             $newClientUrInfo->name_org = $name;
             $newClientUrInfo->inn = $inn;
@@ -569,6 +592,7 @@ class ClientsClass
 
             $newClientFizInfo->source = $source;
             $newClientFizInfo->sale = $sale;
+            $newClientFizInfo->email = $email;
             $newClientFizInfo->phone_chief = $phone_chief;
             $newClientFizInfo->phone_second = $phone_2;
             $newClientFizInfo->date_update = date('Y-m-d H:i:s');
@@ -991,6 +1015,7 @@ class ClientsClass
                 'source' => $sourceBD->id,
                 'org' => $client_ur->name_org,
                 'inn' => $client_ur->clientUrInfos[0]->inn,
+                'email' => $client_ur->clientUrInfos[0]->email,
                 'occupation' => $client_ur->clientUrInfos[0]->occupation,
                 'address' => $client_ur->clientUrInfos[0]->address,
                 'ogrn' => $client_ur->clientUrInfos[0]->ogrn,
@@ -1038,6 +1063,7 @@ class ClientsClass
                 'kpp' => '',
                 'schet' => '',
                 'name_chief' => $client_fiz->fio,
+                'email' => $client_fiz->clientFizInfos[0]->email,
                 'phone_chief' => $client_fiz->clientFizInfos[0]->phone_chief,
                 'phone_2' => $client_fiz->clientFizInfos[0]->phone_second,
                 'phone' => $client_fiz->phone,

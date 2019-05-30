@@ -17,7 +17,7 @@ class m190507_125836_add_table_stock extends Migration
       `id_branch` int(11) DEFAULT NULL,
       `name` varchar(45) COLLATE utf8_bin DEFAULT NULL,
       `date_create` datetime DEFAULT NULL COMMENT 'дата создания записи',
-      `date_update` datetime DEFAULT NULL COMMENT 'тип роли',
+      `date_update` datetime DEFAULT NULL COMMENT 'дата обновления',
       PRIMARY KEY (`id`),
       KEY `fk_stock_1_idx` (`id_branch`),
       CONSTRAINT `fk_stock_1` FOREIGN KEY (`id_branch`) REFERENCES `branch` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION

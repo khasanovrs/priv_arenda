@@ -15,6 +15,7 @@ use Yii;
  * @property int $sale скидки
  * @property string $phone_chief
  * @property string $phone_second
+ * @property string $email
  * @property string $date_create дата создания записи
  * @property string $date_update дата создания записи
  *
@@ -40,7 +41,7 @@ class ClientFizInfo extends \yii\db\ActiveRecord
         return [
             [['client_id', 'source', 'rentals', 'dohod', 'sale'], 'integer'],
             [['date_create', 'date_update'], 'safe'],
-            [['phone_chief'], 'string', 'max' => 150],
+            [['phone_chief', 'email'], 'string', 'max' => 150],
             [['phone_second'], 'string', 'max' => 45],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => ClientFiz::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source'], 'exist', 'skipOnError' => true, 'targetClass' => ClientSource::className(), 'targetAttribute' => ['source' => 'id']],
@@ -62,6 +63,7 @@ class ClientFizInfo extends \yii\db\ActiveRecord
             'sale' => 'Sale',
             'phone_chief' => 'Phone Chief',
             'phone_second' => 'Phone Second',
+            'email' => 'Email',
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];

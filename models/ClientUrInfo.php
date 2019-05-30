@@ -24,6 +24,7 @@ use Yii;
  * @property string $name_chief
  * @property string $phone_chief
  * @property string $phone_second
+ * @property string $email
  * @property string $date_create дата создания записи
  * @property string $date_update дата создания записи
  *
@@ -52,7 +53,7 @@ class ClientUrInfo extends \yii\db\ActiveRecord
             [['address', 'ogrn', 'bic', 'kpp', 'schet', 'phone_second'], 'string', 'max' => 45],
             [['name_org', 'occupation'], 'string', 'max' => 450],
             [['inn'], 'string', 'max' => 20],
-            [['name_chief', 'phone_chief'], 'string', 'max' => 150],
+            [['name_chief', 'phone_chief', 'email'], 'string', 'max' => 150],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => ClientUr::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['sale'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['sale' => 'id']],
             [['source'], 'exist', 'skipOnError' => true, 'targetClass' => ClientSource::className(), 'targetAttribute' => ['source' => 'id']],
@@ -82,6 +83,7 @@ class ClientUrInfo extends \yii\db\ActiveRecord
             'name_chief' => 'Name Chief',
             'phone_chief' => 'Phone Chief',
             'phone_second' => 'Phone Second',
+            'email' => 'Email',
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];

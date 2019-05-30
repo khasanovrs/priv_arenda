@@ -35,8 +35,9 @@ class UpdateClientInfoAction extends Action
         $phone_chief = $request->getBodyParam('phone_chief');
         $phone = $request->getBodyParam('phone');
         $phone_2 = $request->getBodyParam('phone_2');
+        $email = $request->getBodyParam('email');
 
-        $resultChange = ClientsClass::UpdateClientInfo($clientId, $clientType, $sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2);;
+        $resultChange = ClientsClass::UpdateClientInfo($clientId, $clientType, $sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменения детальнной информации клиента', __METHOD__);
