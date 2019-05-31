@@ -18,9 +18,8 @@ class GetClientInfoAction extends Action
         $request = Yii::$app->request;
 
         $clientId = $request->getBodyParam('clientId');
-        $clientType = $request->getBodyParam('clientType');
 
-        $result = ClientsClass::GetDetailInfoClient($clientId, $clientType);
+        $result = ClientsClass::GetDetailInfoClient($clientId);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении детальной информации по клиенту', __METHOD__);
