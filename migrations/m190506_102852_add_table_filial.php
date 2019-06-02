@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m190507_083852_add_table_filial
+ * Class m190506_102852_add_table_filial
  */
-class m190507_083852_add_table_filial extends Migration
+class m190506_102852_add_table_filial extends Migration
 {
     /**
      * {@inheritdoc}

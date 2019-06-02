@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m190507_074603_client_status
+ * Class m190506_102303_client_status
  */
-class m190507_074603_client_status extends Migration
+class m190506_102303_client_status extends Migration
 {
     /**
      * {@inheritdoc}
