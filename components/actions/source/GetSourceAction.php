@@ -6,6 +6,7 @@
 namespace app\components\actions\source;
 
 
+use app\components\source\SourceClass;
 use Yii;
 use yii\base\Action;
 

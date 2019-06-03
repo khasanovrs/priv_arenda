@@ -5,48 +5,33 @@
 
 namespace app\components\actions\roles;
 
-use app\models\UsersRole;
+use app\components\userRoles\UserRolesClass;
 use Yii;
+use yii\base\Action;
 
-class GetRolesAction
+class GetRolesAction extends Action
 {
-    /**
-     * Получение ролей
-     * @return bool|array
-     */
-    public static function GetRoles()
+    public function run()
     {
-        Yii::info('Запуск функции GetRoles', __METHOD__);
-        $result = [];
+        Yii::info('Запуск функции получения ролей', __METHOD__);
 
-        $branchList = UsersRole::find()->all();
+        $resultChange = UserRolesClass::GetRoles();
 
-        if (!is_array($branchList)) {
-            Yii::error('Список ролей пуст', __METHOD__);
+        if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении ролей', __METHOD__);
 
             return [
-                'status' => 'SUCCESS',
-                'msg' => 'Список ролей пуст',
-                'data' => $result
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении ролей',
             ];
         }
 
-        /**
-         * @var UsersRole $value
-         */
-        foreach ($branchList as $value) {
-            $result[] = [
-                'val' => $value->id,
-                'name' => $value->name,
-            ];
-        }
-
-        Yii::info('Роли успешно получены', __METHOD__);
+        Yii::info('Список ролей успешно получен', __METHOD__);
 
         return [
-            'status' => 'SUCCESS',
-            'msg' => 'Роли успешно получены',
-            'data' => $result
+            'status' => 'OK',
+            'msg' => 'Список ролей успешно получен',
+            'data' => $resultChange['data']
         ];
     }
 }

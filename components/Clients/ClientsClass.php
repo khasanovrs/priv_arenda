@@ -673,6 +673,7 @@ class ClientsClass
          */
         foreach ($showFieldClient as $value) {
             $result[] = [
+                'id' => $value->id,
                 'code' => $value->code,
                 'name' => $value->name,
                 'flag' => (int)$value->flag

@@ -3,7 +3,7 @@
  * Управление парметрами
  */
 
-namespace app\components\actions\discount;
+namespace app\components\discount;
 
 use app\models\Discount;
 use Yii;

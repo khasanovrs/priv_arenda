@@ -5,8 +5,6 @@
 
 namespace app\components\Session;
 
-
-
 use Yii;
 use \yii\base\Component;
 use app\models\Session;

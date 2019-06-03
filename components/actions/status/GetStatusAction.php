@@ -6,7 +6,7 @@
 namespace app\components\actions\status;
 
 
-use app\components\Status\StatusClass;
+use app\components\status\StatusClass;
 use Yii;
 use yii\base\Action;
 

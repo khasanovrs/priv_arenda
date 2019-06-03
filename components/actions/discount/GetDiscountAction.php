@@ -5,6 +5,7 @@
 
 namespace app\components\actions\discount;
 
+use app\components\discount\DiscountClass;
 use Yii;
 use yii\base\Action;
 

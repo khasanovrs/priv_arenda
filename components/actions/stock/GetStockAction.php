@@ -5,7 +5,7 @@
 
 namespace app\components\actions\stock;
 
-use app\components\Stock\StockClass;
+use app\components\stock\StockClass;
 use Yii;
 use yii\base\Action;
 

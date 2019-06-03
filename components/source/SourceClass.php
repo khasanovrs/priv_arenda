@@ -3,7 +3,7 @@
  * Управление источниками
  */
 
-namespace app\components\actions\source;
+namespace app\components\source;
 
 use app\models\ClientSource;
 use Yii;

@@ -88,7 +88,7 @@ class ApiController extends Controller
              * Управление источниками
              */
             'get-source' => [
-                'class' => 'app\components\actions\params\GetSourceAction',
+                'class' => 'app\components\actions\source\GetSourceAction',
             ],
             /**
              * Управление складами
@@ -113,6 +113,24 @@ class ApiController extends Controller
              */
             'get-discount' => [
                 'class' => 'app\components\actions\discount\GetDiscountAction',
+            ],
+            /**
+             * Управление оборудованиями
+             */
+            'get-equipments-type' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentTypeAction',
+            ],
+            'get-equipments-category' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentCategoryAction',
+            ],
+            'get-equipments' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentAction',
+            ],
+            'get-equipments-fields' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentActionFields',
+            ],
+            'change-equipments-fields' => [
+                'class' => 'app\components\actions\equipments\ChangeEquipmentActionFields',
             ],
         ];
     }
