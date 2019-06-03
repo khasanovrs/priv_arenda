@@ -6,7 +6,7 @@
 namespace app\components\actions\branch;
 
 
-use app\components\Branch\BranchClass;
+use app\components\branch\BranchClass;
 use Yii;
 use yii\base\Action;
 

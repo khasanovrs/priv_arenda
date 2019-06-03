@@ -93,12 +93,6 @@ class ApiController extends Controller
             /**
              * Управление складами
              */
-            'add-stock' => [
-                'class' => 'app\components\actions\stock\AddStockAction',
-            ],
-            'delete-stock' => [
-                'class' => 'app\components\actions\stock\DeleteStockAction',
-            ],
             'get-stock' => [
                 'class' => 'app\components\actions\stock\GetStockAction',
             ],

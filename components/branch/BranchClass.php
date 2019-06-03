@@ -3,7 +3,7 @@
  * Управление филиалами
  */
 
-namespace app\components\Branch;
+namespace app\components\branch;
 
 use app\models\Branch;
 use Yii;

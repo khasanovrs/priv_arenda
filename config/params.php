@@ -23,6 +23,7 @@ return [
         'api/add-client',
         'api/get-client-info',
         'api/change-client-fields',
-        'api/update-client-info'
+        'api/update-client-info',
+        'api/get-stock'
     ],
 ];
