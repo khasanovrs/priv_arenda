@@ -111,6 +111,9 @@ class ApiController extends Controller
             'delete-stock' => [
                 'class' => 'app\components\actions\stock\DeleteStockAction',
             ],
+            'get-stock' => [
+                'class' => 'app\components\actions\stock\GetStockAction',
+            ],
             /**
              * Управление дополнительными параметрами
              */
