@@ -75,32 +75,20 @@ class ApiController extends Controller
             /**
              * Управление филиалами
              */
-            'add-branch' => [
-                'class' => 'app\components\actions\branch\AddBranchAction',
-            ],
-            'change-branch' => [
-                'class' => 'app\components\actions\branch\ChangeBranchAction',
-            ],
-            'delete-branch' => [
-                'class' => 'app\components\actions\branch\DeleteBranchAction',
+            'get-branch' => [
+                'class' => 'app\components\actions\branch\GetBranchAction',
             ],
             /**
-             * Управление статусами для юр.лиц
+             * Управление статусами для клиентов
              */
-            'add-ur-status' => [
-                'class' => 'app\components\actions\statusUr\AddUrStatusAction',
-            ],
-            'delete-ur-status' => [
-                'class' => 'app\components\actions\statusUr\DeleteUrStatusAction',
+            'get-status' => [
+                'class' => 'app\components\actions\status\GetStatusAction',
             ],
             /**
              * Управление источниками
              */
-            'add-ur-source' => [
-                'class' => 'app\components\actions\sourceUr\AddUrSourceAction',
-            ],
-            'delete-ur-source' => [
-                'class' => 'app\components\actions\sourceUr\DeleteUrSourceAction',
+            'get-source' => [
+                'class' => 'app\components\actions\params\GetSourceAction',
             ],
             /**
              * Управление складами
@@ -115,25 +103,22 @@ class ApiController extends Controller
                 'class' => 'app\components\actions\stock\GetStockAction',
             ],
             /**
-             * Управление дополнительными параметрами
+             * Управление ролями
              */
-            'get-status' => [
-                'class' => 'app\components\actions\params\GetStatusAction',
-            ],
-            'get-source' => [
-                'class' => 'app\components\actions\params\GetSourceAction',
-            ],
-            'get-branch' => [
-                'class' => 'app\components\actions\params\GetBranchAction',
-            ],
             'get-roles' => [
-                'class' => 'app\components\actions\params\GetRolesAction',
+                'class' => 'app\components\actions\roles\GetRolesAction',
             ],
+            /**
+             * Управление правами
+             */
             'get-rights' => [
-                'class' => 'app\components\actions\params\GetRightsAction',
+                'class' => 'app\components\actions\rights\GetRightsAction',
             ],
+            /**
+             * Управление скидками
+             */
             'get-discount' => [
-                'class' => 'app\components\actions\params\GetDiscountAction',
+                'class' => 'app\components\actions\discount\GetDiscountAction',
             ],
         ];
     }

@@ -3,10 +3,9 @@
  * Получение прав
  */
 
-namespace app\components\actions\params;
+namespace app\components\actions\rights;
 
-
-use app\components\params\ParamsClass;
+use app\components\userRights\UserRightsClass;
 use Yii;
 use yii\base\Action;
 
@@ -16,7 +15,7 @@ class GetRightsAction extends Action
     {
         Yii::info('Запуск функции получения прав', __METHOD__);
 
-        $resultChange = ParamsClass::GetRights();
+        $resultChange = UserRightsClass::GetRights();
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении прав', __METHOD__);

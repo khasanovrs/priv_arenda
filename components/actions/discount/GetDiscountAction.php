@@ -3,10 +3,8 @@
  * Получение скидок
  */
 
-namespace app\components\actions\params;
+namespace app\components\actions\discount;
 
-
-use app\components\params\ParamsClass;
 use Yii;
 use yii\base\Action;
 
@@ -16,7 +14,7 @@ class GetDiscountAction extends Action
     {
         Yii::info('Запуск функции получения списка скидок', __METHOD__);
 
-        $resultChange = ParamsClass::GetDiscount();
+        $resultChange = DiscountClass::GetDiscount();
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка скидок', __METHOD__);

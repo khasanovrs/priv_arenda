@@ -3,10 +3,10 @@
  * Получение статусов
  */
 
-namespace app\components\actions\params;
+namespace app\components\actions\status;
 
 
-use app\components\params\ParamsClass;
+use app\components\Status\StatusClass;
 use Yii;
 use yii\base\Action;
 
@@ -16,7 +16,7 @@ class GetStatusAction extends Action
     {
         Yii::info('Запуск функции получения статусов', __METHOD__);
 
-        $resultChange = ParamsClass::GetStatus();
+        $resultChange = StatusClass::GetStatus();
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении статусов', __METHOD__);

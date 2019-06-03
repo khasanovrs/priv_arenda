@@ -3,10 +3,10 @@
  * Получение филиалов
  */
 
-namespace app\components\actions\params;
+namespace app\components\actions\branch;
 
 
-use app\components\params\ParamsClass;
+use app\components\Branch\BranchClass;
 use Yii;
 use yii\base\Action;
 
@@ -16,7 +16,7 @@ class GetBranchAction extends Action
     {
         Yii::info('Запуск функции получения филиалов', __METHOD__);
 
-        $resultChange = ParamsClass::GetBranch();
+        $resultChange = BranchClass::GetBranch();
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении филиалов', __METHOD__);

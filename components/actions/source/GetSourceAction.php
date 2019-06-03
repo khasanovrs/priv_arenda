@@ -3,10 +3,9 @@
  * Получение источников
  */
 
-namespace app\components\actions\params;
+namespace app\components\actions\source;
 
 
-use app\components\params\ParamsClass;
 use Yii;
 use yii\base\Action;
 
@@ -16,7 +15,7 @@ class GetSourceAction extends Action
     {
         Yii::info('Запуск функции получения источников', __METHOD__);
 
-        $resultChange = ParamsClass::GetSource();
+        $resultChange = SourceClass::GetSource();
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении источников', __METHOD__);
