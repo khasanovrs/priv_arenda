@@ -181,7 +181,7 @@ class ApiController extends Controller
 
         Yii::info('Результат запроса: ' . serialize($session), 'EndRequest');
 
-        //$result['session_id'] = $session->session_id;
+        $result['session_id'] = $session->session_id;
 
         if (isset($result['data'])) {
             $result['data'] = json_encode($result['data']);

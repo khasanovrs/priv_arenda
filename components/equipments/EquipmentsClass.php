@@ -152,7 +152,7 @@ class EquipmentsClass
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public function GetEquipmentFields()
+    public static function GetEquipmentFields()
     {
         Yii::info('Запуск функции GetEquipmentFields', __METHOD__);
         $result = [];
