@@ -123,6 +123,9 @@ class ApiController extends Controller
             'get-equipments-category' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentCategoryAction',
             ],
+            'get-equipments-availability' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentAvailabilityAction',
+            ],
             'get-equipments' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentAction',
             ],

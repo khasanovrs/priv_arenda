@@ -7,6 +7,7 @@ namespace app\components\equipments;
 
 use app\components\Session\Sessions;
 use app\models\Equipments;
+use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
 use app\models\EquipmentsShowField;
@@ -89,6 +90,45 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список категорий оборудования получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение статусов оборудования
+     * @return bool|array
+     */
+    public static function GetEquipmentsAvailability()
+    {
+        Yii::info('Запуск функции GetEquipmentsAvailability', __METHOD__);
+        $result = [];
+
+        $equipmentsAvailabilityList = EquipmentsAvailability::find()->orderBy('id')->all();
+
+        if (!is_array($equipmentsAvailabilityList)) {
+            Yii::error('Список статусов оборудования пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список статусов оборудований пуст'
+            ];
+        }
+
+        /**
+         * @var EquipmentsAvailability $value
+         */
+        foreach ($equipmentsAvailabilityList as $value) {
+            $result[] = [
+                'val' => $value->id,
+                'name' => $value->name
+            ];
+        }
+
+        Yii::info('Список статусов оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список статусов оборудования получен',
             'data' => $result
         ];
     }
