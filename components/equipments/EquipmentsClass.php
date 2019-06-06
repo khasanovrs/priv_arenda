@@ -11,6 +11,7 @@ use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
 use app\models\EquipmentsShowField;
+use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
 use Yii;
 
@@ -98,12 +99,12 @@ class EquipmentsClass
      * Получение статусов оборудования
      * @return bool|array
      */
-    public static function GetEquipmentsAvailability()
+    public static function GetEquipmentsStatus()
     {
         Yii::info('Запуск функции GetEquipmentsAvailability', __METHOD__);
         $result = [];
 
-        $equipmentsAvailabilityList = EquipmentsAvailability::find()->orderBy('id')->all();
+        $equipmentsAvailabilityList = EquipmentsStatus::find()->orderBy('id')->all();
 
         if (!is_array($equipmentsAvailabilityList)) {
             Yii::error('Список статусов оборудования пуст', __METHOD__);
@@ -135,12 +136,178 @@ class EquipmentsClass
 
     /**
      * Получение списка оборудования
-     * @return bool|array
+     * @param $status
+     * @param $like
+     * @param $stock
+     * @param $equipmentsType
+     * @param $equipmentsCategory
+     * @param $count_start
+     * @param $count_end
+     * @param $selling_price_start
+     * @param $selling_price_end
+     * @param $price_per_day_start
+     * @param $price_per_day_end
+     * @param $rentals_start
+     * @param $rentals_end
+     * @param $repairs_start
+     * @param $repairs_end
+     * @param $repairs_sum_start
+     * @param $repairs_sum_end
+     * @param $revenue_start
+     * @param $revenue_end
+     * @param $profit_start
+     * @param $profit_end
+     * @param $degree_wear_start
+     * @param $degree_wear_end
+     * @return array
      */
-    public static function GetEquipments()
+    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end)
     {
         Yii::info('Запуск функции GetEquipments', __METHOD__);
+
         $result = [];
+        $listFilter = [];
+        $params = [];
+
+        if ($status !== '' and $status !== null) {
+            Yii::info('Параметр status: ' . serialize($status), __METHOD__);
+            $listFilter[] = 'status=:status';
+            $params[':status'] = $status;
+        }
+
+        if ($like !== '' and $like !== null) {
+            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $like = '%' . $like . '%';
+            $listFilter[] = 'name like :like';
+            $params[':like'] = $like;
+        }
+
+        if ($stock !== '' and $stock !== null) {
+            Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
+            $listFilter[] = 'stock=:stock';
+            $params[':stock'] = $stock;
+        }
+
+        if ($equipmentsType !== '' and $equipmentsType !== null) {
+            Yii::info('Параметр equipmentsType: ' . serialize($equipmentsType), __METHOD__);
+            $listFilter[] = 'equipmentsType=:equipmentsType';
+            $params[':equipmentsType'] = $equipmentsType;
+        }
+
+        if ($equipmentsCategory !== '' and $equipmentsCategory !== null) {
+            Yii::info('Параметр equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
+            $listFilter[] = 'equipmentsCategory=:equipmentsCategory';
+            $params[':equipmentsCategory'] = $equipmentsCategory;
+        }
+
+        if ($count_start !== '' and $count_start !== null) {
+            Yii::info('Параметр count_start: ' . serialize($count_start), __METHOD__);
+            $listFilter[] = 'count>:count_start';
+            $params[':count_start'] = $count_start;
+        }
+
+        if ($count_end !== '' and $count_end !== null) {
+            Yii::info('Параметр count_end: ' . serialize($count_end), __METHOD__);
+            $listFilter[] = 'count<:count_end';
+            $params[':count_end'] = $count_end;
+        }
+
+        if ($selling_price_start !== '' and $selling_price_start !== null) {
+            Yii::info('Параметр selling_price_start: ' . serialize($selling_price_start), __METHOD__);
+            $listFilter[] = 'selling_price>:selling_price_start';
+            $params[':selling_price_start'] = $selling_price_start;
+        }
+
+        if ($selling_price_end !== '' and $selling_price_end !== null) {
+            Yii::info('Параметр selling_price_end: ' . serialize($selling_price_end), __METHOD__);
+            $listFilter[] = 'selling_price<:selling_price_end';
+            $params[':selling_price_end'] = $selling_price_end;
+        }
+
+        if ($price_per_day_start !== '' and $price_per_day_start !== null) {
+            Yii::info('Параметр price_per_day_start: ' . serialize($price_per_day_start), __METHOD__);
+            $listFilter[] = 'price_per_day>:price_per_day_start';
+            $params[':price_per_day_start'] = $price_per_day_start;
+        }
+
+        if ($price_per_day_end !== '' and $price_per_day_end !== null) {
+            Yii::info('Параметр price_per_day_end: ' . serialize($price_per_day_end), __METHOD__);
+            $listFilter[] = 'price_per_day<:price_per_day_end';
+            $params[':price_per_day_end'] = $price_per_day_end;
+        }
+
+        if ($rentals_start !== '' and $rentals_start !== null) {
+            Yii::info('Параметр rentals_start: ' . serialize($rentals_start), __METHOD__);
+            $listFilter[] = 'rentals>:rentals_start';
+            $params[':rentals_start'] = $rentals_start;
+        }
+
+        if ($rentals_end !== '' and $rentals_end !== null) {
+            Yii::info('Параметр rentals_end: ' . serialize($rentals_end), __METHOD__);
+            $listFilter[] = 'rentals<:rentals_end';
+            $params[':rentals_end'] = $rentals_end;
+        }
+
+        if ($repairs_start !== '' and $repairs_start !== null) {
+            Yii::info('Параметр repairs_start: ' . serialize($repairs_start), __METHOD__);
+            $listFilter[] = 'repairs>:repairs_start';
+            $params[':repairs_start'] = $repairs_start;
+        }
+
+        if ($repairs_end !== '' and $repairs_end !== null) {
+            Yii::info('Параметр repairs_end: ' . serialize($repairs_end), __METHOD__);
+            $listFilter[] = 'repairs<:repairs_end';
+            $params[':repairs_end'] = $repairs_end;
+        }
+
+        if ($repairs_sum_start !== '' and $repairs_sum_start !== null) {
+            Yii::info('Параметр repairs_sum_start: ' . serialize($repairs_sum_start), __METHOD__);
+            $listFilter[] = 'repairs_sum>:repairs_sum_start';
+            $params[':repairs_sum_start'] = $repairs_sum_start;
+        }
+
+        if ($repairs_sum_end !== '' and $repairs_sum_end !== null) {
+            Yii::info('Параметр repairs_sum_end: ' . serialize($repairs_sum_end), __METHOD__);
+            $listFilter[] = 'repairs_sum<:repairs_sum_end';
+            $params[':repairs_sum_end'] = $repairs_sum_end;
+        }
+
+        if ($revenue_start !== '' and $revenue_start !== null) {
+            Yii::info('Параметр revenue_start: ' . serialize($revenue_start), __METHOD__);
+            $listFilter[] = 'revenue>:revenue_start';
+            $params[':revenue_start'] = $revenue_start;
+        }
+
+        if ($revenue_end !== '' and $revenue_end !== null) {
+            Yii::info('Параметр revenue_end: ' . serialize($revenue_end), __METHOD__);
+            $listFilter[] = 'revenue<:revenue_end';
+            $params[':revenue_end'] = $revenue_end;
+        }
+
+        if ($profit_start !== '' and $profit_start !== null) {
+            Yii::info('Параметр profit_start: ' . serialize($profit_start), __METHOD__);
+            $listFilter[] = 'profit>:profit_start';
+            $params[':profit_start'] = $profit_start;
+        }
+
+        if ($profit_end !== '' and $profit_end !== null) {
+            Yii::info('Параметр profit_end: ' . serialize($profit_end), __METHOD__);
+            $listFilter[] = 'profit<:profit_end';
+            $params[':profit_end'] = $profit_end;
+        }
+
+        if ($degree_wear_start !== '' and $degree_wear_start !== null) {
+            Yii::info('Параметр degree_wear_start: ' . serialize($degree_wear_start), __METHOD__);
+            $listFilter[] = 'degree_wear>:degree_wear_start';
+            $params[':degree_wear_start'] = $degree_wear_start;
+        }
+
+        if ($degree_wear_end !== '' and $degree_wear_end !== null) {
+            Yii::info('Параметр degree_wear_end: ' . serialize($degree_wear_end), __METHOD__);
+            $listFilter[] = 'degree_wear<:degree_wear_end';
+            $params[':degree_wear_end'] = $degree_wear_end;
+        }
+
 
         $equipmentsTypeList = Equipments::find()->orderBy('id')->all();
 
@@ -163,7 +330,7 @@ class EquipmentsClass
                 'category_id' => $value->category_id,
                 'stock_id' => $value->stock_id,
                 'type' => $value->type,
-                'availability' => $value->availability,
+                'status' => $value->status,
                 'equipmentscol' => $value->equipmentscol,
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,

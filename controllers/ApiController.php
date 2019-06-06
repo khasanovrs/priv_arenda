@@ -123,8 +123,8 @@ class ApiController extends Controller
             'get-equipments-category' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentCategoryAction',
             ],
-            'get-equipments-availability' => [
-                'class' => 'app\components\actions\equipments\GetEquipmentAvailabilityAction',
+            'get-equipments-status' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentStatusAction',
             ],
             'get-equipments' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentAction',
@@ -134,7 +134,7 @@ class ApiController extends Controller
             ],
             'change-equipments-fields' => [
                 'class' => 'app\components\actions\equipments\ChangeEquipmentActionFields',
-            ],
+            ]
         ];
     }
 
