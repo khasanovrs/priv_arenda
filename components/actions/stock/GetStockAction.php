@@ -15,13 +15,13 @@ class GetStockAction extends Action
     {
         Yii::info('Запуск функции получения списка складов', __METHOD__);
 
-        $resultChange = StockClass::GetStock();
+        $result = StockClass::GetStock();
 
-        if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
+        if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка складов', __METHOD__);
 
-            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
-                return $resultChange;
+            if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
+                return $result;
             }
 
             return [
@@ -35,6 +35,7 @@ class GetStockAction extends Action
         return [
             'status' => 'OK',
             'msg' => 'Список складов успешно получен',
+            'data' => $result['data']
         ];
     }
 }

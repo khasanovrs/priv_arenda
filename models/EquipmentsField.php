@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $code
- * @property string $name
+ * @property string $name наименование поля
  *
  * @property EquipmentsShowField[] $equipmentsShowFields
  */
@@ -29,8 +29,9 @@ class EquipmentsField extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code', 'name'], 'required'],
-            [['code', 'name'], 'string', 'max' => 45],
+            [['name'], 'required'],
+            [['code'], 'string', 'max' => 45],
+            [['name'], 'string', 'max' => 150],
         ];
     }
 
@@ -51,6 +52,6 @@ class EquipmentsField extends \yii\db\ActiveRecord
      */
     public function getEquipmentsShowFields()
     {
-        return $this->hasMany(EquipmentsShowField::className(), ['equipments_show_fieldcol' => 'id']);
+        return $this->hasMany(EquipmentsShowField::className(), ['equipments_field_id' => 'id']);
     }
 }

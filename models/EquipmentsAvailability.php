@@ -28,8 +28,10 @@ class EquipmentsAvailability extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['id', 'name'], 'required'],
+            [['id'], 'integer'],
             [['name'], 'string', 'max' => 150],
+            [['id'], 'unique'],
         ];
     }
 

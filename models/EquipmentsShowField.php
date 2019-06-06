@@ -9,10 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property int $user_id
- * @property int $equipments_show_fieldcol
+ * @property int $equipments_field_id код поля
  *
+ * @property EquipmentsField $equipmentsField
  * @property Users $user
- * @property EquipmentsField $equipmentsShowFieldcol
  */
 class EquipmentsShowField extends \yii\db\ActiveRecord
 {
@@ -30,10 +30,10 @@ class EquipmentsShowField extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'equipments_show_fieldcol'], 'required'],
-            [['user_id', 'equipments_show_fieldcol'], 'integer'],
+            [['user_id', 'equipments_field_id'], 'required'],
+            [['user_id', 'equipments_field_id'], 'integer'],
+            [['equipments_field_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsField::className(), 'targetAttribute' => ['equipments_field_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
-            [['equipments_show_fieldcol'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsField::className(), 'targetAttribute' => ['equipments_show_fieldcol' => 'id']],
         ];
     }
 
@@ -45,8 +45,16 @@ class EquipmentsShowField extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
-            'equipments_show_fieldcol' => 'Equipments Show Fieldcol',
+            'equipments_field_id' => 'Equipments Field ID',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsField()
+    {
+        return $this->hasOne(EquipmentsField::className(), ['id' => 'equipments_field_id']);
     }
 
     /**
@@ -55,13 +63,5 @@ class EquipmentsShowField extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEquipmentsShowFieldcol()
-    {
-        return $this->hasOne(EquipmentsField::className(), ['id' => 'equipments_show_fieldcol']);
     }
 }
