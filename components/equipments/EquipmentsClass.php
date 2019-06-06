@@ -6,6 +6,8 @@
 namespace app\components\equipments;
 
 use app\components\Session\Sessions;
+use app\models\Clients;
+use app\models\ClientStatus;
 use app\models\Equipments;
 use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
@@ -308,8 +310,11 @@ class EquipmentsClass
             $params[':degree_wear_end'] = $degree_wear_end;
         }
 
-
-        $equipmentsTypeList = Equipments::find()->orderBy('id')->all();
+        if (!empty($listFilter)) {
+            $equipmentsTypeList = Equipments::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+        } else {
+            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->all();
+        }
 
         if (!is_array($equipmentsTypeList)) {
             Yii::error('Список категорий оборудования пуст', __METHOD__);
@@ -396,7 +401,7 @@ class EquipmentsClass
         foreach ($equipmentsFieldList as $value) {
             $check_flag = EquipmentsShowField::find()->where('equipments_field_id=:equipments_field_id and user_id=:user_id', [':equipments_field_id' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
 
-            $flag = is_object($check_flag) ? 1 : 0;
+            $flag = is_object($check_flag) ? 0 : 1;
 
             $result[] = [
                 'id' => $value->id,
@@ -476,6 +481,79 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Поля успешно изменены'
+        ];
+    }
+
+    /**
+     * Изменение статуса оборудования
+     * @param $id
+     * @param $status
+     * @return bool|array
+     */
+    public static function ChangeEquipmentsStatus($id, $status)
+    {
+        Yii::info('Запуск функции ChangeEquipmentsStatus', __METHOD__);
+
+        if ($id === '' || !is_int($status)) {
+            Yii::error('Ни передан идентификтор организации, id: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификтор оборудования',
+            ];
+        }
+
+        if ($status === '' || !is_int($status)) {
+            Yii::error('Передан некорректный статус, status: ' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный статус',
+            ];
+        }
+
+        $check_status = EquipmentsStatus::find()->where('id=:id', [':id' => $status])->one();
+
+        if (!is_object($check_status)) {
+            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный статус',
+            ];
+        }
+
+        /**
+         * @var Equipments $equipments
+         */
+        $equipments = Equipments::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($equipments)) {
+            Yii::error('По данному идентификатору оборудование ни найдено, id' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Оборудование ни найдено',
+            ];
+        }
+
+        $equipments->status = $status;
+
+        try {
+            if (!$equipments->save(false)) {
+                Yii::error('Ошибка при обновлении статуса оборудования: ' . serialize($equipments->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при обновлении статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Статус оборудования успешно изменен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Статус оборудования успешно изменен'
         ];
     }
 }
