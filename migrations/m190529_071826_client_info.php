@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m190529_071826_client_ur_info
+ * Class m190529_071826_client_info
  */
-class m190529_071826_client_ur_info extends Migration
+class m190529_071826_client_info extends Migration
 {
     /**
      * {@inheritdoc}
@@ -39,7 +39,7 @@ class m190529_071826_client_ur_info extends Migration
   CONSTRAINT `fk_client_info_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_client_info_2` FOREIGN KEY (`source`) REFERENCES `client_source` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_clients_info_1` FOREIGN KEY (`sale`) REFERENCES `discount` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
       ");
     }
 

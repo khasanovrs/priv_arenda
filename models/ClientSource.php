@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  *
- * @property ClientUr[] $clientUrs
+ * @property ClientsInfo[] $clientsInfos
  */
 class ClientSource extends \yii\db\ActiveRecord
 {
@@ -47,8 +47,8 @@ class ClientSource extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getClientUrs()
+    public function getClientsInfos()
     {
-        return $this->hasMany(ClientUr::className(), ['source' => 'id']);
+        return $this->hasMany(ClientsInfo::className(), ['source' => 'id']);
     }
 }

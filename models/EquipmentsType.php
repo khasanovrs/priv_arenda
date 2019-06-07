@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "equipments_type".
  *
  * @property int $id
- * @property string $code
  * @property string $name
  *
  * @property Equipments[] $equipments
@@ -29,7 +28,6 @@ class EquipmentsType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code'], 'string', 'max' => 45],
             [['name'], 'string', 'max' => 150],
         ];
     }
@@ -41,7 +39,6 @@ class EquipmentsType extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'code' => 'Code',
             'name' => 'Name',
         ];
     }

@@ -12,10 +12,8 @@ class m190523_102944_inser_user_rights extends Migration
      */
     public function safeUp()
     {
-
         $this->execute("INSERT INTO `users_rights` (`id`, `name`) VALUES ('1', 'Оплата по счетам');");
         $this->execute("INSERT INTO `users_rights` (`id`, `name`) VALUES ('2', 'Добавление товаров');");
-
     }
 
     /**

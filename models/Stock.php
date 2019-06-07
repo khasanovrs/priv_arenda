@@ -13,6 +13,7 @@ use Yii;
  * @property string $date_create дата создания записи
  * @property string $date_update тип роли
  *
+ * @property Equipments[] $equipments
  * @property Branch $branch
  */
 class Stock extends \yii\db\ActiveRecord
@@ -50,6 +51,14 @@ class Stock extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipments()
+    {
+        return $this->hasMany(Equipments::className(), ['stock_id' => 'id']);
     }
 
     /**

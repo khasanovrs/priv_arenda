@@ -13,11 +13,10 @@ class m190531_134428_equipments_type extends Migration
     public function safeUp()
     {
         $this->execute("CREATE TABLE `equipments_type` (
-          `id` int(11) NOT NULL AUTO_INCREMENT,
-          `code` varchar(45) COLLATE utf8_bin DEFAULT NULL,
-          `name` varchar(150) COLLATE utf8_bin DEFAULT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` varchar(150) COLLATE utf8_bin DEFAULT NULL,
+            PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
     }
 

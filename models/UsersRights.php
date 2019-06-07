@@ -9,6 +9,8 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ *
+ * @property BunchUserRight[] $bunchUserRights
  */
 class UsersRights extends \yii\db\ActiveRecord
 {
@@ -40,5 +42,13 @@ class UsersRights extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBunchUserRights()
+    {
+        return $this->hasMany(BunchUserRight::className(), ['right_id' => 'id']);
     }
 }

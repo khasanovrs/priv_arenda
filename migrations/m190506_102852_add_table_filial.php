@@ -16,7 +16,7 @@ class m190506_102852_add_table_filial extends Migration
           `id` int(11) NOT NULL AUTO_INCREMENT,
           `name` varchar(150) COLLATE utf8_bin NOT NULL,
           PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
     }
 

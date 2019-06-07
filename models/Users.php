@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $fio фио пользователя
- * @property int $telephone телефон пользователя
+ * @property string $telephone телефон пользователя
  * @property string $status
  * @property int $user_type
  * @property string $email
@@ -18,6 +18,8 @@ use Yii;
  * @property string $date_create дата создания записи
  * @property string $date_update Время последнего запроса sms-кода
  *
+ * @property BunchUserRight[] $bunchUserRights
+ * @property EquipmentsShowField[] $equipmentsShowFields
  * @property Session[] $sessions
  * @property UsersRole $userType
  * @property Branch $branch
@@ -39,10 +41,12 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             [['fio', 'telephone', 'user_type', 'branch_id', 'password'], 'required'],
-            [['telephone', 'user_type', 'branch_id'], 'integer'],
+            [['user_type', 'branch_id'], 'integer'],
             [['date_create'], 'safe'],
             [['fio'], 'string', 'max' => 100],
-            [['status', 'email', 'password', 'date_update'], 'string', 'max' => 45],
+            [['telephone'], 'string', 'max' => 11],
+            [['status', 'email', 'date_update'], 'string', 'max' => 45],
+            [['password'], 'string', 'max' => 500],
             [['user_type'], 'exist', 'skipOnError' => true, 'targetClass' => UsersRole::className(), 'targetAttribute' => ['user_type' => 'id']],
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
         ];
@@ -65,6 +69,22 @@ class Users extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBunchUserRights()
+    {
+        return $this->hasMany(BunchUserRight::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsShowFields()
+    {
+        return $this->hasMany(EquipmentsShowField::className(), ['user_id' => 'id']);
     }
 
     /**

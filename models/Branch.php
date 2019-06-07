@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property string $name
  *
+ * @property Clients[] $clients
+ * @property Stock[] $stocks
  * @property Users[] $users
  */
 class Branch extends \yii\db\ActiveRecord
@@ -42,6 +44,22 @@ class Branch extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClients()
+    {
+        return $this->hasMany(Clients::className(), ['branch_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStocks()
+    {
+        return $this->hasMany(Stock::className(), ['id_branch' => 'id']);
     }
 
     /**

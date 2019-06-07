@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property string $code
  * @property string $name
+ *
+ * @property ClientsInfo[] $clientsInfos
  */
 class Discount extends \yii\db\ActiveRecord
 {
@@ -27,6 +29,7 @@ class Discount extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['code', 'name'], 'required'],
             [['code', 'name'], 'string', 'max' => 45],
         ];
     }
@@ -41,5 +44,13 @@ class Discount extends \yii\db\ActiveRecord
             'code' => 'Code',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientsInfos()
+    {
+        return $this->hasMany(ClientsInfo::className(), ['sale' => 'id']);
     }
 }
