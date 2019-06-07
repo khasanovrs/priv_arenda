@@ -19,6 +19,7 @@ use Yii;
  * @property string $date_update Время последнего запроса sms-кода
  *
  * @property BunchUserRight[] $bunchUserRights
+ * @property ClientShowField[] $clientShowFields
  * @property EquipmentsShowField[] $equipmentsShowFields
  * @property Session[] $sessions
  * @property UsersRole $userType
@@ -77,6 +78,14 @@ class Users extends \yii\db\ActiveRecord
     public function getBunchUserRights()
     {
         return $this->hasMany(BunchUserRight::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientShowFields()
+    {
+        return $this->hasMany(ClientShowField::className(), ['user_id' => 'id']);
     }
 
     /**

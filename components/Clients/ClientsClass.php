@@ -5,10 +5,13 @@
 
 namespace app\components\Clients;
 
+use app\components\Session\Sessions;
 use app\models\Branch;
+use app\models\ClientField;
 use app\models\ClientFiz;
 use app\models\ClientFizInfo;
 use app\models\Clients;
+use app\models\ClientShowField;
 use app\models\ClientsInfo;
 use app\models\ClientSource;
 use app\models\ClientStatus;
@@ -650,77 +653,125 @@ class ClientsClass
 
     /**
      * Получение списка полей
-     * @return bool|array
+     * @return array
+     * @throws \yii\base\InvalidConfigException
      */
     public static function GetFields()
     {
         Yii::info('Запуск функции GetFields', __METHOD__);
         $result = [];
 
-        $showFieldClient = ShowFieldClient::find()->all();
+        $clientsFieldList = ClientField::find()->orderBy('id')->all();
 
-        if (!is_array($showFieldClient)) {
+        if (!is_array($clientsFieldList)) {
             Yii::error('Список полей пуст', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при получении полей'
+                'msg' => 'Список полей пуст'
             ];
         }
 
         /**
-         * @var ShowFieldClient $value
+         * @var Sessions $Sessions
          */
-        foreach ($showFieldClient as $value) {
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var ClientField $value
+         */
+        foreach ($clientsFieldList as $value) {
+            $check_flag = ClientShowField::find()->where('equipments_field_id=:equipments_field_id and user_id=:user_id', [':equipments_field_id' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
+
+            $flag = is_object($check_flag) ? 0 : 1;
+
             $result[] = [
                 'id' => $value->id,
                 'code' => $value->code,
                 'name' => $value->name,
-                'flag' => (int)$value->flag
+                'flag' => $flag
             ];
         }
 
-        Yii::info('Список полей успешно получен', __METHOD__);
+        Yii::info('Список полей получен', __METHOD__);
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Список полей успешно получен',
+            'msg' => 'Список полей получен',
             'data' => $result
         ];
     }
 
-
     /**
      * Изменение списка отображаемых полей для таблицы "Клиенты"
      * @param $params
-     * @return bool|array
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
     public static function ChangeFields($params)
     {
-        Yii::info('Запуск функции ChangeFields' . serialize($params), __METHOD__);
+        Yii::info('Запуск функции ChangeFields', __METHOD__);
 
         if (!is_array($params) || empty($params)) {
             Yii::error('Не пришли параметры для изменения', __METHOD__);
         }
 
         /**
-         * @var ShowFieldClient $value
+         * @var Sessions $Sessions
          */
-        foreach ($params as $value) {
-            try {
-                ShowFieldClient::updateAll(['flag' => $value->flag], 'code= :code', [':code' => $value->code]);
-            } catch (\Exception $e) {
-                Yii::error('Поймали Exception при обновлении флага отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
 
-                return false;
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        try {
+            ClientShowField::deleteAll('user_id=:user_id', [':user_id' => $session->user_id]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при очистке списка скрытых полей : ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        foreach ($params as $value) {
+            if ($value->flag === 0) {
+
+                $newVal = new ClientShowField();
+                $newVal->user_id = $session->user_id;
+                $newVal->equipments_field_id = $value->id;
+
+                try {
+                    if (!$newVal->save(false)) {
+                        Yii::error('Ошибка при изменени отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при изменени отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
             }
         }
 
-        Yii::info('Список полей успешно изменен', __METHOD__);
+        Yii::info('Поля успешно изменены', __METHOD__);
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Список полей успешно изменен'
+            'msg' => 'Поля успешно изменены'
         ];
     }
 
