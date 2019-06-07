@@ -332,11 +332,11 @@ class EquipmentsClass
             $result[] = [
                 'id' => $value->id,
                 'name' => $value->name,
-                'category_id' => $value->category_id,
-                'stock_id' => $value->stock_id,
-                'type' => $value->type,
+                'category' => $value->category->name,
+                'stock' => $value->stock->name,
+                'type' => $value->type0->name,
                 'status' => $value->status,
-                'equipmentscol' => $value->equipmentscol,
+                'count' => $value->count,
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,
                 'rentals' => $value->rentals,
@@ -559,6 +559,7 @@ class EquipmentsClass
 
     /**
      * Функция добавления оборудования
+     * @param $name
      * @param $status
      * @param $stock
      * @param $equipmentsType
@@ -571,9 +572,17 @@ class EquipmentsClass
      * @param $degree_wear
      * @return array|bool
      */
-    public static function AddEquipmentFields($status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
+    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Ни передано наименование оборудования, name: ' . serialize($name), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование оборудования',
+            ];
+        }
 
         if ($status === '') {
             Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
@@ -633,9 +642,10 @@ class EquipmentsClass
 
         $newEquipment = new Equipments();
         $newEquipment->status = $status;
-        $newEquipment->stock = $stock;
+        $newEquipment->name = $name;
+        $newEquipment->stock_id = $stock;
         $newEquipment->type = $equipmentsType;
-        $newEquipment->category = $equipmentsCategory;
+        $newEquipment->category_id = $equipmentsCategory;
         $newEquipment->count = $count;
         $newEquipment->tool_number = $tool_number;
         $newEquipment->selling_price = $selling_price;
