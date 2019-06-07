@@ -19,7 +19,7 @@ class m190531_134432_equipments extends Migration
   `stock_id` int(11) NOT NULL,
   `type` int(11) NOT NULL COMMENT 'тип инструмента',
   `status` int(11) DEFAULT NULL COMMENT 'Доступность',
-  `equipmentscol` varchar(45) COLLATE utf8_bin DEFAULT NULL,
+  `count` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   `selling_price` varchar(45) COLLATE utf8_bin DEFAULT NULL COMMENT 'Цена продажи',
   `price_per_day` varchar(45) COLLATE utf8_bin DEFAULT NULL COMMENT 'Цена за сутки',
   `rentals` varchar(45) COLLATE utf8_bin DEFAULT NULL COMMENT 'Количество прокатов ',

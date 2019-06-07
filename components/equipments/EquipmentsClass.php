@@ -556,4 +556,107 @@ class EquipmentsClass
             'msg' => 'Статус оборудования успешно изменен'
         ];
     }
+
+    /**
+     * Функция добавления оборудования
+     * @param $status
+     * @param $stock
+     * @param $equipmentsType
+     * @param $equipmentsCategory
+     * @param $count
+     * @param $tool_number
+     * @param $selling_price
+     * @param $price_per_day
+     * @param $revenue
+     * @param $degree_wear
+     * @return array|bool
+     */
+    public static function AddEquipmentFields($status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
+    {
+        Yii::info('Оборудование успешно добавлено', __METHOD__);
+
+        if ($status === '') {
+            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор статуса',
+            ];
+        }
+
+        if ($stock === '') {
+            Yii::error('Ни передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор склада',
+            ];
+        }
+
+        if ($equipmentsType === '') {
+            Yii::error('Ни передан тип оборудования, equipmentsType: ' . serialize($equipmentsType), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан тип оборудования',
+            ];
+        }
+
+        if ($equipmentsCategory === '') {
+            Yii::error('Ни передана категория оборудования, equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана категория оборудования',
+            ];
+        }
+
+        if ($count === '') {
+            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано количество оборудования',
+            ];
+        }
+
+        if ($count === '') {
+            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано количество оборудования',
+            ];
+        }
+
+        if ($tool_number === '') {
+            Yii::error('Не передан номер оборудования, tool_number: ' . serialize($tool_number), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано количество оборудования',
+            ];
+        }
+
+        $newEquipment = new Equipments();
+        $newEquipment->status = $status;
+        $newEquipment->stock = $stock;
+        $newEquipment->type = $equipmentsType;
+        $newEquipment->category = $equipmentsCategory;
+        $newEquipment->count = $count;
+        $newEquipment->tool_number = $tool_number;
+        $newEquipment->selling_price = $selling_price;
+        $newEquipment->price_per_day = $price_per_day;
+        $newEquipment->revenue = $revenue;
+        $newEquipment->degree_wear = $degree_wear;
+
+        try {
+            if (!$newEquipment->save(false)) {
+                Yii::error('Ошибка при добавлении оборудования: ' . serialize($newEquipment->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно добавлено'
+        ];
+
+    }
 }

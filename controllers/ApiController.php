@@ -138,6 +138,9 @@ class ApiController extends Controller
             'get-equipments-update-status' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentUpdateStatusAction',
             ],
+            'add-equipment' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentAction',
+            ],
         ];
     }
 

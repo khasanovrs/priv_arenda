@@ -13,7 +13,7 @@ use Yii;
  * @property int $stock_id
  * @property int $type тип инструмента
  * @property int $status Доступность
- * @property string $equipmentscol
+ * @property string $count
  * @property string $selling_price Цена продажи
  * @property string $price_per_day Цена за сутки
  * @property string $rentals Количество прокатов 
@@ -51,7 +51,7 @@ class Equipments extends \yii\db\ActiveRecord
             [['name', 'category_id', 'stock_id', 'type'], 'required'],
             [['category_id', 'stock_id', 'type', 'status'], 'integer'],
             [['date_create'], 'safe'],
-            [['name', 'equipmentscol', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio'], 'string', 'max' => 45],
+            [['name', 'count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio'], 'string', 'max' => 45],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsStatus::className(), 'targetAttribute' => ['status' => 'id']],
@@ -72,7 +72,7 @@ class Equipments extends \yii\db\ActiveRecord
             'stock_id' => 'Stock ID',
             'type' => 'Type',
             'status' => 'Status',
-            'equipmentscol' => 'Equipmentscol',
+            'count' => 'Count',
             'selling_price' => 'Selling Price',
             'price_per_day' => 'Price Per Day',
             'rentals' => 'Rentals',

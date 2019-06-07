@@ -3,3 +3,16 @@ users:
 
 session:
 '1', '1', '2019-05-22 10:39:53', '2019-06-03 12:46:49.000000', 'kzp9MxczO45jfFFGUDg9', '1'
+
+equipments_category:
+INSERT INTO `arenda_stroika`.`equipments_category` (`id`, `name`) VALUES ('1', 'Болгарки');
+INSERT INTO `arenda_stroika`.`equipments_category` (`id`, `name`) VALUES ('2', 'Топоры');
+
+equipments_type:
+INSERT INTO `arenda_stroika`.`equipments_type` (`id`, `name`) VALUES ('1', 'Тяжелые');
+INSERT INTO `arenda_stroika`.`equipments_type` (`id`, `name`) VALUES ('2', 'Легкие');
+
+stock
+INSERT INTO `arenda_stroika`.`stock` (`id`, `id_branch`, `name`) VALUES ('1', '1', 'Склад 1');
+INSERT INTO `arenda_stroika`.`stock` (`id`, `id_branch`, `name`) VALUES ('2', '1', 'Склад 2');
+
