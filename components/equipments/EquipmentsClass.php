@@ -570,9 +570,10 @@ class EquipmentsClass
      * @param $price_per_day
      * @param $revenue
      * @param $degree_wear
+     * @param $sale
      * @return array|bool
      */
-    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
+    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $sale)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 
@@ -652,6 +653,7 @@ class EquipmentsClass
         $newEquipment->price_per_day = $price_per_day;
         $newEquipment->revenue = $revenue;
         $newEquipment->degree_wear = $degree_wear;
+        $newEquipment->sale = $sale;
 
         try {
             if (!$newEquipment->save(false)) {
