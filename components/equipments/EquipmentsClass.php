@@ -571,9 +571,14 @@ class EquipmentsClass
      * @param $revenue
      * @param $degree_wear
      * @param $sale
+     * @param $impact_energy
+     * @param $length
+     * @param $network_cord
+     * @param $power
+     * @param $frequency_hits
      * @return array|bool
      */
-    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $sale)
+    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $sale, $impact_energy, $length, $network_cord, $power, $frequency_hits)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 

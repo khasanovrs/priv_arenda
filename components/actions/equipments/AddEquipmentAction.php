@@ -29,8 +29,13 @@ class AddEquipmentAction extends Action
         $revenue = $request->getBodyParam('revenue');
         $degree_wear = $request->getBodyParam('degree_wear');
         $sale = $request->getBodyParam('sale');
+        $impact_energy = $request->getBodyParam('impact_energy');
+        $length = $request->getBodyParam('length');
+        $network_cord = $request->getBodyParam('network_cord');
+        $power = $request->getBodyParam('power');
+        $frequency_hits = $request->getBodyParam('frequency_hits');
 
-        $result = EquipmentsClass::AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $sale);
+        $result = EquipmentsClass::AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $sale, $impact_energy, $length, $network_cord, $power, $frequency_hits);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении оборудования', __METHOD__);
