@@ -181,7 +181,7 @@ class EquipmentsClass
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = '%' . $like . '%';
-            $listFilter[] = 'model like :like';
+            $listFilter[] = 'model like :like or mark0.name like :like';
             $params[':like'] = $like;
         }
 
@@ -312,7 +312,7 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->with('EquipmentsMark')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $equipmentsTypeList = Equipments::find()->orderBy('id desc')->all();
         }
