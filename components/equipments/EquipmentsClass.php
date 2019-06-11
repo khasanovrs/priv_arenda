@@ -364,6 +364,66 @@ class EquipmentsClass
     }
 
     /**
+     * Получение детальной информации об оборудовании
+     * @param $equipmentId
+     * @return array
+     */
+    public static function GetEquipmentInfo($equipmentId)
+    {
+        Yii::info('Запуск функции GetEquipmentInfo', __METHOD__);
+
+        $equipment = Equipments::find()->where('id=:id', [':id' => $equipmentId])->one();
+
+        if (!is_object($equipment)) {
+            Yii::error('Оборудование ни найдено, id:' . serialize($equipmentId), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Оборудование ни найдено'
+            ];
+        }
+
+        /**
+         * @var Equipments $equipment
+         */
+
+        $result = [
+            'id' => $equipment->id,
+            'mark' => $equipment->mark,
+            'model' => $equipment->model,
+            'category' => $equipment->category_id,
+            'stock' => $equipment->stock_id,
+            'type' => $equipment->type,
+            'discount' => $equipment->discount,
+            'status' => $equipment->status,
+            'count' => $equipment->count,
+            'selling_price' => $equipment->selling_price,
+            'price_per_day' => $equipment->price_per_day,
+            'rentals' => $equipment->rentals,
+            'repairs' => $equipment->repairs,
+            'repairs_sum' => $equipment->repairs_sum,
+            'tool_number' => $equipment->tool_number,
+            'revenue' => $equipment->revenue,
+            'profit' => $equipment->profit,
+            'degree_wear' => $equipment->degree_wear,
+            'payback_ratio' => $equipment->payback_ratio,
+            'power_energy' => $equipment->equipmentsInfos[0]->power_energy,
+            'length' => $equipment->equipmentsInfos[0]->length,
+            'network_cord' => $equipment->equipmentsInfos[0]->network_cord,
+            'power' => $equipment->equipmentsInfos[0]->power,
+            'frequency_hits' => $equipment->equipmentsInfos[0]->frequency_hits,
+        ];
+
+        Yii::info('Информация об оборудовании получено', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Информация об оборудовании получено',
+            'data' => $result
+        ];
+    }
+
+    /**
      * Получение списка полей для оборудования
      * @return array
      * @throws \yii\base\InvalidConfigException
@@ -763,5 +823,193 @@ class EquipmentsClass
             'msg' => 'Список марок оборудования получен',
             'data' => $result
         ];
+    }
+
+    /**
+     * Функция изменения оборудования
+     * @param $id
+     * @param $model
+     * @param $mark
+     * @param $status
+     * @param $stock
+     * @param $equipmentsType
+     * @param $equipmentsCategory
+     * @param $count
+     * @param $tool_number
+     * @param $selling_price
+     * @param $price_per_day
+     * @param $revenue
+     * @param $degree_wear
+     * @param $discount
+     * @param $rentals
+     * @param $repairs
+     * @param $repairs_sum
+     * @param $profit
+     * @param $payback_ratio
+     * @param $power_energy
+     * @param $length
+     * @param $network_cord
+     * @param $power
+     * @param $frequency_hits
+     * @return array|bool
+     */
+    public static function changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits)
+    {
+        if ($model === '') {
+            Yii::error('Ни передано модель оборудования, model: ' . serialize($model), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование оборудования',
+            ];
+        }
+
+        if ($mark === '') {
+            Yii::error('Ни передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование оборудования',
+            ];
+        }
+
+        if ($status === '') {
+            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор статуса',
+            ];
+        }
+
+        if ($discount === '') {
+            Yii::error('Ни передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор скидки',
+            ];
+        }
+
+        if ($stock === '') {
+            Yii::error('Ни передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор склада',
+            ];
+        }
+
+        if ($equipmentsType === '') {
+            Yii::error('Ни передан тип оборудования, equipmentsType: ' . serialize($equipmentsType), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан тип оборудования',
+            ];
+        }
+
+        if ($equipmentsCategory === '') {
+            Yii::error('Ни передана категория оборудования, equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана категория оборудования',
+            ];
+        }
+
+        if ($count === '') {
+            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано количество оборудования',
+            ];
+        }
+
+        if ($count === '') {
+            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано количество оборудования',
+            ];
+        }
+
+        if ($tool_number === '') {
+            Yii::error('Не передан номер оборудования, tool_number: ' . serialize($tool_number), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано количество оборудования',
+            ];
+        }
+
+        /**
+         * @var Equipments $equipment
+         */
+        $equipment = Equipments::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($equipment)) {
+            Yii::error('Оборудование не найдено, id: ' . serialize($id), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Оборудование не найдено',
+            ];
+        }
+
+        $equipment->status = $status;
+        $equipment->mark = $mark;
+        $equipment->model = $model;
+        $equipment->stock_id = $stock;
+        $equipment->type = $equipmentsType;
+        $equipment->category_id = $equipmentsCategory;
+        $equipment->count = $count;
+        $equipment->tool_number = $tool_number;
+        $equipment->selling_price = $selling_price;
+        $equipment->price_per_day = $price_per_day;
+        $equipment->revenue = $revenue;
+        $equipment->degree_wear = $degree_wear;
+        $equipment->discount = $discount;
+        $equipment->rentals = $rentals;
+        $equipment->repairs = $repairs;
+        $equipment->repairs_sum = $repairs_sum;
+        $equipment->profit = $profit;
+        $equipment->payback_ratio = $payback_ratio;
+
+        try {
+            if (!$equipment->save(false)) {
+                Yii::error('Ошибка при изменении оборудования: ' . serialize($equipment->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        /**
+         * @var EquipmentsInfo $equipmentsInfo
+         */
+        $equipmentsInfo = EquipmentsInfo::find()->where('equipments_id=:id', [':id' => $id])->one();
+
+        if (!is_object($equipmentsInfo)) {
+            Yii::error('Информация об оборудовании не найдено, id: ' . serialize($id), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Оборудование не найдено',
+            ];
+        }
+
+        $equipmentsInfo->power_energy = $power_energy;
+        $equipmentsInfo->length = $length;
+        $equipmentsInfo->network_cord = $network_cord;
+        $equipmentsInfo->power = $power;
+        $equipmentsInfo->frequency_hits = $frequency_hits;
+
+        try {
+            if (!$equipmentsInfo->save(false)) {
+                Yii::error('Ошибка при изменении дополнительной информации об оборудовании: ' . serialize($equipmentsInfo->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении дополнительной информации об оборудовании: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно изменено'
+        ];
+
     }
 }
