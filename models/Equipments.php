@@ -35,6 +35,7 @@ use Yii;
  * @property EquipmentsStatus $status1
  * @property EquipmentsMark $mark0
  * @property Discount $discount0
+ * @property EquipmentsInfo[] $equipmentsInfos
  */
 class Equipments extends \yii\db\ActiveRecord
 {
@@ -150,5 +151,13 @@ class Equipments extends \yii\db\ActiveRecord
     public function getDiscount0()
     {
         return $this->hasOne(Discount::className(), ['id' => 'discount']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsInfos()
+    {
+        return $this->hasMany(EquipmentsInfo::className(), ['equipments_id' => 'id']);
     }
 }

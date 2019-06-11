@@ -12,6 +12,7 @@ use app\models\Equipments;
 use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
+use app\models\EquipmentsInfo;
 use app\models\EquipmentsMark;
 use app\models\EquipmentsShowField;
 use app\models\EquipmentsStatus;
@@ -184,6 +185,7 @@ class EquipmentsClass
             $listFilter[] = 'model like :like or mark0.name like :like';
             $params[':like'] = $like;
         }
+
 
         if ($stock !== '' and $stock !== null) {
             Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
@@ -579,9 +581,14 @@ class EquipmentsClass
      * @param $repairs_sum
      * @param $profit
      * @param $payback_ratio
+     * @param $power_energy
+     * @param $length
+     * @param $network_cord
+     * @param $power
+     * @param $frequency_hits
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 
@@ -692,6 +699,24 @@ class EquipmentsClass
             }
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при добавлении оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        $newEquipmentsInfo = new EquipmentsInfo();
+        $newEquipmentsInfo->equipments_id = $newEquipment->id;
+        $newEquipmentsInfo->power_energy = $power_energy;
+        $newEquipmentsInfo->length = $length;
+        $newEquipmentsInfo->network_cord = $network_cord;
+        $newEquipmentsInfo->power = $power;
+        $newEquipmentsInfo->frequency_hits = $frequency_hits;
+
+        try {
+            if (!$newEquipmentsInfo->save(false)) {
+                Yii::error('Ошибка при добавлении дополнительной информации об оборудовании: ' . serialize($newEquipmentsInfo->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении дополнительной информации об оборудовании: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
 
