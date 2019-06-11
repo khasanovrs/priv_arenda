@@ -12,6 +12,7 @@ use app\models\Equipments;
 use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
+use app\models\EquipmentsMark;
 use app\models\EquipmentsShowField;
 use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
@@ -118,7 +119,7 @@ class EquipmentsClass
         }
 
         /**
-         * @var EquipmentsAvailability $value
+         * @var EquipmentsStatus $value
          */
         foreach ($equipmentsAvailabilityList as $value) {
             $result[] = [
@@ -559,7 +560,8 @@ class EquipmentsClass
 
     /**
      * Функция добавления оборудования
-     * @param $name
+     * @param $model
+     * @param $mark
      * @param $status
      * @param $stock
      * @param $equipmentsType
@@ -572,12 +574,20 @@ class EquipmentsClass
      * @param $degree_wear
      * @return array|bool
      */
-    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
+    public static function AddEquipmentFields($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 
-        if ($name === '') {
-            Yii::error('Ни передано наименование оборудования, name: ' . serialize($name), __METHOD__);
+        if ($model === '') {
+            Yii::error('Ни передано модель оборудования, model: ' . serialize($model), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование оборудования',
+            ];
+        }
+
+        if ($mark === '') {
+            Yii::error('Ни передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передано наименование оборудования',
@@ -668,5 +678,43 @@ class EquipmentsClass
             'msg' => 'Оборудование успешно добавлено'
         ];
 
+    }
+
+    /**
+     * @return array
+     */
+    public static function GetEquipmentsMark()
+    {
+        Yii::info('Запуск функции GetEquipmentsMark', __METHOD__);
+        $result = [];
+
+        $equipmentsMarkList = EquipmentsMark::find()->orderBy('id')->all();
+
+        if (!is_array($equipmentsMarkList)) {
+            Yii::error('Список марок оборудования пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список марок оборудования пуст'
+            ];
+        }
+
+        /**
+         * @var EquipmentsMark $value
+         */
+        foreach ($equipmentsMarkList as $value) {
+            $result[] = [
+                'val' => $value->id,
+                'name' => $value->name
+            ];
+        }
+
+        Yii::info('Список марок оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список марок оборудования получен',
+            'data' => $result
+        ];
     }
 }
