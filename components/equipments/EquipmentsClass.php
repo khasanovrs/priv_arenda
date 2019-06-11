@@ -181,7 +181,7 @@ class EquipmentsClass
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = '%' . $like . '%';
-            $listFilter[] = 'name like :like';
+            $listFilter[] = 'model like :like';
             $params[':like'] = $like;
         }
 
@@ -332,7 +332,7 @@ class EquipmentsClass
         foreach ($equipmentsTypeList as $value) {
             $result[] = [
                 'id' => $value->id,
-                'name' => $value->name,
+                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
                 'category' => $value->category->name,
                 'stock' => $value->stock->name,
                 'type' => $value->type0->name,
@@ -341,6 +341,7 @@ class EquipmentsClass
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,
                 'rentals' => $value->rentals,
+                'repairs' => $value->repairs,
                 'repairs_sum' => $value->repairs_sum,
                 'tool_number' => $value->tool_number,
                 'revenue' => $value->revenue,
@@ -572,9 +573,15 @@ class EquipmentsClass
      * @param $price_per_day
      * @param $revenue
      * @param $degree_wear
+     * @param $discount
+     * @param $rentals
+     * @param $repairs
+     * @param $repairs_sum
+     * @param $profit
+     * @param $payback_ratio
      * @return array|bool
      */
-    public static function AddEquipmentFields($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 
@@ -652,7 +659,8 @@ class EquipmentsClass
 
         $newEquipment = new Equipments();
         $newEquipment->status = $status;
-        $newEquipment->name = $name;
+        $newEquipment->mark = $mark;
+        $newEquipment->model = $model;
         $newEquipment->stock_id = $stock;
         $newEquipment->type = $equipmentsType;
         $newEquipment->category_id = $equipmentsCategory;
@@ -662,6 +670,12 @@ class EquipmentsClass
         $newEquipment->price_per_day = $price_per_day;
         $newEquipment->revenue = $revenue;
         $newEquipment->degree_wear = $degree_wear;
+        $newEquipment->discount = $discount;
+        $newEquipment->rentals = $rentals;
+        $newEquipment->repairs = $repairs;
+        $newEquipment->repairs_sum = $repairs_sum;
+        $newEquipment->profit = $profit;
+        $newEquipment->payback_ratio = $payback_ratio;
 
         try {
             if (!$newEquipment->save(false)) {

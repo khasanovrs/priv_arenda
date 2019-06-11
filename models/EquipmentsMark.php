@@ -9,6 +9,8 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ *
+ * @property Equipments[] $equipments
  */
 class EquipmentsMark extends \yii\db\ActiveRecord
 {
@@ -40,5 +42,13 @@ class EquipmentsMark extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipments()
+    {
+        return $this->hasMany(Equipments::className(), ['mark' => 'id']);
     }
 }

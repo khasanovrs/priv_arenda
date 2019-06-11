@@ -29,8 +29,14 @@ class AddEquipmentAction extends Action
         $price_per_day = $request->getBodyParam('price_per_day');
         $revenue = $request->getBodyParam('revenue');
         $degree_wear = $request->getBodyParam('degree_wear');
+        $discount = $request->getBodyParam('discount');
+        $rentals = $request->getBodyParam('rentals');
+        $repairs = $request->getBodyParam('repairs');
+        $repairs_sum = $request->getBodyParam('repairs_sum');
+        $profit = $request->getBodyParam('profit');
+        $payback_ratio = $request->getBodyParam('payback_ratio');
 
-        $result = EquipmentsClass::AddEquipmentFields($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear);
+        $result = EquipmentsClass::AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении оборудования', __METHOD__);

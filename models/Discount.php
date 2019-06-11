@@ -12,6 +12,7 @@ use Yii;
  * @property string $name
  *
  * @property ClientsInfo[] $clientsInfos
+ * @property Equipments[] $equipments
  */
 class Discount extends \yii\db\ActiveRecord
 {
@@ -52,5 +53,13 @@ class Discount extends \yii\db\ActiveRecord
     public function getClientsInfos()
     {
         return $this->hasMany(ClientsInfo::className(), ['sale' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipments()
+    {
+        return $this->hasMany(Equipments::className(), ['discount' => 'id']);
     }
 }
