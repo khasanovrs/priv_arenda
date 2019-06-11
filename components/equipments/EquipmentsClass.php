@@ -12,7 +12,6 @@ use app\models\Equipments;
 use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
-use app\models\EquipmentsMark;
 use app\models\EquipmentsShowField;
 use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
@@ -119,7 +118,7 @@ class EquipmentsClass
         }
 
         /**
-         * @var EquipmentsStatus $value
+         * @var EquipmentsAvailability $value
          */
         foreach ($equipmentsAvailabilityList as $value) {
             $result[] = [
@@ -181,7 +180,7 @@ class EquipmentsClass
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = '%' . $like . '%';
-            $listFilter[] = 'model like :like';
+            $listFilter[] = 'name like :like';
             $params[':like'] = $like;
         }
 
@@ -332,7 +331,7 @@ class EquipmentsClass
         foreach ($equipmentsTypeList as $value) {
             $result[] = [
                 'id' => $value->id,
-                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
+                'name' => $value->name,
                 'category' => $value->category->name,
                 'stock' => $value->stock->name,
                 'type' => $value->type0->name,
@@ -341,7 +340,6 @@ class EquipmentsClass
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,
                 'rentals' => $value->rentals,
-                'repairs' => $value->repairs,
                 'repairs_sum' => $value->repairs_sum,
                 'tool_number' => $value->tool_number,
                 'revenue' => $value->revenue,
@@ -561,8 +559,7 @@ class EquipmentsClass
 
     /**
      * Функция добавления оборудования
-     * @param $model
-     * @param $mark
+     * @param $name
      * @param $status
      * @param $stock
      * @param $equipmentsType
@@ -573,28 +570,20 @@ class EquipmentsClass
      * @param $price_per_day
      * @param $revenue
      * @param $degree_wear
-     * @param $discount
-     * @param $rentals
-     * @param $repairs
-     * @param $repairs_sum
-     * @param $profit
-     * @param $payback_ratio
+     * @param $sale
+     * @param $impact_energy
+     * @param $length
+     * @param $network_cord
+     * @param $power
+     * @param $frequency_hits
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio)
+    public static function AddEquipmentFields($name, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $sale, $impact_energy, $length, $network_cord, $power, $frequency_hits)
     {
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 
-        if ($model === '') {
-            Yii::error('Ни передано модель оборудования, model: ' . serialize($model), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передано наименование оборудования',
-            ];
-        }
-
-        if ($mark === '') {
-            Yii::error('Ни передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
+        if ($name === '') {
+            Yii::error('Ни передано наименование оборудования, name: ' . serialize($name), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передано наименование оборудования',
@@ -606,14 +595,6 @@ class EquipmentsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор статуса',
-            ];
-        }
-
-        if ($discount === '') {
-            Yii::error('Ни передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор скидки',
             ];
         }
 
@@ -667,8 +648,7 @@ class EquipmentsClass
 
         $newEquipment = new Equipments();
         $newEquipment->status = $status;
-        $newEquipment->mark = $mark;
-        $newEquipment->model = $model;
+        $newEquipment->name = $name;
         $newEquipment->stock_id = $stock;
         $newEquipment->type = $equipmentsType;
         $newEquipment->category_id = $equipmentsCategory;
@@ -678,12 +658,7 @@ class EquipmentsClass
         $newEquipment->price_per_day = $price_per_day;
         $newEquipment->revenue = $revenue;
         $newEquipment->degree_wear = $degree_wear;
-        $newEquipment->discount = $discount;
-        $newEquipment->rentals = $rentals;
-        $newEquipment->repairs = $repairs;
-        $newEquipment->repairs_sum = $repairs_sum;
-        $newEquipment->profit = $profit;
-        $newEquipment->payback_ratio = $payback_ratio;
+        $newEquipment->sale = $sale;
 
         try {
             if (!$newEquipment->save(false)) {
@@ -700,43 +675,5 @@ class EquipmentsClass
             'msg' => 'Оборудование успешно добавлено'
         ];
 
-    }
-
-    /**
-     * @return array
-     */
-    public static function GetEquipmentsMark()
-    {
-        Yii::info('Запуск функции GetEquipmentsMark', __METHOD__);
-        $result = [];
-
-        $equipmentsMarkList = EquipmentsMark::find()->orderBy('id')->all();
-
-        if (!is_array($equipmentsMarkList)) {
-            Yii::error('Список марок оборудования пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список марок оборудования пуст'
-            ];
-        }
-
-        /**
-         * @var EquipmentsMark $value
-         */
-        foreach ($equipmentsMarkList as $value) {
-            $result[] = [
-                'val' => $value->id,
-                'name' => $value->name
-            ];
-        }
-
-        Yii::info('Список марок оборудования получен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Список марок оборудования получен',
-            'data' => $result
-        ];
     }
 }
