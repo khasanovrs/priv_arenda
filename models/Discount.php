@@ -11,6 +11,7 @@ use Yii;
  * @property string $code
  * @property string $name
  *
+ * @property Applications[] $applications
  * @property ClientsInfo[] $clientsInfos
  * @property Equipments[] $equipments
  */
@@ -45,6 +46,14 @@ class Discount extends \yii\db\ActiveRecord
             'code' => 'Code',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplications()
+    {
+        return $this->hasMany(Applications::className(), ['discount_id' => 'id']);
     }
 
     /**

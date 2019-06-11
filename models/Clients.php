@@ -16,6 +16,7 @@ use Yii;
  * @property string $last_contact последний контакт
  * @property string $date_create дата создания записи
  *
+ * @property Applications[] $applications
  * @property Branch $branch
  * @property ClientStatus $status0
  * @property ClientsInfo[] $clientsInfos
@@ -61,6 +62,14 @@ class Clients extends \yii\db\ActiveRecord
             'last_contact' => 'Last Contact',
             'date_create' => 'Date Create',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplications()
+    {
+        return $this->hasMany(Applications::className(), ['client_id' => 'id']);
     }
 
     /**

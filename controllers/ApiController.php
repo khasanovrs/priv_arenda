@@ -150,6 +150,28 @@ class ApiController extends Controller
             'equipments-update' => [
                 'class' => 'app\components\actions\equipments\EquipmentUpdateAction',
             ],
+            /**
+             * Управление заявками
+             */
+            'get--applications-status' => [
+                'class' => 'app\components\actions\equipments\GetApplicationsStatusAction',
+            ],
+            'get--applications-source' => [
+                'class' => 'app\components\actions\equipments\GetApplicationsSourceAction',
+            ],
+            'get--applications-delivery' => [
+                'class' => 'app\components\actions\equipments\GetApplicationsDeliveryAction',
+            ],
+            'get--applications-field' => [
+                'class' => 'app\components\actions\equipments\GetApplicationsFieldAction',
+            ],
+            'change--applications-field' => [
+                'class' => 'app\components\actions\equipments\ChangeApplicationsFieldAction',
+            ],
+            'get--applications' => [
+                'class' => 'app\components\actions\equipments\GetApplicationsAction',
+            ]
+
         ];
     }
 

@@ -18,6 +18,7 @@ use Yii;
  * @property string $date_create дата создания записи
  * @property string $date_update Время последнего запроса sms-кода
  *
+ * @property ApplicationsShowField[] $applicationsShowFields
  * @property BunchUserRight[] $bunchUserRights
  * @property ClientShowField[] $clientShowFields
  * @property EquipmentsShowField[] $equipmentsShowFields
@@ -70,6 +71,14 @@ class Users extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationsShowFields()
+    {
+        return $this->hasMany(ApplicationsShowField::className(), ['user_id' => 'id']);
     }
 
     /**
