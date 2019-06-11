@@ -609,6 +609,14 @@ class EquipmentsClass
             ];
         }
 
+        if ($discount === '') {
+            Yii::error('Ни передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор скидки',
+            ];
+        }
+
         if ($stock === '') {
             Yii::error('Ни передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
             return [
