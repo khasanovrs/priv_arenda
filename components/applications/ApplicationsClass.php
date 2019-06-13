@@ -3,9 +3,10 @@
  * Управление заявками
  */
 
-namespace app\components\equipments;
+namespace app\components\applications;
 
 use app\components\Session\Sessions;
+use app\models\Applications;
 use app\models\ApplicationsDelivery;
 use app\models\ApplicationsField;
 use app\models\ApplicationsShowField;
@@ -172,7 +173,7 @@ class ApplicationsClass
          * @var ApplicationsField $value
          */
         foreach ($applicationsFieldList as $value) {
-            $check_flag = ApplicationsShowField::find()->where('ApplicationsField=:ApplicationsField and user_id=:user_id', [':ApplicationsField' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
+            $check_flag = ApplicationsShowField::find()->where('applications_field_id=:applications_field_id and user_id=:user_id', [':applications_field_id' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
 
             $flag = is_object($check_flag) ? 0 : 1;
 
@@ -254,6 +255,73 @@ class ApplicationsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Поля успешно изменены'
+        ];
+    }
+
+    public static function UpdateApplicationsStatus($id, $status)
+    {
+        Yii::info('Запуск функции UpdateApplicationsStatus', __METHOD__);
+
+        if ($id === '' || !is_int($status)) {
+            Yii::error('Ни передан идентификтор заявки, id: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификтор заявки',
+            ];
+        }
+
+        if ($status === '' || !is_int($status)) {
+            Yii::error('Передан некорректный статус, status: ' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный статус',
+            ];
+        }
+
+        $check_status = ApplicationsStatus::find()->where('id=:id', [':id' => $status])->one();
+
+        if (!is_object($check_status)) {
+            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный статус',
+            ];
+        }
+
+        /**
+         * @var Applications $applications
+         */
+        $applications = Applications::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($applications)) {
+            Yii::error('По данному идентификатору заявка не найдена, id' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена',
+            ];
+        }
+
+        $applications->status = $status;
+
+        try {
+            if (!$applications->save(false)) {
+                Yii::error('Ошибка при обновлении статуса заявки: ' . serialize($applications->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при обновлении статуса заявки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Статус заявки успешно изменен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Статус заявки успешно изменен'
         ];
     }
 }

@@ -3,9 +3,9 @@
  * Изменение списка полей для зявок
  */
 
-namespace app\components\actions\equipments;
+namespace app\components\actions\applications;
 
-use app\components\equipments\ApplicationsClass;
+use app\components\applications\ApplicationsClass;
 use Yii;
 use yii\base\Action;
 
@@ -38,8 +38,7 @@ class ChangeApplicationsFieldAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Списки полей для заявок успешно изменены',
-            'data' => $result['data']
+            'msg' => 'Списки полей для заявок успешно изменены'
         ];
     }
 }

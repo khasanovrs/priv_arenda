@@ -153,23 +153,26 @@ class ApiController extends Controller
             /**
              * Управление заявками
              */
-            'get--applications-status' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsStatusAction',
+            'get-applications-status' => [
+                'class' => 'app\components\actions\applications\GetApplicationsStatusAction',
             ],
-            'get--applications-source' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsSourceAction',
+            'update-applications-status' => [
+                'class' => 'app\components\actions\applications\updateApplicationsStatusAction',
             ],
-            'get--applications-delivery' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsDeliveryAction',
+            'get-applications-source' => [
+                'class' => 'app\components\actions\applications\GetApplicationsSourceAction',
             ],
-            'get--applications-field' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsFieldAction',
+            'get-applications-delivery' => [
+                'class' => 'app\components\actions\applications\GetApplicationsDeliveryAction',
             ],
-            'change--applications-field' => [
-                'class' => 'app\components\actions\equipments\ChangeApplicationsFieldAction',
+            'get-applications-field' => [
+                'class' => 'app\components\actions\applications\GetApplicationsFieldAction',
             ],
-            'get--applications' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsAction',
+            'change-applications-field' => [
+                'class' => 'app\components\actions\applications\ChangeApplicationsFieldAction',
+            ],
+            'get-applications' => [
+                'class' => 'app\components\actions\applications\GetApplicationsAction',
             ]
 
         ];
