@@ -34,8 +34,7 @@ class ChangeFieldsClientAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Список полей успешно изменен',
-            'data' => []
+            'msg' => 'Список полей успешно изменен'
         ];
     }
 }

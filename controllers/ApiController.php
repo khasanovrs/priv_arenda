@@ -54,6 +54,9 @@ class ApiController extends Controller
             'get-client' => [
                 'class' => 'app\components\actions\client\GetUrClientAction',
             ],
+            'get-search-client' => [
+                'class' => 'app\components\actions\client\GetSearchClientAction',
+            ],
             'add-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',
             ],
@@ -153,23 +156,32 @@ class ApiController extends Controller
             /**
              * Управление заявками
              */
-            'get--applications-status' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsStatusAction',
+            'get-applications-status' => [
+                'class' => 'app\components\actions\applications\GetApplicationsStatusAction',
             ],
-            'get--applications-source' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsSourceAction',
+            'update-applications-status' => [
+                'class' => 'app\components\actions\applications\updateApplicationsStatusAction',
             ],
-            'get--applications-delivery' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsDeliveryAction',
+            'get-applications-source' => [
+                'class' => 'app\components\actions\applications\GetApplicationsSourceAction',
             ],
-            'get--applications-field' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsFieldAction',
+            'get-applications-type-lease' => [
+                'class' => 'app\components\actions\applications\GetApplicationsTypeLeaseAction',
             ],
-            'change--applications-field' => [
-                'class' => 'app\components\actions\equipments\ChangeApplicationsFieldAction',
+            'get-applications-delivery' => [
+                'class' => 'app\components\actions\applications\GetApplicationsDeliveryAction',
             ],
-            'get--applications' => [
-                'class' => 'app\components\actions\equipments\GetApplicationsAction',
+            'get-applications-field' => [
+                'class' => 'app\components\actions\applications\GetApplicationsFieldAction',
+            ],
+            'change-applications-field' => [
+                'class' => 'app\components\actions\applications\ChangeApplicationsFieldAction',
+            ],
+            'get-applications' => [
+                'class' => 'app\components\actions\applications\GetApplicationsAction',
+            ],
+            'add-application' => [
+                'class' => 'app\components\actions\applications\AddApplicationAction',
             ]
 
         ];

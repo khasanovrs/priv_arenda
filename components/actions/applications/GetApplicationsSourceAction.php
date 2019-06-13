@@ -3,9 +3,9 @@
  * Получение источников зявок
  */
 
-namespace app\components\actions\equipments;
+namespace app\components\actions\applications;
 
-use app\components\equipments\ApplicationsClass;
+use app\components\applications\ApplicationsClass;
 use Yii;
 use yii\base\Action;
 

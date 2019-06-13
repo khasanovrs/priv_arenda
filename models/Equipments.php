@@ -28,7 +28,7 @@ use Yii;
  * @property string $payback_ratio Коэфициент окупаемости
  * @property string $date_create
  *
- * @property Applications[] $applications
+ * @property ApplicationEquipment[] $applicationEquipments
  * @property EquipmentsCategory $category
  * @property Stock $stock
  * @property EquipmentsType $type0
@@ -52,7 +52,7 @@ class Equipments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'required'],
+            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model'], 'string', 'max' => 150],
@@ -97,9 +97,9 @@ class Equipments extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getApplications()
+    public function getApplicationEquipments()
     {
-        return $this->hasMany(Applications::className(), ['equipments_id' => 'id']);
+        return $this->hasMany(ApplicationEquipment::className(), ['equipments_id' => 'id']);
     }
 
     /**
