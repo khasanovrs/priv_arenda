@@ -54,6 +54,9 @@ class ApiController extends Controller
             'get-client' => [
                 'class' => 'app\components\actions\client\GetUrClientAction',
             ],
+            'get-search-client' => [
+                'class' => 'app\components\actions\client\GetSearchClientAction',
+            ],
             'add-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',
             ],
@@ -162,6 +165,9 @@ class ApiController extends Controller
             'get-applications-source' => [
                 'class' => 'app\components\actions\applications\GetApplicationsSourceAction',
             ],
+            'get-applications-type-lease' => [
+                'class' => 'app\components\actions\applications\GetApplicationsTypeLeaseAction',
+            ],
             'get-applications-delivery' => [
                 'class' => 'app\components\actions\applications\GetApplicationsDeliveryAction',
             ],
@@ -173,6 +179,9 @@ class ApiController extends Controller
             ],
             'get-applications' => [
                 'class' => 'app\components\actions\applications\GetApplicationsAction',
+            ],
+            'add-application' => [
+                'class' => 'app\components\actions\applications\AddApplicationAction',
             ]
 
         ];
