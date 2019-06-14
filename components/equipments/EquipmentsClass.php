@@ -375,11 +375,11 @@ class EquipmentsClass
         $equipment = Equipments::find()->where('id=:id', [':id' => $equipmentId])->one();
 
         if (!is_object($equipment)) {
-            Yii::error('Оборудование ни найдено, id:' . serialize($equipmentId), __METHOD__);
+            Yii::error('Оборудование не найдено, id:' . serialize($equipmentId), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Оборудование ни найдено'
+                'msg' => 'Оборудование не найдено'
             ];
         }
 
@@ -529,11 +529,11 @@ class EquipmentsClass
 
                 try {
                     if (!$newVal->save(false)) {
-                        Yii::error('Ошибка при изменени отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
+                        Yii::error('Ошибка при изменене отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
                         return false;
                     }
                 } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при изменени отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+                    Yii::error('Поймали Exception при изменене отображения поля: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
             }
@@ -559,11 +559,11 @@ class EquipmentsClass
         Yii::info('Запуск функции ChangeEquipmentsStatus', __METHOD__);
 
         if ($id === '' || !is_int($status)) {
-            Yii::error('Ни передан идентификтор организации, id: ' . serialize($id), __METHOD__);
+            Yii::error('Не передан идентификтор организации, id: ' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан идентификтор оборудования',
+                'msg' => 'Не передан идентификтор оборудования',
             ];
         }
 
@@ -593,11 +593,11 @@ class EquipmentsClass
         $equipments = Equipments::find()->where('id=:id', [':id' => $id])->one();
 
         if (!is_object($equipments)) {
-            Yii::error('По данному идентификатору оборудование ни найдено, id' . serialize($id), __METHOD__);
+            Yii::error('По данному идентификатору оборудование не найдено, id' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Оборудование ни найдено',
+                'msg' => 'Оборудование не найдено',
             ];
         }
 
@@ -653,7 +653,7 @@ class EquipmentsClass
         Yii::info('Оборудование успешно добавлено', __METHOD__);
 
         if ($model === '') {
-            Yii::error('Ни передано модель оборудования, model: ' . serialize($model), __METHOD__);
+            Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передано наименование оборудования',
@@ -661,7 +661,7 @@ class EquipmentsClass
         }
 
         if ($mark === '') {
-            Yii::error('Ни передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
+            Yii::error('Не передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передано наименование оборудования',
@@ -669,7 +669,7 @@ class EquipmentsClass
         }
 
         if ($status === '') {
-            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
+            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор статуса',
@@ -677,7 +677,7 @@ class EquipmentsClass
         }
 
         if ($discount === '') {
-            Yii::error('Ни передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
+            Yii::error('Не передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор скидки',
@@ -685,7 +685,7 @@ class EquipmentsClass
         }
 
         if ($stock === '') {
-            Yii::error('Ни передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
+            Yii::error('Не передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор склада',
@@ -693,7 +693,7 @@ class EquipmentsClass
         }
 
         if ($equipmentsType === '') {
-            Yii::error('Ни передан тип оборудования, equipmentsType: ' . serialize($equipmentsType), __METHOD__);
+            Yii::error('Не передан тип оборудования, equipmentsType: ' . serialize($equipmentsType), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан тип оборудования',
@@ -701,7 +701,7 @@ class EquipmentsClass
         }
 
         if ($equipmentsCategory === '') {
-            Yii::error('Ни передана категория оборудования, equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
+            Yii::error('Не передана категория оборудования, equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передана категория оборудования',
@@ -856,7 +856,7 @@ class EquipmentsClass
     public static function changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits)
     {
         if ($model === '') {
-            Yii::error('Ни передано модель оборудования, model: ' . serialize($model), __METHOD__);
+            Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передано наименование оборудования',
@@ -864,7 +864,7 @@ class EquipmentsClass
         }
 
         if ($mark === '') {
-            Yii::error('Ни передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
+            Yii::error('Не передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передано наименование оборудования',
@@ -872,7 +872,7 @@ class EquipmentsClass
         }
 
         if ($status === '') {
-            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
+            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор статуса',
@@ -880,7 +880,7 @@ class EquipmentsClass
         }
 
         if ($discount === '') {
-            Yii::error('Ни передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
+            Yii::error('Не передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор скидки',
@@ -888,7 +888,7 @@ class EquipmentsClass
         }
 
         if ($stock === '') {
-            Yii::error('Ни передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
+            Yii::error('Не передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор склада',
@@ -896,7 +896,7 @@ class EquipmentsClass
         }
 
         if ($equipmentsType === '') {
-            Yii::error('Ни передан тип оборудования, equipmentsType: ' . serialize($equipmentsType), __METHOD__);
+            Yii::error('Не передан тип оборудования, equipmentsType: ' . serialize($equipmentsType), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан тип оборудования',
@@ -904,7 +904,7 @@ class EquipmentsClass
         }
 
         if ($equipmentsCategory === '') {
-            Yii::error('Ни передана категория оборудования, equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
+            Yii::error('Не передана категория оборудования, equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передана категория оборудования',

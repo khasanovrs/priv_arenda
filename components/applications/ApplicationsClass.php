@@ -285,11 +285,11 @@ class ApplicationsClass
 
                 try {
                     if (!$newVal->save(false)) {
-                        Yii::error('Ошибка при изменени отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
+                        Yii::error('Ошибка при изменене отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
                         return false;
                     }
                 } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при изменени отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+                    Yii::error('Поймали Exception при изменене отображения поля: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
             }
@@ -315,11 +315,11 @@ class ApplicationsClass
         Yii::info('Запуск функции UpdateApplicationsStatus', __METHOD__);
 
         if ($id === '' || !is_int($status)) {
-            Yii::error('Ни передан идентификтор заявки, id: ' . serialize($id), __METHOD__);
+            Yii::error('Не передан идентификтор заявки, id: ' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан идентификтор заявки',
+                'msg' => 'Не передан идентификтор заявки',
             ];
         }
 
