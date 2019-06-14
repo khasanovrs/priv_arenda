@@ -17,9 +17,10 @@ class GetApplicationsAction extends Action
 
         $request = Yii::$app->request;
 
-        $params = $request->getBodyParam('data');
+        $status = $request->getBodyParam('status');
+        $source = $request->getBodyParam('source');
 
-        $result = ApplicationsClass::getApplications($params);
+        $result = ApplicationsClass::getApplications($status, $source);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка заявок', __METHOD__);

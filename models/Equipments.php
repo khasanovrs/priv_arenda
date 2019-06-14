@@ -27,6 +27,7 @@ use Yii;
  * @property string $degree_wear Степень износа 
  * @property string $payback_ratio Коэфициент окупаемости
  * @property string $date_create
+ * @property string $photo
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property EquipmentsCategory $category
@@ -55,7 +56,7 @@ class Equipments extends \yii\db\ActiveRecord
             [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
-            [['model'], 'string', 'max' => 150],
+            [['model', 'photo'], 'string', 'max' => 150],
             [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio'], 'string', 'max' => 45],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
@@ -91,6 +92,7 @@ class Equipments extends \yii\db\ActiveRecord
             'degree_wear' => 'Degree Wear',
             'payback_ratio' => 'Payback Ratio',
             'date_create' => 'Date Create',
+            'photo' => 'Photo',
         ];
     }
 

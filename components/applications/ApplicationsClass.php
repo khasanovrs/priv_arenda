@@ -592,16 +592,34 @@ class ApplicationsClass
 
     /**
      * Функция получения заявок
-     * @param $params
+     * @param $status
+     * @param $source
      * @return array
      */
-    public static function getApplications($params)
+    public static function getApplications($status, $source)
     {
         Yii::info('Запуск функции getApplications', __METHOD__);
-
         $result = [];
+        $listFilter = [];
+        $params = [];
 
-        $applications = Applications::find()->orderBy('id desc')->all();
+        if ($status !== '' and $status !== null) {
+            Yii::info('Параметр status: ' . serialize($status), __METHOD__);
+            $listFilter[] = 'application_equipment.status_id=:status';
+            $params[':status'] = $status;
+        }
+
+        if ($source !== '' and $source !== null) {
+            Yii::info('Параметр status: ' . serialize($source), __METHOD__);
+            $listFilter[] = 'source_id=:source';
+            $params[':source'] = $source;
+        }
+
+        if (!empty($listFilter)) {
+            $applications = Applications::find()->joinWith('applicationEquipments')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+        } else {
+            $applications = Applications::find()->joinWith('applicationEquipments')->orderBy('id desc')->all();
+        }
 
         if (!is_array($applications)) {
             Yii::info('Список заявок пуст', __METHOD__);
@@ -617,6 +635,10 @@ class ApplicationsClass
          */
         foreach ($applications as $application) {
             foreach ($application->applicationEquipments as $equipments) {
+
+                if ($status !== '' and $status !== null && $equipments->status_id !== $status) {
+                    continue;
+                }
 
                 $mark = $equipments->equipments->mark0->name;
                 $model = $equipments->equipments->model;
