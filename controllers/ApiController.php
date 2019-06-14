@@ -160,7 +160,7 @@ class ApiController extends Controller
                 'class' => 'app\components\actions\applications\GetApplicationsStatusAction',
             ],
             'update-applications-status' => [
-                'class' => 'app\components\actions\applications\updateApplicationsStatusAction',
+                'class' => 'app\components\actions\applications\UpdateApplicationsStatusAction',
             ],
             'get-applications-source' => [
                 'class' => 'app\components\actions\applications\GetApplicationsSourceAction',

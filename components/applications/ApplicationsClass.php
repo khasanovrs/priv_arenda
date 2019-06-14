@@ -339,9 +339,9 @@ class ApplicationsClass
         }
 
         /**
-         * @var Applications $applications
+         * @var ApplicationEquipment $applications
          */
-        $applications = Applications::find()->where('id=:id', [':id' => $id])->one();
+        $applications = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
 
         if (!is_object($applications)) {
             Yii::error('По данному идентификатору заявка не найдена, id' . serialize($id), __METHOD__);
@@ -352,7 +352,7 @@ class ApplicationsClass
             ];
         }
 
-        $applications->status = $status;
+        $applications->status_id = $status;
 
         try {
             if (!$applications->save(false)) {
@@ -385,7 +385,8 @@ class ApplicationsClass
      * @param $delivery_sum
      * @param $status
      * @param $comment
-     * @return array | bool
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
     public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment)
     {
@@ -400,9 +401,15 @@ class ApplicationsClass
             ];
         }
 
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
         $newApplications = new Applications();
         $newApplications->client_id = $client_id;
-        $newApplications->status_id = $status;
+        $newApplications->user_id = $session->user_id;
         $newApplications->source_id = $client_id;
         $newApplications->discount_id = $sale;
         $newApplications->delivery_id = $delivery;
@@ -423,11 +430,11 @@ class ApplicationsClass
             return false;
         }
 
-
         foreach ($equipments as $value) {
             $newApplicationEquipment = new ApplicationEquipment();
             $newApplicationEquipment->application_id = $newApplications->id;
             $newApplicationEquipment->equipments_id = $value->id;
+            $newApplicationEquipment->status_id = $status;
             $newApplicationEquipment->equipments_count = $value->count;
 
             try {
@@ -475,14 +482,26 @@ class ApplicationsClass
          * @var Applications $application
          */
         foreach ($applications as $application) {
-            $result[] = [
-                'client' => $application->client->name,
-                'phone' => $application->client->phone,
-                'typeLease' => $application->typeLease->name,
-                'status' => $application->status->name,
-                'source' => $application->source->name,
-                'comment' => $application->comment
-            ];
+            foreach ($application->applicationEquipments as $equipments) {
+
+                $mark = $equipments->equipments->mark0->name;
+                $model = $equipments->equipments->model;
+                $category = $equipments->equipments->category->name;
+
+                $result[] = [
+                    'id' => $application->id,
+                    'equipments_id' => $equipments->id,
+                    'equipments_name' => $category . ' ' . $mark . ' ' . $model,
+                    'equipments_count' => $equipments->equipments_count,
+                    'status' => $equipments->status_id,
+                    'client' => $application->client->name,
+                    'phone' => $application->client->phone,
+                    'typeLease' => $application->typeLease->name,
+                    'source' => $application->source->name,
+                    'comment' => $application->comment,
+                    'user' => $application->user->fio,
+                ];
+            }
         }
 
         Yii::info('Заявки успешно получены', __METHOD__);

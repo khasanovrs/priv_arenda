@@ -9,11 +9,11 @@ use Yii;
  *
  * @property int $id
  * @property int $client_id
- * @property int $status_id
  * @property int $source_id
  * @property int $discount_id
  * @property int $delivery_id
  * @property int $type_lease_id
+ * @property int $user_id
  * @property string $comment
  * @property string $rent_start
  * @property string $rent_end
@@ -23,10 +23,10 @@ use Yii;
  * @property ApplicationEquipment[] $applicationEquipments
  * @property Clients $client
  * @property ApplicationsSource $source
- * @property ApplicationsStatus $status
  * @property Discount $discount
  * @property ApplicationsDelivery $delivery
  * @property ApplicationsTypeLease $typeLease
+ * @property Users $user
  */
 class Applications extends \yii\db\ActiveRecord
 {
@@ -44,16 +44,16 @@ class Applications extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'status_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id'], 'required'],
-            [['client_id', 'status_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'delivery_sum', 'total_sum'], 'integer'],
+            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id'], 'required'],
+            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'delivery_sum', 'total_sum'], 'integer'],
             [['rent_start', 'rent_end'], 'safe'],
             [['comment'], 'string', 'max' => 500],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsSource::className(), 'targetAttribute' => ['source_id' => 'id']],
-            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsStatus::className(), 'targetAttribute' => ['status_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
             [['delivery_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsDelivery::className(), 'targetAttribute' => ['delivery_id' => 'id']],
             [['type_lease_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsTypeLease::className(), 'targetAttribute' => ['type_lease_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -65,11 +65,11 @@ class Applications extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'client_id' => 'Client ID',
-            'status_id' => 'Status ID',
             'source_id' => 'Source ID',
             'discount_id' => 'Discount ID',
             'delivery_id' => 'Delivery ID',
             'type_lease_id' => 'Type Lease ID',
+            'user_id' => 'User ID',
             'comment' => 'Comment',
             'rent_start' => 'Rent Start',
             'rent_end' => 'Rent End',
@@ -105,14 +105,6 @@ class Applications extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getStatus()
-    {
-        return $this->hasOne(ApplicationsStatus::className(), ['id' => 'status_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getDiscount()
     {
         return $this->hasOne(Discount::className(), ['id' => 'discount_id']);
@@ -132,5 +124,13 @@ class Applications extends \yii\db\ActiveRecord
     public function getTypeLease()
     {
         return $this->hasOne(ApplicationsTypeLease::className(), ['id' => 'type_lease_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'user_id']);
     }
 }
