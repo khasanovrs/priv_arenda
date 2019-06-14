@@ -180,6 +180,9 @@ class ApiController extends Controller
             'get-applications' => [
                 'class' => 'app\components\actions\applications\GetApplicationsAction',
             ],
+            'get-application-info' => [
+                'class' => 'app\components\actions\applications\GetApplicationInfoAction',
+            ],
             'add-application' => [
                 'class' => 'app\components\actions\applications\AddApplicationAction',
             ]
