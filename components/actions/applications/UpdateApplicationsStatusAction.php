@@ -39,8 +39,7 @@ class UpdateApplicationsStatusAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Статус заявки успешно изменен',
-            'data' => $result['data']
+            'msg' => 'Статус заявки успешно изменен'
         ];
     }
 }

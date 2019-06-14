@@ -14,7 +14,12 @@ use app\models\ApplicationsShowField;
 use app\models\ApplicationsSource;
 use app\models\ApplicationsStatus;
 use app\models\ApplicationsTypeLease;
+use app\models\Branch;
+use app\models\Clients;
+use app\models\Discount;
 use app\models\EquipmentsShowField;
+use app\models\Stock;
+use Codeception\Application;
 use Yii;
 
 class ApplicationsClass
@@ -280,11 +285,11 @@ class ApplicationsClass
 
                 try {
                     if (!$newVal->save(false)) {
-                        Yii::error('Ошибка при изменени отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
+                        Yii::error('Ошибка при изменене отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
                         return false;
                     }
                 } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при изменени отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+                    Yii::error('Поймали Exception при изменене отображения поля: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
             }
@@ -310,11 +315,11 @@ class ApplicationsClass
         Yii::info('Запуск функции UpdateApplicationsStatus', __METHOD__);
 
         if ($id === '' || !is_int($status)) {
-            Yii::error('Ни передан идентификтор заявки, id: ' . serialize($id), __METHOD__);
+            Yii::error('Не передан идентификтор заявки, id: ' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан идентификтор заявки',
+                'msg' => 'Не передан идентификтор заявки',
             ];
         }
 
@@ -339,9 +344,9 @@ class ApplicationsClass
         }
 
         /**
-         * @var Applications $applications
+         * @var ApplicationEquipment $applications
          */
-        $applications = Applications::find()->where('id=:id', [':id' => $id])->one();
+        $applications = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
 
         if (!is_object($applications)) {
             Yii::error('По данному идентификатору заявка не найдена, id' . serialize($id), __METHOD__);
@@ -352,7 +357,7 @@ class ApplicationsClass
             ];
         }
 
-        $applications->status = $status;
+        $applications->status_id = $status;
 
         try {
             if (!$applications->save(false)) {
@@ -385,9 +390,11 @@ class ApplicationsClass
      * @param $delivery_sum
      * @param $status
      * @param $comment
-     * @return array | bool
+     * @param $branch
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -400,18 +407,176 @@ class ApplicationsClass
             ];
         }
 
+        if ($client_id === '') {
+            Yii::error('Не передан идентификатор клиента, client_id: ' . serialize($client_id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор клиента',
+            ];
+        }
+
+        if ($typeLease === '') {
+            Yii::error('Не передан идентификатор тип аренды, typeLease: ' . serialize($typeLease), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор тип аренды',
+            ];
+        }
+
+        if ($sale === '') {
+            Yii::error('Не передан идентификатор скидки, sale: ' . serialize($sale), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор скидки',
+            ];
+        }
+
+        if ($rent_start === '') {
+            Yii::error('Не передана дата начала аренды, rent_start: ' . serialize($rent_start), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана дата начала аренды',
+            ];
+        }
+
+        if ($rent_end === '') {
+            Yii::error('Не передана дата окончания аренды, rent_end: ' . serialize($rent_end), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана дата окончания аренды',
+            ];
+        }
+
+        if ($delivery === '') {
+            Yii::error('Не указан способ доставки, delivery: ' . serialize($delivery), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указан способ доставки',
+            ];
+        }
+
+        if ($delivery_sum === '') {
+            Yii::error('Не указана сумма доставки, delivery_sum: ' . serialize($delivery_sum), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана сумма доставки',
+            ];
+        }
+
+        if ($sum === '') {
+            Yii::error('Не указана сумма, sum: ' . serialize($sum), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана сумма',
+            ];
+        }
+
+        if ($status === '') {
+            Yii::error('Не указан статус, status: ' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указан статус',
+            ];
+        }
+
+        if ($branch === '') {
+            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор филиала',
+            ];
+        }
+
+        $check = Clients::find()->where('id=:id', [':id' => $client_id])->one();
+        if (!is_object($check)) {
+            Yii::error('Клиент не найден, client_id: ' . serialize($client_id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Клиент не найден',
+            ];
+        }
+
+        $check = ApplicationsTypeLease::find()->where('id=:id', [':id' => $typeLease])->one();
+        if (!is_object($check)) {
+            Yii::error('Тип аренда не найден, typeLease: ' . serialize($typeLease), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Тип аренда не найден',
+            ];
+        }
+
+        $check = Discount::find()->where('id=:id', [':id' => $sale])->one();
+        if (!is_object($check)) {
+            Yii::error('Тип скидки не найден, sale: ' . serialize($sale), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Тип скидки не найден',
+            ];
+        }
+
+        $check = ApplicationsDelivery::find()->where('id=:id', [':id' => $delivery])->one();
+        if (!is_object($check)) {
+            Yii::error('Тип доставки не найден, delivery: ' . serialize($delivery), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Тип доставки не найден',
+            ];
+        }
+
+        $check = ApplicationsStatus::find()->where('id=:id', [':id' => $status])->one();
+        if (!is_object($check)) {
+            Yii::error('Статус не найден, status: ' . serialize($status), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Статус не найден',
+            ];
+        }
+
+        $check = Branch::find()->where('id=:id', [':id' => $branch])->one();
+        if (!is_object($check)) {
+            Yii::error('Филиал не найден, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Филиал не найден',
+            ];
+        }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
         $newApplications = new Applications();
         $newApplications->client_id = $client_id;
-        $newApplications->status_id = $status;
+        $newApplications->user_id = $session->user_id;
         $newApplications->source_id = $client_id;
         $newApplications->discount_id = $sale;
         $newApplications->delivery_id = $delivery;
         $newApplications->type_lease_id = $typeLease;
+        $newApplications->branch_id = $branch;
         $newApplications->comment = $comment;
         $newApplications->rent_start = $rent_start;
         $newApplications->rent_end = $rent_end;
         $newApplications->delivery_sum = $delivery_sum;
         $newApplications->total_sum = $sum;
+        $newApplications->date_create = date('Y-m-d H:i:s');
 
         try {
             if (!$newApplications->save(false)) {
@@ -423,11 +588,11 @@ class ApplicationsClass
             return false;
         }
 
-
         foreach ($equipments as $value) {
             $newApplicationEquipment = new ApplicationEquipment();
             $newApplicationEquipment->application_id = $newApplications->id;
             $newApplicationEquipment->equipments_id = $value->id;
+            $newApplicationEquipment->status_id = $status;
             $newApplicationEquipment->equipments_count = $value->count;
 
             try {
@@ -450,17 +615,136 @@ class ApplicationsClass
     }
 
     /**
-     * Функция получения заявок
-     * @param $params
-     * @return array
+     * Получение детальной информации о заявке
+     * @param $applicationId
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
-    public static function getApplications($params)
+    public static function getApplicationInfo($applicationId)
     {
-        Yii::info('Запуск функции getApplications', __METHOD__);
-
+        Yii::info('Запуск функции getApplicationInfo', __METHOD__);
         $result = [];
 
-        $applications = Applications::find()->orderBy('id desc')->all();
+        if ($applicationId === '') {
+            Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($applicationId), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор клиента',
+            ];
+        }
+
+        $applications = Applications::find()->where('id=:id', [':id' => $applicationId])->one();
+
+        if (!is_object($applications)) {
+            Yii::info('Ошибка при получении заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+        /**
+         * @var Applications $application
+         */
+        foreach ($applications as $application) {
+            $result = [
+                'id' => $application->id,
+                'branch' => $application->branch_id,
+                'delivery' => $application->delivery_id,
+                'typeLease' => $application->type_lease_id,
+                'sale' => $application->discount_id,
+                'source' => $application->source_id,
+                'comment' => $application->comment,
+                'rent_start' => $application->rent_start,
+                'rent_end' => $application->rent_end,
+                'client_id' => $application->client->id,
+                'client_fio' => $application->client->name,
+                'client_phone' => $application->client->phone,
+                'delivery_sum' => $application->delivery_sum,
+                'sum' => $application->total_sum,
+            ];
+
+            foreach ($application->applicationEquipments as $equipments) {
+
+                $mark = $equipments->equipments->mark0->name;
+                $model = $equipments->equipments->model;
+                $category = $equipments->equipments->category->name;
+
+                $result['equipments'][] = [
+                    'id' => $equipments->id,
+                    'equipments_id' => $equipments->equipments_id,
+                    'name' => $category . ' ' . $mark . ' ' . $model,
+                    'count' => $equipments->equipments_count,
+                    'status' => $equipments->status_id,
+                    'photo' => $equipments->equipments->photo
+                ];
+            }
+        }
+
+
+        Yii::info('Заявка успешно получена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно получена',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Функция получения заявок
+     * @param $status
+     * @param $source
+     * @param $branch
+     * @param $date_start
+     * @param $date_end
+     * @return array
+     */
+    public static function getApplications($status, $source, $branch, $date_start, $date_end)
+    {
+        Yii::info('Запуск функции getApplications', __METHOD__);
+        $result = [];
+        $listFilter = [];
+        $params = [];
+
+        if ($status !== '' and $status !== null) {
+            Yii::info('Параметр status: ' . serialize($status), __METHOD__);
+            $listFilter[] = 'application_equipment.status_id=:status';
+            $params[':status'] = $status;
+        }
+
+        if ($source !== '' and $source !== null) {
+            Yii::info('Параметр status: ' . serialize($source), __METHOD__);
+            $listFilter[] = 'source_id=:source';
+            $params[':source'] = $source;
+        }
+
+        if ($date_start !== '' and $date_start !== null) {
+            Yii::info('Параметр date_start: ' . serialize($date_start), __METHOD__);
+            $listFilter[] = 'date_create>:date_start';
+            $params[':date_start'] = $date_start . ' 00:00:00';
+        }
+
+        if ($date_end !== '' and $date_end !== null) {
+            Yii::info('Параметр date_end: ' . serialize($date_end), __METHOD__);
+            $listFilter[] = 'date_create<:date_end';
+            $params[':date_end'] = $date_end . ' 23:59:59';
+        }
+
+        if ($branch !== '' and $branch !== null) {
+            Yii::info('Параметр branch: ' . serialize($branch), __METHOD__);
+
+            $listFilter[] = 'branch_id in (:branch_id)';
+            $params[':branch_id'] = $branch;
+        }
+
+        if (!empty($listFilter)) {
+            $applications = Applications::find()->joinWith('applicationEquipments')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+        } else {
+            $applications = Applications::find()->joinWith('applicationEquipments')->orderBy('id desc')->all();
+        }
 
         if (!is_array($applications)) {
             Yii::info('Список заявок пуст', __METHOD__);
@@ -475,14 +759,30 @@ class ApplicationsClass
          * @var Applications $application
          */
         foreach ($applications as $application) {
-            $result[] = [
-                'client' => $application->client->name,
-                'phone' => $application->client->phone,
-                'typeLease' => $application->typeLease->name,
-                'status' => $application->status->name,
-                'source' => $application->source->name,
-                'comment' => $application->comment
-            ];
+            foreach ($application->applicationEquipments as $equipments) {
+
+                if ($status !== '' and $status !== null && $equipments->status_id !== $status) {
+                    continue;
+                }
+
+                $mark = $equipments->equipments->mark0->name;
+                $model = $equipments->equipments->model;
+                $category = $equipments->equipments->category->name;
+
+                $result[] = [
+                    'id' => $application->id,
+                    'equipments_id' => $equipments->id,
+                    'equipments_name' => $category . ' ' . $mark . ' ' . $model,
+                    'equipments_count' => $equipments->equipments_count,
+                    'status' => $equipments->status_id,
+                    'client' => $application->client->name,
+                    'phone' => $application->client->phone,
+                    'typeLease' => $application->typeLease->name,
+                    'source' => $application->source->name,
+                    'comment' => $application->comment,
+                    'user' => $application->user->fio,
+                ];
+            }
         }
 
         Yii::info('Заявки успешно получены', __METHOD__);

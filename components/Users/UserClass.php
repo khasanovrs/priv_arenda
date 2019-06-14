@@ -208,7 +208,7 @@ class UserClass
         Yii::info('Запуск функции обновления персональных данных пользователя', __METHOD__);
 
         if ($id === '') {
-            Yii::error('Ни передан идентификатор пользователя, id:' . serialize($id), __METHOD__);
+            Yii::error('Не передан идентификатор пользователя, id:' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -276,11 +276,11 @@ class UserClass
         $user = Users::find()->where('id=:id', [':id' => $id])->one();
 
         if (!is_object($user)) {
-            Yii::error('Пользователь ни найден, id:' . serialize($id), __METHOD__);
+            Yii::error('Пользователь не найден, id:' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Пользователь ни найден',
+                'msg' => 'Пользователь не найден',
             ];
         }
 
@@ -343,7 +343,7 @@ class UserClass
         Yii::info('Запуск функции измененения пароля пользователя', __METHOD__);
 
         if ($id === '') {
-            Yii::error('Ни передан идентификатор пользователя, id:' . serialize($id), __METHOD__);
+            Yii::error('Не передан идентификатор пользователя, id:' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -366,11 +366,11 @@ class UserClass
         $user = Users::find()->where('id=:id', [':id' => $id])->one();
 
         if (!is_object($user)) {
-            Yii::error('Пользователь ни найден, id:' . serialize($id), __METHOD__);
+            Yii::error('Пользователь не найден, id:' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Пользователь ни найден',
+                'msg' => 'Пользователь не найден',
             ];
         }
 
@@ -406,7 +406,7 @@ class UserClass
         $result = [];
 
         if ($branch === '' || !is_int($branch)) {
-            Yii::error('Ни передан идентификатор филиала, branch:' . serialize($branch), __METHOD__);
+            Yii::error('Не передан идентификатор филиала, branch:' . serialize($branch), __METHOD__);
 
             return [
                 'status' => 'ERROR',

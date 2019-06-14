@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  *
- * @property Applications[] $applications
+ * @property ApplicationEquipment[] $applicationEquipments
  */
 class ApplicationsStatus extends \yii\db\ActiveRecord
 {
@@ -47,8 +47,8 @@ class ApplicationsStatus extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getApplications()
+    public function getApplicationEquipments()
     {
-        return $this->hasMany(Applications::className(), ['status_id' => 'id']);
+        return $this->hasMany(ApplicationEquipment::className(), ['status_id' => 'id']);
     }
 }

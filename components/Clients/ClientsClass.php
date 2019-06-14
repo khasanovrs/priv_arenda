@@ -41,14 +41,18 @@ class ClientsClass
      * @param $phone_chief ,
      * @param $phone ,
      * @param $email ,
+     * @param $number_passport ,
+     * @param $where_passport ,
+     * @param $date_passport ,
+     * @param $address_passport
      * @return bool|array
      */
-    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email)
+    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email, $number_passport, $where_passport, $date_passport, $address_passport)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
         if ($sale === '') {
-            Yii::error('Ни передано значение скидки, sale: ' . serialize($sale), __METHOD__);
+            Yii::error('Не передано значение скидки, sale: ' . serialize($sale), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -57,7 +61,7 @@ class ClientsClass
         }
 
         if ($branch === '') {
-            Yii::error('Ни передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
+            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -66,7 +70,7 @@ class ClientsClass
         }
 
         if ($status === '') {
-            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
+            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -75,7 +79,7 @@ class ClientsClass
         }
 
         if ($source === '') {
-            Yii::error('Ни передан идентификатор источника, source: ' . serialize($source), __METHOD__);
+            Yii::error('Не передан идентификатор источника, source: ' . serialize($source), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -84,11 +88,11 @@ class ClientsClass
         }
 
         if ($phone_chief === '' && $phone === '' && $phone_2 === '') {
-            Yii::error('Ни передан номер телефона', __METHOD__);
+            Yii::error('Не передан номер телефона', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан номер телефона',
+                'msg' => 'Не передан номер телефона',
             ];
         } else if (($phone_chief !== '' && strlen($phone_chief) !== 11) || ($phone !== '' && strlen($phone) !== 11) || ($phone_2 !== '' && strlen($phone_2) !== 11)) {
             Yii::error('Указан некорректный номер телефона', __METHOD__);
@@ -190,7 +194,7 @@ class ClientsClass
         $client = Clients::find()->where('phone=:phone', [':phone' => $phone])->one();
 
         if (!is_object($client)) {
-            Yii::error('Клиент с данным номер телефона ни найден, phone:' . serialize($phone), __METHOD__);
+            Yii::error('Клиент с данным номер телефона не найден, phone:' . serialize($phone), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -215,6 +219,10 @@ class ClientsClass
         $newClientInfo->name_chief = $name_chief;
         $newClientInfo->phone_chief = $phone_chief;
         $newClientInfo->phone_second = $phone_2;
+        $newClientInfo->number_passport = $number_passport;
+        $newClientInfo->where_passport = $where_passport;
+        $newClientInfo->date_passport = $date_passport;
+        $newClientInfo->address_passport = $address_passport;
         $newClientInfo->date_create = date('Y-m-d H:i:s');
         $newClientInfo->date_update = date('Y-m-d H:i:s');
 
@@ -271,7 +279,7 @@ class ClientsClass
         }
 
         if ($sale === '') {
-            Yii::error('Ни передано значение скидки, sale: ' . serialize($sale), __METHOD__);
+            Yii::error('Не передано значение скидки, sale: ' . serialize($sale), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -280,7 +288,7 @@ class ClientsClass
         }
 
         if ($branch === '') {
-            Yii::error('Ни передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
+            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -289,7 +297,7 @@ class ClientsClass
         }
 
         if ($status === '') {
-            Yii::error('Ни передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
+            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -298,7 +306,7 @@ class ClientsClass
         }
 
         if ($source === '') {
-            Yii::error('Ни передан идентификатор источника, source: ' . serialize($source), __METHOD__);
+            Yii::error('Не передан идентификатор источника, source: ' . serialize($source), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -307,11 +315,11 @@ class ClientsClass
         }
 
         if ($phone_chief === '' && $phone === '' && $phone_2 === '') {
-            Yii::error('Ни передан номер телефона', __METHOD__);
+            Yii::error('Не передан номер телефона', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан номер телефона',
+                'msg' => 'Не передан номер телефона',
             ];
         } else if (($phone_chief !== '' && strlen($phone_chief) !== 11) || ($phone !== '' && strlen($phone) !== 11) || ($phone_2 !== '' && strlen($phone_2) !== 11)) {
             Yii::error('Указан некорректный номер телефона', __METHOD__);
@@ -383,7 +391,7 @@ class ClientsClass
         $clients = Clients::find()->where('id=:id', [':id' => $clientId])->one();
 
         if (!is_object($clients)) {
-            Yii::error('Клиент ни найден, id:' . serialize($clientId), __METHOD__);
+            Yii::error('Клиент не найден, id:' . serialize($clientId), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -412,7 +420,7 @@ class ClientsClass
         $clientsInfo = ClientsInfo::find()->where('client_id=:client_id', [':client_id' => $clientId])->one();
 
         if (!is_object($clientsInfo)) {
-            Yii::error('Запись ни найдена, client_id:' . serialize($clientId), __METHOD__);
+            Yii::error('Запись не найдена, client_id:' . serialize($clientId), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -464,11 +472,11 @@ class ClientsClass
         Yii::info('Запуск функции UpdateStatusClientUr', __METHOD__);
 
         if ($id === '' || !is_int($status)) {
-            Yii::error('Ни передан идентификтор организации, id: ' . serialize($id), __METHOD__);
+            Yii::error('Не передан идентификтор организации, id: ' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ни передан идентификтор организации',
+                'msg' => 'Не передан идентификтор организации',
             ];
         }
 
@@ -498,11 +506,11 @@ class ClientsClass
         $client = Clients::find()->where('id=:id', [':id' => $id])->one();
 
         if (!is_object($client)) {
-            Yii::error('По данному идентификатору ни найден клиент, id' . serialize($id), __METHOD__);
+            Yii::error('По данному идентификатору не найден клиент, id' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Организация ни найдена',
+                'msg' => 'Организация не найдена',
             ];
         }
 
@@ -799,11 +807,11 @@ class ClientsClass
         $client = Clients::find()->where('id=:id', [':id' => $clientId])->one();
 
         if (!is_object($client)) {
-            Yii::error('Клиент с таким идентификатором ни найден, id: ' . serialize($clientId), __METHOD__);
+            Yii::error('Клиент с таким идентификатором не найден, id: ' . serialize($clientId), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Клиент с таким идентификатором ни найден'
+                'msg' => 'Клиент с таким идентификатором не найден'
             ];
         }
 
