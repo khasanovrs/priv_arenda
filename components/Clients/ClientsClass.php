@@ -41,9 +41,13 @@ class ClientsClass
      * @param $phone_chief ,
      * @param $phone ,
      * @param $email ,
+     * @param $number_passport ,
+     * @param $where_passport ,
+     * @param $date_passport ,
+     * @param $address_passport
      * @return bool|array
      */
-    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email)
+    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email, $number_passport, $where_passport, $date_passport, $address_passport)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -215,6 +219,10 @@ class ClientsClass
         $newClientInfo->name_chief = $name_chief;
         $newClientInfo->phone_chief = $phone_chief;
         $newClientInfo->phone_second = $phone_2;
+        $newClientInfo->number_passport = $number_passport;
+        $newClientInfo->where_passport = $where_passport;
+        $newClientInfo->date_passport = $date_passport;
+        $newClientInfo->address_passport = $address_passport;
         $newClientInfo->date_create = date('Y-m-d H:i:s');
         $newClientInfo->date_update = date('Y-m-d H:i:s');
 

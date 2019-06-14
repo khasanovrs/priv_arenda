@@ -14,8 +14,6 @@ class m190614_060945_fix_applications_field extends Migration
     {
         $this->execute("INSERT INTO `applications_field` (`id`, `code`, `name`) VALUES ('8', 'equipments_count', 'Количество');");
         $this->execute("UPDATE `applications_field` SET `code`='equipments_name' WHERE `id`='3';");
-
-
     }
 
     /**
@@ -24,7 +22,6 @@ class m190614_060945_fix_applications_field extends Migration
     public function safeDown()
     {
         echo "m190614_060945_fix_applications_field cannot be reverted.\n";
-
         return false;
     }
 
