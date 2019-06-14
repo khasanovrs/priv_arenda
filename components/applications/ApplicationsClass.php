@@ -14,9 +14,11 @@ use app\models\ApplicationsShowField;
 use app\models\ApplicationsSource;
 use app\models\ApplicationsStatus;
 use app\models\ApplicationsTypeLease;
+use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
 use app\models\EquipmentsShowField;
+use app\models\Stock;
 use Codeception\Application;
 use Yii;
 
@@ -388,10 +390,11 @@ class ApplicationsClass
      * @param $delivery_sum
      * @param $status
      * @param $comment
+     * @param $branch
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -485,6 +488,15 @@ class ApplicationsClass
             ];
         }
 
+        if ($branch === '') {
+            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор филиала',
+            ];
+        }
+
         $check = Clients::find()->where('id=:id', [':id' => $client_id])->one();
         if (!is_object($check)) {
             Yii::error('Клиент не найден, client_id: ' . serialize($client_id), __METHOD__);
@@ -535,6 +547,16 @@ class ApplicationsClass
             ];
         }
 
+        $check = Branch::find()->where('id=:id', [':id' => $branch])->one();
+        if (!is_object($check)) {
+            Yii::error('Филиал не найден, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Филиал не найден',
+            ];
+        }
+
         /**
          * @var Sessions $Sessions
          */
@@ -548,11 +570,13 @@ class ApplicationsClass
         $newApplications->discount_id = $sale;
         $newApplications->delivery_id = $delivery;
         $newApplications->type_lease_id = $typeLease;
+        $newApplications->branch_id = $branch;
         $newApplications->comment = $comment;
         $newApplications->rent_start = $rent_start;
         $newApplications->rent_end = $rent_end;
         $newApplications->delivery_sum = $delivery_sum;
         $newApplications->total_sum = $sum;
+        $newApplications->date_create = date('Y-m-d H:i:s');
 
         try {
             if (!$newApplications->save(false)) {
@@ -594,9 +618,12 @@ class ApplicationsClass
      * Функция получения заявок
      * @param $status
      * @param $source
+     * @param $branch
+     * @param $date_start
+     * @param $date_end
      * @return array
      */
-    public static function getApplications($status, $source)
+    public static function getApplications($status, $source, $branch, $date_start, $date_end)
     {
         Yii::info('Запуск функции getApplications', __METHOD__);
         $result = [];
@@ -613,6 +640,25 @@ class ApplicationsClass
             Yii::info('Параметр status: ' . serialize($source), __METHOD__);
             $listFilter[] = 'source_id=:source';
             $params[':source'] = $source;
+        }
+
+        if ($date_start !== '' and $date_start !== null) {
+            Yii::info('Параметр date_start: ' . serialize($date_start), __METHOD__);
+            $listFilter[] = 'date_create>:date_start';
+            $params[':date_start'] = $date_start . ' 00:00:00';
+        }
+
+        if ($date_end !== '' and $date_end !== null) {
+            Yii::info('Параметр date_end: ' . serialize($date_end), __METHOD__);
+            $listFilter[] = 'date_create<:date_end';
+            $params[':date_end'] = $date_end . ' 23:59:59';
+        }
+
+        if ($branch !== '' and $branch !== null) {
+            Yii::info('Параметр branch: ' . serialize($branch), __METHOD__);
+
+            $listFilter[] = 'branch_id in (:branch_id)';
+            $params[':branch_id'] = $branch;
         }
 
         if (!empty($listFilter)) {

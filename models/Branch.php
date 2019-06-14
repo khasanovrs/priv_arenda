@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  *
+ * @property Applications[] $applications
  * @property Clients[] $clients
  * @property Stock[] $stocks
  * @property Users[] $users
@@ -44,6 +45,14 @@ class Branch extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplications()
+    {
+        return $this->hasMany(Applications::className(), ['branch_id' => 'id']);
     }
 
     /**
