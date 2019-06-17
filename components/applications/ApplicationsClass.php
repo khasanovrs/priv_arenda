@@ -634,7 +634,22 @@ class ApplicationsClass
             ];
         }
 
-        $application = Applications::find()->where('id=:id', [':id' => $applicationId])->one();
+        /**
+         * @var ApplicationEquipment $applicationEq
+         */
+        $applicationEq = ApplicationEquipment::find()->where('id=:id', [':id' => $applicationId])->one();
+
+        if (!is_object($applicationEq)) {
+            Yii::info('Ошибка при получении оборудования у заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+
+        $application = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
 
         if (!is_object($application)) {
             Yii::info('Ошибка при получении заявки', __METHOD__);
@@ -666,21 +681,19 @@ class ApplicationsClass
             'sum' => $application->total_sum,
         ];
 
-        foreach ($application->applicationEquipments as $equipments) {
 
-            $mark = $equipments->equipments->mark0->name;
-            $model = $equipments->equipments->model;
-            $category = $equipments->equipments->category->name;
+        $mark = $applicationEq->equipments->mark0->name;
+        $model = $applicationEq->equipments->model;
+        $category = $applicationEq->equipments->category->name;
 
-            $result['equipments'][] = [
-                'id' => $equipments->id,
-                'equipments_id' => $equipments->equipments_id,
-                'name' => $category . ' ' . $mark . ' ' . $model,
-                'count' => $equipments->equipments_count,
-                'status' => $equipments->status_id,
-                'photo' => $equipments->equipments->photo
-            ];
-        }
+        $result['equipments'] = [
+            'id' => $applicationEq->id,
+            'equipments_id' => $applicationEq->equipments_id,
+            'name' => $category . ' ' . $mark . ' ' . $model,
+            'count' => $applicationEq->equipments_count,
+            'status' => $applicationEq->status_id,
+            'photo' => $applicationEq->equipments->photo
+        ];
 
         Yii::info('Заявка успешно получена', __METHOD__);
 
