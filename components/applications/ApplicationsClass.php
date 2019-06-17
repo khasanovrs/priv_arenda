@@ -634,9 +634,9 @@ class ApplicationsClass
             ];
         }
 
-        $applications = Applications::find()->where('id=:id', [':id' => $applicationId])->one();
+        $application = Applications::find()->where('id=:id', [':id' => $applicationId])->one();
 
-        if (!is_object($applications)) {
+        if (!is_object($application)) {
             Yii::info('Ошибка при получении заявки', __METHOD__);
 
             return [
@@ -648,41 +648,39 @@ class ApplicationsClass
         /**
          * @var Applications $application
          */
-        foreach ($applications as $application) {
-            $result = [
-                'id' => $application->id,
-                'branch' => $application->branch_id,
-                'delivery' => $application->delivery_id,
-                'typeLease' => $application->type_lease_id,
-                'sale' => $application->discount_id,
-                'source' => $application->source_id,
-                'comment' => $application->comment,
-                'rent_start' => $application->rent_start,
-                'rent_end' => $application->rent_end,
-                'client_id' => $application->client->id,
-                'client_fio' => $application->client->name,
-                'client_phone' => $application->client->phone,
-                'delivery_sum' => $application->delivery_sum,
-                'sum' => $application->total_sum,
+
+        $result = [
+            'id' => $application->id,
+            'branch' => $application->branch_id,
+            'delivery' => $application->delivery_id,
+            'typeLease' => $application->type_lease_id,
+            'sale' => $application->discount_id,
+            'source' => $application->source_id,
+            'comment' => $application->comment,
+            'rent_start' => date('Y-m-d', strtotime($application->rent_start)),
+            'rent_end' => date('Y-m-d', strtotime($application->rent_end)),
+            'client_id' => $application->client->id,
+            'client_fio' => $application->client->name,
+            'client_phone' => $application->client->phone,
+            'delivery_sum' => $application->delivery_sum,
+            'sum' => $application->total_sum,
+        ];
+
+        foreach ($application->applicationEquipments as $equipments) {
+
+            $mark = $equipments->equipments->mark0->name;
+            $model = $equipments->equipments->model;
+            $category = $equipments->equipments->category->name;
+
+            $result['equipments'][] = [
+                'id' => $equipments->id,
+                'equipments_id' => $equipments->equipments_id,
+                'name' => $category . ' ' . $mark . ' ' . $model,
+                'count' => $equipments->equipments_count,
+                'status' => $equipments->status_id,
+                'photo' => $equipments->equipments->photo
             ];
-
-            foreach ($application->applicationEquipments as $equipments) {
-
-                $mark = $equipments->equipments->mark0->name;
-                $model = $equipments->equipments->model;
-                $category = $equipments->equipments->category->name;
-
-                $result['equipments'][] = [
-                    'id' => $equipments->id,
-                    'equipments_id' => $equipments->equipments_id,
-                    'name' => $category . ' ' . $mark . ' ' . $model,
-                    'count' => $equipments->equipments_count,
-                    'status' => $equipments->status_id,
-                    'photo' => $equipments->equipments->photo
-                ];
-            }
         }
-
 
         Yii::info('Заявка успешно получена', __METHOD__);
 
