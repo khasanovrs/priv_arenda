@@ -703,12 +703,11 @@ class EquipmentsClass
      * @param $network_cord
      * @param $power
      * @param $frequency_hits
+     * @param $photo
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo)
     {
-        Yii::info('Оборудование успешно добавлено', __METHOD__);
-
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
             return [
@@ -808,6 +807,7 @@ class EquipmentsClass
         $newEquipment->repairs_sum = $repairs_sum;
         $newEquipment->profit = $profit;
         $newEquipment->payback_ratio = $payback_ratio;
+        $newEquipment->photo = $photo;
 
         try {
             if (!$newEquipment->save(false)) {
@@ -840,6 +840,46 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Оборудование успешно добавлено'
+        ];
+    }
+
+    /**
+     * Функция добавления фотографии оборудования
+     * @param $file
+     * @param $file_name
+     * @return array|bool
+     */
+    public static function AddEquipmentPhoto($file_name, $file)
+    {
+        if ($file_name === '') {
+            Yii::error('Не передано наименование фотографии, file_name: ' . serialize($file_name), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование фотографии',
+            ];
+        }
+
+        if ($file === '') {
+            Yii::error('Не передано содержимое фотографии, file: ' . serialize($file), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано содержимое фотографии',
+            ];
+        }
+
+        //@todo указать папку для сохранения фото
+        $uploadFile = "/home/fox/" . $file_name;
+
+        if (!file_exists($uploadFile)) {
+            $fp = fopen($uploadFile, "w"); // ("r" - считывать "w" - создавать "a" - добовлять к тексту),мы создаем файл
+            fwrite($fp, base64_decode($file));
+            fclose($fp);
+        }
+
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Фотография успешно добавлена'
         ];
 
     }

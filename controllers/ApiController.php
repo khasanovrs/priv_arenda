@@ -147,6 +147,9 @@ class ApiController extends Controller
             'add-equipment' => [
                 'class' => 'app\components\actions\equipments\AddEquipmentAction',
             ],
+            'add-equipment-photo' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentPhotoAction',
+            ],
             'get-equipment-mark' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentMarkAction',
             ],
