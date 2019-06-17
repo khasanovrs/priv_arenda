@@ -363,6 +363,63 @@ class EquipmentsClass
         ];
     }
 
+
+    /**
+     * Получение списка оборудования по поиску
+     * @param $filter
+     * @return array
+     */
+    public static function GetEquipmentsSearch($filter)
+    {
+        Yii::info('Запуск функции GetEquipmentsSearch', __METHOD__);
+        $result = [];
+
+        if ($filter === '') {
+            Yii::error('Фильтр не передан', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Фильтр не передан'
+            ];
+        }
+
+        $filter = strtolower($filter);
+        $filter = '%' . $filter . '%';
+
+        $equipments = Equipments::find()->joinWith('mark0')->where('lower(model) like :filter or lower(equipments_mark.name) like :filter', [':filter' => $filter])->orderBy('id desc')->all();
+
+        if (!is_array($equipments)) {
+            Yii::error('Список оборудования пуст', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Список оборудования пуст',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var Equipments $value
+         */
+        foreach ($equipments as $value) {
+            $result[] = [
+                'id' => $value->id,
+                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
+                'price_per_day' => $value->price_per_day,
+                'count' => $value->count,
+                'photo' => $value->photo
+            ];
+        }
+
+        Yii::info('Список оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список оборудования получен',
+            'data' => $result
+        ];
+    }
+
     /**
      * Получение детальной информации об оборудовании
      * @param $equipmentId
