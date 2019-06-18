@@ -12,13 +12,13 @@ class m190613_084427_fix_applications extends Migration
      */
     public function safeUp()
     {
-        $this->execute("ALTER TABLE `arenda_stroika`.`applications` 
+        $this->execute("ALTER TABLE `applications` 
             ADD COLUMN `type_lease_id` INT(11) NOT NULL AFTER `delivery_id`,
             ADD INDEX `fk_applications_1_idx` (`type_lease_id` ASC);
-            ALTER TABLE `arenda_stroika`.`applications` 
+            ALTER TABLE `applications` 
             ADD CONSTRAINT `fk_applications_1`
             FOREIGN KEY (`type_lease_id`)
-            REFERENCES `arenda_stroika`.`applications_type_lease` (`id`)
+            REFERENCES `applications_type_lease` (`id`)
             ON DELETE NO ACTION
 ON UPDATE NO ACTION;
         ");
