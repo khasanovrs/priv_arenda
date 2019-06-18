@@ -10,23 +10,24 @@ use app\models\BunchUserRight;
 use app\models\Users;
 use app\models\UsersRole;
 use Yii;
+use yii\debug\models\search\User;
 
 class UserClass
 {
 
     /**
      * Добавление нового пользователя
-     * @param $phone ,
-     * @param $name ,
-     * @param $lastName ,
-     * @param $email ,
+     * @param id
+     * @param $phone
+     * @param $fio
+     * @param $email
      * @param $user_type
      * @param $pass
      * @param $branch_id
      * @param $user_right
      * @return bool|array
      */
-    public static function AddUser($phone, $name, $lastName, $email, $user_type, $pass, $branch_id, $user_right)
+    public static function AddUser($id, $phone, $fio, $email, $user_type, $pass, $branch_id, $user_right)
     {
         Yii::info('Запуск функции обновления персональных данных пользователя', __METHOD__);
 
@@ -39,8 +40,8 @@ class UserClass
             ];
         }
 
-        if ($name === '') {
-            Yii::error('Ошибка при проверке name, fio:' . serialize($name), __METHOD__);
+        if ($fio === '') {
+            Yii::error('Ошибка при проверке name, fio:' . serialize($fio), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -48,21 +49,12 @@ class UserClass
             ];
         }
 
-        if ($pass === '') {
+        if ($pass === '' && $id !== null) {
             Yii::error('Не передан пароль для пользователя, pass:' . serialize($pass), __METHOD__);
 
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан пароль для пользователя',
-            ];
-        }
-
-        if ($lastName === '') {
-            Yii::error('Передан некорректная фамилия, status:' . serialize($lastName), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
             ];
         }
 
@@ -122,7 +114,7 @@ class UserClass
          */
         $check_user = Users::find()->where('telephone=:telephone', [':telephone' => $phone])->one();
 
-        if (is_object($check_user)) {
+        if (is_object($check_user) && $check_user->id !== $id) {
             Yii::error('Данный номер телефона уже зарегестрирован, phone:' . serialize($phone), __METHOD__);
 
             return [
@@ -131,13 +123,31 @@ class UserClass
             ];
         }
 
-        $user = new Users();
-        $user->fio = $name . ' ' . $lastName;
+        if ($id !== null) {
+            $user = Users::find()->where('id=:id', [':id' => $id])->one();
+
+            if (!is_object($user)) {
+
+                Yii::error('Пользователь с таким идентификатором не найден, id:' . serialize($id), __METHOD__);
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Пользователь не найден',
+                ];
+            }
+        } else {
+            $user = new Users();
+        }
+
+        $user->fio = $fio;
         $user->telephone = $phone;
         $user->user_type = $user_type;
         $user->email = $email;
         $user->branch_id = $branch_id;
-        $user->password = password_hash($pass, PASSWORD_DEFAULT);
+
+        if ($id === null) {
+            $user->password = password_hash($pass, PASSWORD_DEFAULT);
+        }
+
         $user->date_create = date('Y-m-d H:i:s');
         $user->date_update = date('Y-m-d H:i:s');
 
@@ -153,23 +163,19 @@ class UserClass
 
         Yii::info('Проверяем права для пользователя', __METHOD__);
 
+        try {
+            BunchUserRight::deleteAll('user_id=:user_id', [':user_id' => $user->id]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении прав пользователя: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
         if (!empty($user_right)) {
             Yii::info('Есть специальные права для пользователя', __METHOD__);
 
-            $check_user = Users::find()->where('telephone=:telephone', [':telephone' => $phone])->one();
-
-            if (!is_object($check_user)) {
-                Yii::error('Ошибка при установке прав для пользователя, phone:' . serialize($phone), __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при установке прав для пользователя',
-                ];
-            }
-
             foreach ($user_right as $value) {
                 $newRight = new BunchUserRight();
-                $newRight->user_id = $check_user->id;
+                $newRight->user_id = $user->id;
                 $newRight->right_id = $value;
 
                 try {
@@ -194,12 +200,12 @@ class UserClass
 
     /**
      * Изменение параметров пользователя кроме пароля
-     * @param $id ,
-     * @param $phone ,
-     * @param $fio ,
-     * @param $status ,
-     * @param $email ,
-     * @param $user_type ,
+     * @param $id
+     * @param $phone
+     * @param $fio
+     * @param $status
+     * @param $email
+     * @param $user_type
      * @param $branch_id
      * @return bool|array
      */
@@ -334,8 +340,8 @@ class UserClass
 
     /**
      * Измененение пароля пользователя
-     * @param $id ,
-     * @param $pass ,
+     * @param $id
+     * @param $pass
      * @return bool|array
      */
     public static function ChangeUserPass($id, $pass)
@@ -396,7 +402,7 @@ class UserClass
 
     /**
      * Получение списка пользователей
-     * @param $branch ,
+     * @param $branch
      * @return bool|array
      */
     public static function GetUsers($branch)
@@ -430,14 +436,29 @@ class UserClass
          * @var Users $user
          */
         foreach ($users as $user) {
+            $rights = [];
+
+            $rightsList = BunchUserRight::find()->where('user_id=:user_id', [':user_id' => $user->id])->all();
+
+            if (!empty($rightsList)) {
+                /**
+                 * @var BunchUserRight $value
+                 */
+                foreach ($rightsList as $value) {
+                    array_push($rights, $value->right_id);
+                }
+            }
+
             $result[] = [
+                'id' => $user->id,
                 'fio' => $user->fio,
                 'phone' => $user->telephone,
                 'status' => $user->status,
                 'user_type' => $user->user_type,
                 'email' => $user->email,
                 'branch_id' => $user->branch_id,
-                'date_create' => date('d.m.Y h:i:s', strtotime($user->date_create))
+                'date_create' => date('d.m.Y h:i:s', strtotime($user->date_create)),
+                'rights' => $rights
             ];
         }
 

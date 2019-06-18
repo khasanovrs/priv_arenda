@@ -132,6 +132,9 @@ class ApiController extends Controller
             'get-equipments' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentAction',
             ],
+            'get-equipments-search' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentSearchAction',
+            ],
             'get-equipments-fields' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentActionFields',
             ],
@@ -143,6 +146,9 @@ class ApiController extends Controller
             ],
             'add-equipment' => [
                 'class' => 'app\components\actions\equipments\AddEquipmentAction',
+            ],
+            'add-equipment-photo' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentPhotoAction',
             ],
             'get-equipment-mark' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentMarkAction',

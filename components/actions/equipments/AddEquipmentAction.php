@@ -40,8 +40,9 @@ class AddEquipmentAction extends Action
         $network_cord = $request->getBodyParam('network_cord');
         $power = $request->getBodyParam('power');
         $frequency_hits = $request->getBodyParam('frequency_hits');
+        $photo = $request->getBodyParam('photo');
 
-        $result = EquipmentsClass::AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits);
+        $result = EquipmentsClass::AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении оборудования', __METHOD__);

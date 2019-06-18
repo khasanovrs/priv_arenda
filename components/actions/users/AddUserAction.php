@@ -17,8 +17,8 @@ class AddUserAction extends Action
 
         $request = Yii::$app->request;
 
-        $name = $request->getBodyParam('name');
-        $lastName = $request->getBodyParam('lastName');
+        $fio = $request->getBodyParam('fio');
+        $id = $request->getBodyParam('id');
         $password = $request->getBodyParam('password');
         $user_type = $request->getBodyParam('user_type');
         $branch_id = $request->getBodyParam('branch_id');
@@ -26,7 +26,7 @@ class AddUserAction extends Action
         $phone = $request->getBodyParam('phone');
         $user_right = $request->getBodyParam('user_right');
 
-        $resultChange = UserClass::AddUser($phone, $name, $lastName, $email, $user_type, $password, $branch_id, $user_right);
+        $resultChange = UserClass::AddUser($id, $phone, $fio, $email, $user_type, $password, $branch_id, $user_right);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового пользователя', __METHOD__);
