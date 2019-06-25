@@ -567,8 +567,7 @@ class ClientsClass
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = '%' . $like . '%';
-            $listUr[] = 'name_org like :like';
-            $listFiz[] = 'fio like :like';
+            $listFilter[] = 'name like :like';
             $params[':like'] = $like;
         }
 
