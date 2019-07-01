@@ -3,7 +3,7 @@
  * Добавление скидок
  */
 
-namespace app\components\actions\branch;
+namespace app\components\actions\discount;
 
 use app\components\discount\DiscountClass;
 use Yii;

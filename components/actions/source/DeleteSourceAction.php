@@ -3,13 +3,13 @@
  * Удаление источника
  */
 
-namespace app\components\actions\sourceUr;
+namespace app\components\actions\source;
 
 use app\components\source\SourceClass;
 use Yii;
 use yii\base\Action;
 
-class DeleteUrSourceAction extends Action
+class DeleteSourceAction extends Action
 {
     public function run()
     {

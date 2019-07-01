@@ -3,7 +3,7 @@
  * Добавление нового статуса для юр.лица
  */
 
-namespace app\components\actions\statusUr;
+namespace app\components\actions\status;
 
 use app\components\Status\StatusClass;
 use Yii;

@@ -3,7 +3,7 @@
  * Добавление ролей
  */
 
-namespace app\components\actions\branch;
+namespace app\components\actions\roles;
 
 use app\components\userRoles\UserRolesClass;
 use Yii;

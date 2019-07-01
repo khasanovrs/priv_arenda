@@ -3,13 +3,13 @@
  * Добавление нового источника
  */
 
-namespace app\components\actions\sourceUr;
+namespace app\components\actions\source;
 
 use app\components\source\SourceClass;
 use Yii;
 use yii\base\Action;
 
-class AddUrSourceAction extends Action
+class AddSourceAction extends Action
 {
     public function run()
     {

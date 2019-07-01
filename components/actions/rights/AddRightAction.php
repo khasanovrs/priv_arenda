@@ -9,7 +9,7 @@ use app\components\userRights\UserRightsClass;
 use Yii;
 use yii\base\Action;
 
-class A extends Action
+class AddRightAction extends Action
 {
     public function run()
     {

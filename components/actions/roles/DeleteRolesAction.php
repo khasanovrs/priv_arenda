@@ -3,7 +3,7 @@
  * Удаление скидки
  */
 
-namespace app\components\actions\branch;
+namespace app\components\actions\roles;
 
 use app\components\discount\DiscountClass;
 use app\components\userRoles\UserRolesClass;

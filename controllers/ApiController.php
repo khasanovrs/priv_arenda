@@ -93,11 +93,23 @@ class ApiController extends Controller
             'get-status' => [
                 'class' => 'app\components\actions\status\GetStatusAction',
             ],
+            'add-status' => [
+                'class' => 'app\components\actions\status\AddStatusAction',
+            ],
+            'delete-status' => [
+                'class' => 'app\components\actions\status\DeleteStatusAction',
+            ],
             /**
              * Управление источниками
              */
             'get-source' => [
                 'class' => 'app\components\actions\source\GetSourceAction',
+            ],
+            'add-source' => [
+                'class' => 'app\components\actions\source\AddSourceAction',
+            ],
+            'delete-source' => [
+                'class' => 'app\components\actions\source\DeleteSourceAction',
             ],
             /**
              * Управление складами
@@ -105,11 +117,23 @@ class ApiController extends Controller
             'get-stock' => [
                 'class' => 'app\components\actions\stock\GetStockAction',
             ],
+            'add-stock' => [
+                'class' => 'app\components\actions\stock\AddStockAction',
+            ],
+            'delete-stock' => [
+                'class' => 'app\components\actions\stock\DeleteStockAction',
+            ],
             /**
              * Управление ролями
              */
             'get-roles' => [
                 'class' => 'app\components\actions\roles\GetRolesAction',
+            ],
+            'add-roles' => [
+                'class' => 'app\components\actions\roles\AddRolesAction',
+            ],
+            'delete-roles' => [
+                'class' => 'app\components\actions\roles\DeleteRolesAction',
             ],
             /**
              * Управление правами
@@ -117,11 +141,23 @@ class ApiController extends Controller
             'get-rights' => [
                 'class' => 'app\components\actions\rights\GetRightsAction',
             ],
+            'add-rights' => [
+                'class' => 'app\components\actions\rights\AddRightAction',
+            ],
+            'delete-rights' => [
+                'class' => 'app\components\actions\rights\DeleteRightAction',
+            ],
             /**
              * Управление скидками
              */
             'get-discount' => [
                 'class' => 'app\components\actions\discount\GetDiscountAction',
+            ],
+            'add-discount' => [
+                'class' => 'app\components\actions\discount\AddDiscountAction',
+            ],
+            'delete-discount' => [
+                'class' => 'app\components\actions\discount\DeleteDiscountAction',
             ],
             /**
              * Управление оборудованиями
