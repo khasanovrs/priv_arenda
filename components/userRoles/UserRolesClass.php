@@ -49,4 +49,54 @@ class UserRolesClass
             'data' => $result
         ];
     }
+
+    /**
+     * Функция добавления роли
+     * @param $role
+     * @return array|bool
+     */
+    public static function AddRole($role)
+    {
+        Yii::info('Запуск функции AddRole', __METHOD__);
+
+        $newRole = new UsersRole();
+
+        $newRole->name = $role;
+
+        try {
+            if (!$newRole->save(false)) {
+                Yii::error('Ошибка при добавлении новой роли: ' . serialize($newRole->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении новой роли: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Роль успешно добавлена'
+        ];
+    }
+
+    /**
+     * Функция удаления филиала
+     * @param $role
+     * @return array|bool
+     */
+    public static function DeleteRole($role) {
+        Yii::info('Запуск функции DeleteRole', __METHOD__);
+
+        try {
+            UsersRole::deleteAll('id=:id', [':id' => $role]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении роли: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Роль успешно удалена'
+        ];
+    }
 }
