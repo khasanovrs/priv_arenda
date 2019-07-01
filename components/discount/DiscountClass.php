@@ -48,4 +48,55 @@ class DiscountClass
             'data' => $result
         ];
     }
+
+    /**
+     * Функция добавления скидки
+     * @param $discount
+     * @return array|bool
+     */
+    public static function AddDiscount($discount)
+    {
+        Yii::info('Запуск функции AddDiscount', __METHOD__);
+
+        $newDiscount = new Discount();
+
+        $newDiscount->code = (int)$discount;
+        $newDiscount->name = $discount;
+
+        try {
+            if (!$newDiscount->save(false)) {
+                Yii::error('Ошибка при добавлении новой скидки: ' . serialize($newDiscount->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении новой скидки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Скидка успешно добавлена'
+        ];
+    }
+
+    /**
+     * Функция удаления филиала
+     * @param $discount
+     * @return array|bool
+     */
+    public static function DeleteDiscount($discount) {
+        Yii::info('Запуск функции AddBranch', __METHOD__);
+
+        try {
+            Discount::deleteAll('id=:id', [':id' => $discount]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении скидки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Скидка успешно удалена'
+        ];
+    }
 }
