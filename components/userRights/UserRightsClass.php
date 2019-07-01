@@ -50,4 +50,55 @@ class UserRightsClass
             'data' => $result
         ];
     }
+
+
+    /**
+     * Функция добавления роли
+     * @param $right
+     * @return array|bool
+     */
+    public static function AddRight($right)
+    {
+        Yii::info('Запуск функции AddRight', __METHOD__);
+
+        $newRight = new UsersRights();
+
+        $newRight->name = $right;
+
+        try {
+            if (!$newRight->save(false)) {
+                Yii::error('Ошибка при добавлении нового права: ' . serialize($newRight->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении нового права: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Права успешно добавлены'
+        ];
+    }
+
+    /**
+     * Функция удаления филиала
+     * @param $right
+     * @return array|bool
+     */
+    public static function DeleteRight($right) {
+        Yii::info('Запуск функции DeleteRight', __METHOD__);
+
+        try {
+            UsersRights::deleteAll('id=:id', [':id' => $right]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении права: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Права успешно удалены'
+        ];
+    }
 }
