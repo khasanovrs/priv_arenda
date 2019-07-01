@@ -49,4 +49,53 @@ class BranchClass
             'data' => $result
         ];
     }
+
+    /**
+     * Функци добавления филиала
+     * @param $branch
+     * @return array|bool
+     */
+    public static function AddBranch($branch) {
+        Yii::info('Запуск функции AddBranch', __METHOD__);
+
+        $newBranch = new Branch();
+
+        $newBranch->name = $branch;
+
+        try {
+            if (!$newBranch->save(false)) {
+                Yii::error('Ошибка при добавлении нового филиала: ' . serialize($newBranch->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении нового филиала: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Филиал успешно добавлен'
+        ];
+    }
+
+    /**
+     * Функция удаления филиала
+     * @param $branch
+     * @return array|bool
+     */
+    public static function DeleteBranch($branch) {
+        Yii::info('Запуск функции AddBranch', __METHOD__);
+
+        try {
+            Branch::deleteAll('id=:id', [':id' => $branch]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении филиала: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Филиал успешно удален'
+        ];
+    }
 }

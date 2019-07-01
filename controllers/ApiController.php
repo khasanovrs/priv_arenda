@@ -81,6 +81,12 @@ class ApiController extends Controller
             'get-branch' => [
                 'class' => 'app\components\actions\branch\GetBranchAction',
             ],
+            'add-branch' => [
+                'class' => 'app\components\actions\branch\AddBranchAction',
+            ],
+            'delete-branch' => [
+                'class' => 'app\components\actions\branch\DeleteBranchAction',
+            ],
             /**
              * Управление статусами для клиентов
              */
