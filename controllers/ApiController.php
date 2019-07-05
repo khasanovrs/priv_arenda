@@ -204,6 +204,9 @@ class ApiController extends Controller
             'add-equipment-status' => [
                 'class' => 'app\components\actions\equipments\AddEquipmentStatusAction',
             ],
+            'delete-equipment-status' => [
+                'class' => 'app\components\actions\equipments\DeleteEquipmentStatusAction',
+            ],
             /**
              * Управление заявками
              */
@@ -212,6 +215,9 @@ class ApiController extends Controller
             ],
             'add-applications-status' => [
                 'class' => 'app\components\actions\applications\AddApplicationsStatusAction',
+            ],
+            'delete-applications-status' => [
+                'class' => 'app\components\actions\applications\DeleteApplicationsStatusAction',
             ],
             'update-applications-status' => [
                 'class' => 'app\components\actions\applications\UpdateApplicationsStatusAction',

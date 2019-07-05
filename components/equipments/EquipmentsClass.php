@@ -1148,4 +1148,48 @@ class EquipmentsClass
             'msg' => 'Статус для оборудования успешно добавлен'
         ];
     }
+
+    /**
+     * Удаление статуса оборудования
+     * @param $id ,
+     * @return bool|array
+     */
+    public static function DeleteStatus($id)
+    {
+        Yii::info('Запуск функции удаления статуса оборудования', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передано идентификатор статуса, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор статуса',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('id=:id', [':id' => $id])->one();
+
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется',
+            ];
+        }
+
+        try {
+            EquipmentsStatus::deleteAll('id=:id', array(':id' => $id));
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении статуса: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Статус успешно удален', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Статус успешно удален'
+        ];
+    }
 }

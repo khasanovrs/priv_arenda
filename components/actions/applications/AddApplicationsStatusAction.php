@@ -13,7 +13,7 @@ class AddApplicationsStatusAction extends Action
 {
     public function run()
     {
-        Yii::info('Запуск функции добавления новой заявки', __METHOD__);
+        Yii::info('Запуск функции добавления статуса заявки', __METHOD__);
 
         $request = Yii::$app->request;
 
