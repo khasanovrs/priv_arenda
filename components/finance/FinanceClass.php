@@ -6,6 +6,7 @@
 namespace app\components\finance;
 
 use app\components\Session\Sessions;
+use app\models\FinanceCashbox;
 use app\models\FinanceCategory;
 use app\models\FinanceField;
 use app\models\FinanceShowField;
@@ -214,6 +215,45 @@ class FinanceClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список типов финансов получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение касс финансов
+     * @return bool|array
+     */
+    public static function GetFinanceCashBox()
+    {
+        Yii::info('Запуск функции GetFinanceCashBox', __METHOD__);
+        $result = [];
+
+        $equipmentsTypeList = FinanceCashbox::find()->orderBy('id')->all();
+
+        if (!is_array($equipmentsTypeList)) {
+            Yii::error('Список касс финансов пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список касс финансов пуст'
+            ];
+        }
+
+        /**
+         * @var FinanceCashbox $value
+         */
+        foreach ($equipmentsTypeList as $value) {
+            $result[] = [
+                'val' => $value->id,
+                'name' => $value->name
+            ];
+        }
+
+        Yii::info('Список касс финансов получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список касс финансов получен',
             'data' => $result
         ];
     }
