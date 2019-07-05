@@ -245,8 +245,22 @@ class ApiController extends Controller
             ],
             'add-application' => [
                 'class' => 'app\components\actions\applications\AddApplicationAction',
-            ]
-
+            ],
+            /**
+             * Управление финансами
+             */
+            'get-finance-fields' => [
+                'class' => 'app\components\actions\finance\GetFinanceFieldAction',
+            ],
+            'change-finance-field' => [
+                'class' => 'app\components\actions\finance\ChangeFinanceFieldAction',
+            ],
+            'get-finance-category' => [
+                'class' => 'app\components\actions\finance\GetFinanceCategoryAction',
+            ],
+            'get-finance-type' => [
+                'class' => 'app\components\actions\finance\GetFinanceTypeAction',
+            ],
         ];
     }
 
