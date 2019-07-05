@@ -90,13 +90,13 @@ class ApiController extends Controller
             /**
              * Управление статусами для клиентов
              */
-            'get-status' => [
+            'get-client-status' => [
                 'class' => 'app\components\actions\status\GetStatusAction',
             ],
-            'add-status' => [
+            'add-client-status' => [
                 'class' => 'app\components\actions\status\AddStatusAction',
             ],
-            'delete-status' => [
+            'delete-client-status' => [
                 'class' => 'app\components\actions\status\DeleteStatusAction',
             ],
             /**
@@ -201,11 +201,17 @@ class ApiController extends Controller
             'equipments-update' => [
                 'class' => 'app\components\actions\equipments\EquipmentUpdateAction',
             ],
+            'add-equipment-status' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentStatusAction',
+            ],
             /**
              * Управление заявками
              */
             'get-applications-status' => [
                 'class' => 'app\components\actions\applications\GetApplicationsStatusAction',
+            ],
+            'add-applications-status' => [
+                'class' => 'app\components\actions\applications\AddApplicationsStatusAction',
             ],
             'update-applications-status' => [
                 'class' => 'app\components\actions\applications\UpdateApplicationsStatusAction',

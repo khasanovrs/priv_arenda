@@ -804,4 +804,44 @@ class ApplicationsClass
             'data' => $result
         ];
     }
+
+
+    /**
+     * Добавление нового статуса для заявки
+     * @param $name ,
+     * @return bool|array
+     */
+    public static function AddStatus($name)
+    {
+        Yii::info('Запуск функции добавления нового статуса для оборудования', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Ни передано наименование статуса, name:' . serialize($name), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передано наименование статуса',
+            ];
+        }
+
+        $new_status = new ApplicationsStatus();
+        $new_status->name = $name;
+
+        try {
+            if (!$new_status->save(false)) {
+                Yii::error('Ошибка при добавлении нового статуса для заявки: ' . serialize($new_status->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении нового статуса для заявки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Статус для заявки успешно добавлен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Статус для заявки успешно добавлен'
+        ];
+    }
 }
