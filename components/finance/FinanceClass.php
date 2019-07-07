@@ -6,8 +6,6 @@
 namespace app\components\finance;
 
 use app\components\Session\Sessions;
-use app\models\Clients;
-use app\models\ClientStatus;
 use app\models\Finance;
 use app\models\FinanceCashbox;
 use app\models\FinanceCategory;
@@ -57,7 +55,7 @@ class FinanceClass
          * @var FinanceField $value
          */
         foreach ($applicationsFieldList as $value) {
-            $check_flag = FinanceShowField::find()->where('applications_field_id=:applications_field_id and user_id=:user_id', [':applications_field_id' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
+            $check_flag = FinanceShowField::find()->where('finance_field_id=:finance_field_id and user_id=:user_id', [':finance_field_id' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
 
             $flag = is_object($check_flag) ? 0 : 1;
 
@@ -119,15 +117,15 @@ class FinanceClass
 
                 $newVal = new FinanceShowField();
                 $newVal->user_id = $session->user_id;
-                $newVal->applications_field_id = $value->id;
+                $newVal->finance_field_id = $value->id;
 
                 try {
                     if (!$newVal->save(false)) {
-                        Yii::error('Ошибка при изменене отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
+                        Yii::error('Ошибка при изменении отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
                         return false;
                     }
                 } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при изменене отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+                    Yii::error('Поймали Exception при изменении отображения поля: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
             }
@@ -265,9 +263,65 @@ class FinanceClass
     public static function GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end)
     {
         Yii::info('Запуск функции GetFinance', __METHOD__);
+
+        $listFilter = [];
+        $params = [];
         $result = [];
 
-        $financeList = Finance::find()->all();
+        if ($like !== '' and $like !== null) {
+            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $like = '%' . $like . '%';
+            $listFilter[] = 'name like :like';
+            $params[':like'] = $like;
+        }
+
+        if ($category !== '' and $category !== null) {
+            Yii::info('Параметр category: ' . serialize($category), __METHOD__);
+            $listFilter[] = 'category_id=:category';
+            $params[':category'] = $category;
+        }
+
+        if ($cashBox !== 1 and $cashBox !== null) {
+            Yii::info('Параметр cashBox: ' . serialize($cashBox), __METHOD__);
+            $listFilter[] = 'cashBox_id=:cashBox';
+            $params[':cashBox'] = $cashBox;
+        }
+
+        if ($type !== '' and $type !== null) {
+            Yii::info('Параметр type: ' . serialize($type), __METHOD__);
+            $listFilter[] = 'type_id=:type';
+            $params[':type'] = $type;
+        }
+
+        if ($date_start !== '' and $date_start !== null) {
+            Yii::info('Параметр date_start: ' . serialize($date_start), __METHOD__);
+            $listFilter[] = 'date_create>:date_start';
+            $params[':date_start'] = $date_start . ' 00:00:00';
+        }
+
+        if ($date_end !== '' and $date_end !== null) {
+            Yii::info('Параметр date_end: ' . serialize($date_end), __METHOD__);
+            $listFilter[] = 'date_create<:date_end';
+            $params[':date_end'] = $date_end . ' 23:59:59';
+        }
+
+        if ($sum_start !== '' and $sum_start !== null) {
+            Yii::info('Параметр sum_start: ' . serialize($sum_start), __METHOD__);
+            $listFilter[] = 'sum<:sum_start';
+            $params[':sum_start'] = (int)$sum_start;
+        }
+
+        if ($sum_end !== '' and $sum_end !== null) {
+            Yii::info('Параметр sum_end: ' . serialize($sum_end), __METHOD__);
+            $listFilter[] = 'sum>:sum_end';
+            $params[':sum_end'] = (int)$sum_end;
+        }
+
+        if (!empty($listFilter)) {
+            $financeList = Finance::find()->where(implode(" and ", $listFilter), $params)->orderBy('date_create desc')->all();
+        } else {
+            $financeList = Finance::find()->orderBy('date_create desc')->all();
+        }
 
         if (empty($financeList)) {
             Yii::info('Список финансов пуст', __METHOD__);
@@ -304,7 +358,7 @@ class FinanceClass
     }
 
     /**
-     * Изменение статуса финансов
+     * Изменение категории финансов
      * @param $id
      * @param $finance_category
      * @return bool|array

@@ -9,6 +9,8 @@ use Yii;
  *
  * @property int $id
  * @property string $name Наименование категории
+ *
+ * @property Finance[] $finances
  */
 class FinanceCategory extends \yii\db\ActiveRecord
 {
@@ -40,5 +42,13 @@ class FinanceCategory extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFinances()
+    {
+        return $this->hasMany(Finance::className(), ['category_id' => 'id']);
     }
 }

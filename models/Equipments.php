@@ -15,6 +15,7 @@ use Yii;
  * @property int $type тип инструмента
  * @property int $discount
  * @property int $status Доступность
+ * @property int $sale
  * @property string $count
  * @property string $selling_price Цена продажи
  * @property string $price_per_day Цена за сутки
@@ -53,8 +54,8 @@ class Equipments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
-            [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
+            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount', 'status', 'sale'], 'required'],
+            [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status', 'sale'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],
             [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio'], 'string', 'max' => 45],
@@ -80,6 +81,7 @@ class Equipments extends \yii\db\ActiveRecord
             'type' => 'Type',
             'discount' => 'Discount',
             'status' => 'Status',
+            'sale' => 'Sale',
             'count' => 'Count',
             'selling_price' => 'Selling Price',
             'price_per_day' => 'Price Per Day',

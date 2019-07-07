@@ -20,6 +20,7 @@ use Yii;
  * @property Branch $branch
  * @property ClientStatus $status0
  * @property ClientsInfo[] $clientsInfos
+ * @property Finance[] $finances
  */
 class Clients extends \yii\db\ActiveRecord
 {
@@ -94,5 +95,13 @@ class Clients extends \yii\db\ActiveRecord
     public function getClientsInfos()
     {
         return $this->hasMany(ClientsInfo::className(), ['client_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFinances()
+    {
+        return $this->hasMany(Finance::className(), ['payer_id' => 'id']);
     }
 }

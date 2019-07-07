@@ -23,6 +23,7 @@ use Yii;
  * @property BunchUserRight[] $bunchUserRights
  * @property ClientShowField[] $clientShowFields
  * @property EquipmentsShowField[] $equipmentsShowFields
+ * @property FinanceShowField[] $financeShowFields
  * @property Session[] $sessions
  * @property UsersRole $userType
  * @property Branch $branch
@@ -112,6 +113,14 @@ class Users extends \yii\db\ActiveRecord
     public function getEquipmentsShowFields()
     {
         return $this->hasMany(EquipmentsShowField::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFinanceShowFields()
+    {
+        return $this->hasMany(FinanceShowField::className(), ['user_id' => 'id']);
     }
 
     /**

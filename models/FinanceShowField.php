@@ -9,10 +9,9 @@ use Yii;
  *
  * @property int $id
  * @property int $user_id
- * @property int $applications_field_id код поля
+ * @property int $finance_field_id код поля
  *
  * @property Users $user
- * @property Equipments $applicationsField
  */
 class FinanceShowField extends \yii\db\ActiveRecord
 {
@@ -30,10 +29,9 @@ class FinanceShowField extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'applications_field_id'], 'required'],
-            [['user_id', 'applications_field_id'], 'integer'],
+            [['user_id', 'finance_field_id'], 'required'],
+            [['user_id', 'finance_field_id'], 'integer'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
-            [['applications_field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['applications_field_id' => 'id']],
         ];
     }
 
@@ -45,7 +43,7 @@ class FinanceShowField extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
-            'applications_field_id' => 'Applications Field ID',
+            'finance_field_id' => 'Finance Field ID',
         ];
     }
 
@@ -55,13 +53,5 @@ class FinanceShowField extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getApplicationsField()
-    {
-        return $this->hasOne(Equipments::className(), ['id' => 'applications_field_id']);
     }
 }
