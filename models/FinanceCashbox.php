@@ -9,6 +9,9 @@ use Yii;
  *
  * @property int $id
  * @property string $name Наименование категории
+ * @property string $sum
+ *
+ * @property Finance[] $finances
  */
 class FinanceCashbox extends \yii\db\ActiveRecord
 {
@@ -28,6 +31,7 @@ class FinanceCashbox extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 150],
+            [['sum'], 'string', 'max' => 45],
         ];
     }
 
@@ -39,6 +43,15 @@ class FinanceCashbox extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'sum' => 'Sum',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFinances()
+    {
+        return $this->hasMany(Finance::className(), ['cashBox_id' => 'id']);
     }
 }

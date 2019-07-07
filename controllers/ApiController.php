@@ -264,6 +264,12 @@ class ApiController extends Controller
             'get-finance-cash-box' => [
                 'class' => 'app\components\actions\finance\GetFinanceCashBoxAction',
             ],
+            'get-finance' => [
+                'class' => 'app\components\actions\finance\GetFinanceAction',
+            ],
+            'update-category-finance' => [
+                'class' => 'app\components\actions\finance\UpdateFinanceCategoryAction',
+            ],
         ];
     }
 

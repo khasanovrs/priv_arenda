@@ -6,6 +6,9 @@
 namespace app\components\finance;
 
 use app\components\Session\Sessions;
+use app\models\Clients;
+use app\models\ClientStatus;
+use app\models\Finance;
 use app\models\FinanceCashbox;
 use app\models\FinanceCategory;
 use app\models\FinanceField;
@@ -245,7 +248,8 @@ class FinanceClass
         foreach ($equipmentsTypeList as $value) {
             $result[] = [
                 'val' => $value->id,
-                'name' => $value->name
+                'name' => $value->name,
+                'sum' => $value->sum
             ];
         }
 
@@ -255,6 +259,120 @@ class FinanceClass
             'status' => 'SUCCESS',
             'msg' => 'Список касс финансов получен',
             'data' => $result
+        ];
+    }
+
+    public static function GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end)
+    {
+        Yii::info('Запуск функции GetFinance', __METHOD__);
+        $result = [];
+
+        $financeList = Finance::find()->all();
+
+        if (empty($financeList)) {
+            Yii::info('Список финансов пуст', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Список финансов пуст',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var Finance $finance
+         */
+        foreach ($financeList as $finance) {
+            $result[] = [
+                'id'=>$finance->id,
+                'name'=>$finance->name,
+                'category_id'=>$finance->category_id,
+                'type'=>$finance->type->name,
+                'date_create'=>date('d.m.Y',strtotime($finance->date_create)),
+                'payer'=>$finance->payer->name,
+                'sum'=>$finance->sum
+            ];
+        }
+
+        Yii::info('Список финансов получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список финансов получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Изменение статуса финансов
+     * @param $id
+     * @param $finance_category
+     * @return bool|array
+     */
+    public static function UpdateStatus($id, $finance_category)
+    {
+        Yii::info('Запуск функции UpdateStatus', __METHOD__);
+
+        if ($id === '' || !is_int($finance_category)) {
+            Yii::error('Не передан идентификатор финансов, id: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор финансов',
+            ];
+        }
+
+        if ($finance_category === '' || !is_int($finance_category)) {
+            Yii::error('Передан некорректный идентификатор категории, status: ' . serialize($finance_category), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор категории',
+            ];
+        }
+
+        $check_status = FinanceCategory::find()->where('id=:id', [':id' => $finance_category])->one();
+
+        if (!is_object($check_status)) {
+            Yii::error('Передан некорректный идентификатор категории, status:' . serialize($finance_category), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор категории',
+            ];
+        }
+
+        /**
+         * @var Finance $finance
+         */
+        $finance = Finance::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($finance)) {
+            Yii::error('По данному идентификатору не найден клиент, id' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Организация не найдена',
+            ];
+        }
+
+        $finance->category_id = $finance_category;
+
+        try {
+            if (!$finance->save(false)) {
+                Yii::error('Ошибка при обновлении категории финансов: ' . serialize($finance->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при обновлении категории финансов: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Категория успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Категория успешно изменена'
         ];
     }
 }
