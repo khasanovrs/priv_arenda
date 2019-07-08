@@ -3,19 +3,19 @@
  * Получение касс для финансов
  */
 
-namespace app\components\actions\finance;
+namespace app\components\actions\cashBox;
 
-use app\components\finance\FinanceClass;
+use app\components\CashBox\CashBoxClass;
 use Yii;
 use yii\base\Action;
 
-class GetFinanceCashBoxAction extends Action
+class GetCashBoxAction extends Action
 {
     public function run()
     {
         Yii::info('Запуск функции получения списка касс для финансов', __METHOD__);
 
-        $result = FinanceClass::GetFinanceCashBox();
+        $result = CashBoxClass::GetFinanceCashBox();
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка касс для финансов', __METHOD__);

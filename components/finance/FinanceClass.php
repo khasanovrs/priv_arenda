@@ -220,46 +220,6 @@ class FinanceClass
         ];
     }
 
-    /**
-     * Получение касс финансов
-     * @return bool|array
-     */
-    public static function GetFinanceCashBox()
-    {
-        Yii::info('Запуск функции GetFinanceCashBox', __METHOD__);
-        $result = [];
-
-        $equipmentsTypeList = FinanceCashbox::find()->orderBy('id')->all();
-
-        if (!is_array($equipmentsTypeList)) {
-            Yii::error('Список касс финансов пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список касс финансов пуст'
-            ];
-        }
-
-        /**
-         * @var FinanceCashbox $value
-         */
-        foreach ($equipmentsTypeList as $value) {
-            $result[] = [
-                'val' => $value->id,
-                'name' => $value->name,
-                'sum' => $value->sum
-            ];
-        }
-
-        Yii::info('Список касс финансов получен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Список касс финансов получен',
-            'data' => $result
-        ];
-    }
-
     public static function GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end)
     {
         Yii::info('Запуск функции GetFinance', __METHOD__);
