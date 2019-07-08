@@ -338,13 +338,13 @@ class FinanceClass
          */
         foreach ($financeList as $finance) {
             $result[] = [
-                'id'=>$finance->id,
-                'name'=>$finance->name,
-                'category_id'=>$finance->category_id,
-                'type'=>$finance->type->name,
-                'date_create'=>date('d.m.Y',strtotime($finance->date_create)),
-                'payer'=>$finance->payer->name,
-                'sum'=>$finance->sum
+                'id' => $finance->id,
+                'name' => $finance->name,
+                'category_id' => $finance->category_id,
+                'type' => $finance->type->name,
+                'date_create' => date('d.m.Y', strtotime($finance->date_create)),
+                'payer' => $finance->payer->name,
+                'sum' => $finance->sum
             ];
         }
 
@@ -427,6 +427,47 @@ class FinanceClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Категория успешно изменена'
+        ];
+    }
+
+    /**
+     * Функция добавления финансов
+     * @param $name
+     * @param $category
+     * @param $type
+     * @param $date
+     * @param $payer
+     * @param $sum
+     * @param $cashBox
+     */
+    public static function addFinance($name, $category, $type, $date, $payer, $sum, $cashBox)
+    {
+        Yii::info('Функция добавления финансов', __METHOD__);
+
+        $newFinance = new Finance();
+        $newFinance->name = $name;
+        $newFinance->category_id = $category;
+        $newFinance->type_id = $type;
+        $newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
+        $newFinance->payer_id = $payer;
+        $newFinance->sum = $sum;
+        $newFinance->cashBox_id = $cashBox;
+
+        try {
+            if (!$newFinance->save(false)) {
+                Yii::error('Ошибка при добавлении финансов: ' . serialize($newFinance->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении финансов: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Финансовая запись успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Финансовая запись успешно изменена'
         ];
     }
 }
