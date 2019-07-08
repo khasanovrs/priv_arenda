@@ -276,6 +276,12 @@ class ApiController extends Controller
             'add-finance' => [
                 'class' => 'app\components\actions\finance\AddFinanceAction',
             ],
+            /**
+             * Управление кассой
+             */
+            'add-cashBox' => [
+                'class' => 'app\components\actions\cashBox\AddCashBoxAction',
+            ],
         ];
     }
 
