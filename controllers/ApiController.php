@@ -267,6 +267,9 @@ class ApiController extends Controller
             'get-finance' => [
                 'class' => 'app\components\actions\finance\GetFinanceAction',
             ],
+            'get-finance-info' => [
+                'class' => 'app\components\actions\finance\GetFinanceInfoAction',
+            ],
             'update-category-finance' => [
                 'class' => 'app\components\actions\finance\UpdateFinanceCategoryAction',
             ],

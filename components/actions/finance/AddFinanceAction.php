@@ -17,6 +17,7 @@ class AddFinanceAction extends Action
 
         $request = Yii::$app->request;
 
+        $id = $request->getBodyParam('id');
         $name = $request->getBodyParam('name');
         $category = $request->getBodyParam('category');
         $type = $request->getBodyParam('type');
@@ -25,7 +26,7 @@ class AddFinanceAction extends Action
         $sum = $request->getBodyParam('sum');
         $cashBox = $request->getBodyParam('cashBox');
 
-        $result = FinanceClass::addFinance($name, $category, $type, $date, $payer, $sum, $cashBox);
+        $result = FinanceClass::addFinance($id, $name, $category, $type, $date, $payer, $sum, $cashBox);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении финансов', __METHOD__);
