@@ -261,17 +261,29 @@ class ApiController extends Controller
             'get-finance-type' => [
                 'class' => 'app\components\actions\finance\GetFinanceTypeAction',
             ],
-            'get-finance-cash-box' => [
-                'class' => 'app\components\actions\finance\GetFinanceCashBoxAction',
-            ],
             'get-finance' => [
                 'class' => 'app\components\actions\finance\GetFinanceAction',
+            ],
+            'get-finance-info' => [
+                'class' => 'app\components\actions\finance\GetFinanceInfoAction',
             ],
             'update-category-finance' => [
                 'class' => 'app\components\actions\finance\UpdateFinanceCategoryAction',
             ],
             'add-finance' => [
                 'class' => 'app\components\actions\finance\AddFinanceAction',
+            ],
+            /**
+             * Управление кассой
+             */
+            'add-cashBox' => [
+                'class' => 'app\components\actions\cashBox\AddCashBoxAction',
+            ],
+            'get-cashBox' => [
+                'class' => 'app\components\actions\cashBox\GetCashBoxAction',
+            ],
+            'delete-cashBox' => [
+                'class' => 'app\components\actions\cashBox\DeleteCashBoxAction',
             ],
         ];
     }

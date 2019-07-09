@@ -220,46 +220,6 @@ class FinanceClass
         ];
     }
 
-    /**
-     * Получение касс финансов
-     * @return bool|array
-     */
-    public static function GetFinanceCashBox()
-    {
-        Yii::info('Запуск функции GetFinanceCashBox', __METHOD__);
-        $result = [];
-
-        $equipmentsTypeList = FinanceCashbox::find()->orderBy('id')->all();
-
-        if (!is_array($equipmentsTypeList)) {
-            Yii::error('Список касс финансов пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список касс финансов пуст'
-            ];
-        }
-
-        /**
-         * @var FinanceCashbox $value
-         */
-        foreach ($equipmentsTypeList as $value) {
-            $result[] = [
-                'val' => $value->id,
-                'name' => $value->name,
-                'sum' => $value->sum
-            ];
-        }
-
-        Yii::info('Список касс финансов получен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Список касс финансов получен',
-            'data' => $result
-        ];
-    }
-
     public static function GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end)
     {
         Yii::info('Запуск функции GetFinance', __METHOD__);
@@ -358,6 +318,61 @@ class FinanceClass
     }
 
     /**
+     * Получение детальной информации по финансам
+     * @param $financeId
+     * @return array
+     */
+    public static function GetFinanceInfo($financeId)
+    {
+        Yii::info('Запуск функции GetFinanceInfo', __METHOD__);
+
+        if ($financeId === '') {
+            Yii::error('Не передан идентификатор финансов, id: ' . serialize($financeId), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор финансов',
+            ];
+        }
+
+        $finance = Finance::find()->where('id=:id', [':id' => $financeId])->one();
+
+        if (!is_object($finance)) {
+            Yii::info('Запись финанса не найдена,id:' . serialize($financeId), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Запись финанса не найдена',
+                'data' => []
+            ];
+        }
+
+        /**
+         * @var Finance $finance
+         */
+
+        $result = [
+            'id' => $finance->id,
+            'name' => $finance->name,
+            'category' => $finance->category_id,
+            'type' => $finance->type_id,
+            'date' => date('d.m.Y', strtotime($finance->date_create)),
+            'payer' => $finance->payer->name,
+            'payer_id' => $finance->payer_id,
+            'sum' => $finance->sum,
+            'cashBox' => $finance->cashBox_id
+        ];
+
+        Yii::info('Запись финанса получена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Запись финанса получена',
+            'data' => $result
+        ];
+    }
+
+    /**
      * Изменение категории финансов
      * @param $id
      * @param $finance_category
@@ -432,6 +447,7 @@ class FinanceClass
 
     /**
      * Функция добавления финансов
+     * @param $id
      * @param $name
      * @param $category
      * @param $type
@@ -439,19 +455,140 @@ class FinanceClass
      * @param $payer
      * @param $sum
      * @param $cashBox
+     * @return array|bool
      */
-    public static function addFinance($name, $category, $type, $date, $payer, $sum, $cashBox)
+    public static function addFinance($id, $name, $category, $type, $date, $payer, $sum, $cashBox)
     {
         Yii::info('Функция добавления финансов', __METHOD__);
 
-        $newFinance = new Finance();
-        $newFinance->name = $name;
-        $newFinance->category_id = $category;
-        $newFinance->type_id = $type;
-        $newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
-        $newFinance->payer_id = $payer;
-        $newFinance->sum = $sum;
-        $newFinance->cashBox_id = $cashBox;
+        if ($name === '') {
+            Yii::error('Не передано назначение', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано назначение'
+            ];
+        }
+
+        if ($category === '') {
+            Yii::error('Не передан идентификатор категории', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор категории'
+            ];
+        }
+
+        if ($type === '') {
+            Yii::error('Не передан идентификатор типа', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор типа'
+            ];
+        }
+
+        if ($date === '') {
+            Yii::error('Не передана дата', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана дата'
+            ];
+        }
+
+        if ($payer === '') {
+            Yii::error('Не передан идетификатор плательщика', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идетификатор плательщика'
+            ];
+        }
+
+        if ($sum === '') {
+            Yii::error('Не передана сумма', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана сумма'
+            ];
+        }
+
+        if ($cashBox === '') {
+            Yii::error('Не передан идентификатор кассы', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор кассы'
+            ];
+        }
+
+        $checkCategory = FinanceCategory::find()->where('id=:id', [':id' => $category])->one();
+
+        if (!is_object($checkCategory)) {
+            Yii::error('Передан некорректный идентификатор категории, id:' . serialize($category), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор категории'
+            ];
+        }
+
+        $checkType = FinanceType::find()->where('id=:id', [':id' => $type])->one();
+
+        if (!is_object($checkType)) {
+            Yii::error('Передан некорректный идентификатор типа, id:' . serialize($type), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор типа'
+            ];
+        }
+
+        $checkCashBox = FinanceType::find()->where('id=:id', [':id' => $cashBox])->one();
+
+        if (!is_object($checkCashBox)) {
+            Yii::error('Передан некорректный идентификатор кассы, id:' . serialize($cashBox), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор кассы'
+            ];
+        }
+
+        if ($id !== '') {
+            /**
+             * @var Finance $newFinance
+             */
+            $newFinance = Finance::find()->where('id=:id', [':id' => $id])->one();
+
+            if (!is_object($newFinance)) {
+                Yii::error('Данная запись не найдена, id:' . serialize($id), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Данная запись не найдена'
+                ];
+            }
+
+            $newFinance->name = $name;
+            $newFinance->category_id = $category;
+            //$newFinance->type_id = $type;
+            //$newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
+            $newFinance->payer_id = $payer;
+            //$newFinance->sum = $sum;
+            //$newFinance->cashBox_id = $cashBox;
+        } else {
+            $newFinance = new Finance();
+            $newFinance->name = $name;
+            $newFinance->category_id = $category;
+            $newFinance->type_id = $type;
+            $newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
+            $newFinance->payer_id = $payer;
+            $newFinance->sum = $sum;
+            $newFinance->cashBox_id = $cashBox;
+        }
 
         try {
             if (!$newFinance->save(false)) {
