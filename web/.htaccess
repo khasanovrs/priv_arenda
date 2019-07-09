@@ -1,0 +1,8 @@
+# Mod_Autoindex
+<IfModule mod_autoindex.c>
+  # Disable indexes
+  Options -Indexes
+</IfModule>
+
+# Mod_Rewrite
+<IfModule mod_rewrite.c>
