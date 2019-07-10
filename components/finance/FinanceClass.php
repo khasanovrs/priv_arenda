@@ -6,6 +6,7 @@
 namespace app\components\finance;
 
 use app\components\Session\Sessions;
+use app\models\Branch;
 use app\models\Finance;
 use app\models\FinanceCashbox;
 use app\models\FinanceCategory;
@@ -220,13 +221,30 @@ class FinanceClass
         ];
     }
 
-    public static function GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end)
+    /**
+     * Получение списка финансов
+     * @param $like
+     * @param $category
+     * @param $cashBox
+     * @param $type
+     * @param $sum_start
+     * @param $sum_end
+     * @param $date_start
+     * @param $date_end
+     * @param $branch
+     * @return array
+     */
+    public static function GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end, $branch)
     {
         Yii::info('Запуск функции GetFinance', __METHOD__);
 
         $listFilter = [];
         $params = [];
         $result = [];
+        $sum = [
+            'rate' => [],
+            'income' => []
+        ];
 
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
@@ -277,6 +295,12 @@ class FinanceClass
             $params[':sum_end'] = (int)$sum_end;
         }
 
+        if ($branch !== '' and $branch !== null) {
+            Yii::info('Параметр branch: ' . serialize($branch), __METHOD__);
+            $listFilter[] = 'branch_id=:branch';
+            $params[':branch'] = (int)$branch;
+        }
+
         if (!empty($listFilter)) {
             $financeList = Finance::find()->where(implode(" and ", $listFilter), $params)->orderBy('date_create desc')->all();
         } else {
@@ -304,16 +328,53 @@ class FinanceClass
                 'type' => $finance->type->name,
                 'date_create' => date('d.m.Y', strtotime($finance->date_create)),
                 'payer' => $finance->payer->name,
-                'sum' => $finance->sum
+                'sum' => $finance->sum,
+                'branch' => $finance->branch->name
             ];
+
+            $checkSearch = false;
+
+             if ($finance->type_id === 1) {
+                 foreach ($sum['rate'] as $key => $value) {
+                     if ($value['val'] === $finance->category_id) {
+                         $checkSearch = true;
+                         $sum['rate'][$key]['sum'] += (float)$finance->sum;
+                     }
+                 }
+
+                 if (!$checkSearch) {
+                     $sum['rate'][] = [
+                         'val' => $finance->category_id,
+                         'name' => $finance->category->name,
+                         'sum' => (float)$finance->sum,
+                     ];
+                 }
+             }
+
+            if ($finance->type_id === 2) {
+                foreach ($sum['income'] as $key => $value) {
+                    if ($value['val'] === $finance->category_id) {
+                        $checkSearch = true;
+                        $sum['income'][$key]['sum'] += (float)$finance->sum;
+                    }
+                }
+
+                if (!$checkSearch) {
+                    $sum['income'][] = [
+                        'val' => $finance->category_id,
+                        'name' => $finance->category->name,
+                        'sum' => (float)$finance->sum,
+                    ];
+                }
+            }
         }
 
-        Yii::info('Список финансов получен', __METHOD__);
+        Yii::info('Список финансов получен' . serialize($sum), __METHOD__);
 
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список финансов получен',
-            'data' => $result
+            'data' => ['list' => $result, 'sum' => $sum]
         ];
     }
 
@@ -360,7 +421,8 @@ class FinanceClass
             'payer' => $finance->payer->name,
             'payer_id' => $finance->payer_id,
             'sum' => $finance->sum,
-            'cashBox' => $finance->cashBox_id
+            'cashBox' => $finance->cashBox_id,
+            'branch' => $finance->branch_id
         ];
 
         Yii::info('Запись финанса получена', __METHOD__);
@@ -455,9 +517,10 @@ class FinanceClass
      * @param $payer
      * @param $sum
      * @param $cashBox
+     * @param $branch
      * @return array|bool
      */
-    public static function addFinance($id, $name, $category, $type, $date, $payer, $sum, $cashBox)
+    public static function addFinance($id, $name, $category, $type, $date, $payer, $sum, $cashBox, $branch)
     {
         Yii::info('Функция добавления финансов', __METHOD__);
 
@@ -524,6 +587,15 @@ class FinanceClass
             ];
         }
 
+        if ($branch === '') {
+            Yii::error('Не передан идентификатор филиала', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор филиала'
+            ];
+        }
+
         $checkCategory = FinanceCategory::find()->where('id=:id', [':id' => $category])->one();
 
         if (!is_object($checkCategory)) {
@@ -557,6 +629,17 @@ class FinanceClass
             ];
         }
 
+        $checkBranch = Branch::find()->where('id=:id', [':id' => $branch])->one();
+
+        if (!is_object($checkBranch)) {
+            Yii::error('Передан некорректный идентификатор филиала, id:' . serialize($cashBox), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор филиала'
+            ];
+        }
+
         if ($id !== '') {
             /**
              * @var Finance $newFinance
@@ -577,6 +660,7 @@ class FinanceClass
             //$newFinance->type_id = $type;
             //$newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
             $newFinance->payer_id = $payer;
+            $newFinance->branch_id = $branch;
             //$newFinance->sum = $sum;
             //$newFinance->cashBox_id = $cashBox;
         } else {
@@ -587,6 +671,7 @@ class FinanceClass
             $newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
             $newFinance->payer_id = $payer;
             $newFinance->sum = $sum;
+            $newFinance->branch_id = $branch;
             $newFinance->cashBox_id = $cashBox;
         }
 

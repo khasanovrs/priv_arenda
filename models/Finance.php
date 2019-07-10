@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ * @property int $branch_id
  * @property int $category_id
  * @property int $type_id
  * @property string $date_create
@@ -20,6 +21,7 @@ use Yii;
  * @property FinanceType $type
  * @property Clients $payer
  * @property FinanceCashbox $cashBox
+ * @property Branch $branch
  */
 class Finance extends \yii\db\ActiveRecord
 {
@@ -37,8 +39,8 @@ class Finance extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'category_id', 'type_id', 'payer_id', 'cashBox_id'], 'required'],
-            [['category_id', 'type_id', 'payer_id', 'cashBox_id'], 'integer'],
+            [['name', 'branch_id', 'category_id', 'type_id', 'payer_id', 'cashBox_id'], 'required'],
+            [['branch_id', 'category_id', 'type_id', 'payer_id', 'cashBox_id'], 'integer'],
             [['date_create'], 'safe'],
             [['name'], 'string', 'max' => 150],
             [['sum'], 'string', 'max' => 45],
@@ -46,6 +48,7 @@ class Finance extends \yii\db\ActiveRecord
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceType::className(), 'targetAttribute' => ['type_id' => 'id']],
             [['payer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['payer_id' => 'id']],
             [['cashBox_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceCashbox::className(), 'targetAttribute' => ['cashBox_id' => 'id']],
+            [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
         ];
     }
 
@@ -57,6 +60,7 @@ class Finance extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'branch_id' => 'Branch ID',
             'category_id' => 'Category ID',
             'type_id' => 'Type ID',
             'date_create' => 'Date Create',
@@ -96,5 +100,13 @@ class Finance extends \yii\db\ActiveRecord
     public function getCashBox()
     {
         return $this->hasOne(FinanceCashbox::className(), ['id' => 'cashBox_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBranch()
+    {
+        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
     }
 }

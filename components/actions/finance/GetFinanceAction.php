@@ -25,8 +25,9 @@ class GetFinanceAction extends Action
         $sum_end = $request->getBodyParam('sum_end');
         $date_start = $request->getBodyParam('date_start');
         $date_end = $request->getBodyParam('date_end');
+        $branch = $request->getBodyParam('branch');
 
-        $result = FinanceClass::GetFinance($like,$category,$cashBox,$type,$sum_start,$sum_end,$date_start,$date_end);
+        $result = FinanceClass::GetFinance($like, $category, $cashBox, $type, $sum_start, $sum_end, $date_start, $date_end, $branch);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка финансов', __METHOD__);
