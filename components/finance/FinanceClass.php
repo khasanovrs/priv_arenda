@@ -618,7 +618,7 @@ class FinanceClass
             ];
         }
 
-        $checkCashBox = FinanceType::find()->where('id=:id', [':id' => $cashBox])->one();
+        $checkCashBox = FinanceCashbox::find()->where('id=:id', [':id' => $cashBox])->one();
 
         if (!is_object($checkCashBox)) {
             Yii::error('Передан некорректный идентификатор кассы, id:' . serialize($cashBox), __METHOD__);
