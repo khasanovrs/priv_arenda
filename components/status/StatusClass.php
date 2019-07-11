@@ -56,9 +56,10 @@ class StatusClass
      * Добавление нового статуса для клиента
      * @param $name
      * @param $color
+     * @param $val
      * @return bool|array
      */
-    public static function AddStatus($name, $color)
+    public static function AddStatus($name, $color, $val)
     {
         Yii::info('Запуск функции добавления нового статуса для юр. лиц', __METHOD__);
 
@@ -71,7 +72,21 @@ class StatusClass
             ];
         }
 
-        $new_status = new ClientStatus();
+        if ($val !== '') {
+            $new_status = ClientStatus::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new_status)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new_status = new ClientStatus();
+        }
+
         $new_status->name = $name;
         $new_status->color = $color;
 
@@ -89,7 +104,7 @@ class StatusClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Статус для клиента успешно добавлен'
+            'msg' => $val === '' ? 'Статус для клиента успешно добавлен' : 'Статус для клиента успешно обновлен'
         ];
     }
 

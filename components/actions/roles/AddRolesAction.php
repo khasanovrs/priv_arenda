@@ -18,8 +18,9 @@ class AddRolesAction extends Action
         $request = Yii::$app->request;
 
         $role = $request->getBodyParam('name');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = UserRolesClass::AddRole($role);
+        $resultChange = UserRolesClass::AddRole($role, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении новой роли', __METHOD__);
@@ -38,7 +39,7 @@ class AddRolesAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Роль успешно добавлена',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

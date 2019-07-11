@@ -55,13 +55,38 @@ class DiscountClass
     /**
      * Функция добавления скидки
      * @param $discount
+     * @param $val
      * @return array|bool
      */
-    public static function AddDiscount($discount)
+    public static function AddDiscount($discount, $val)
     {
         Yii::info('Запуск функции AddDiscount', __METHOD__);
 
-        $newDiscount = new Discount();
+        if ($discount === '') {
+            Yii::error('Ни передано наименование скидки, name:' . serialize($discount), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передано наименование скидки',
+            ];
+        }
+
+        if ($val !== '') {
+            $newDiscount = Discount::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($newDiscount)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $newDiscount = new Discount();
+        }
+
+        $discount = str_replace('%', '', $discount);
 
         $newDiscount->code = (int)$discount;
         $newDiscount->name = $discount . '%';
@@ -78,7 +103,7 @@ class DiscountClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Скидка успешно добавлена'
+            'msg' => $val === '' ? 'Скидка успешно добавлена' : 'Скидка успешно обновлена'
         ];
     }
 

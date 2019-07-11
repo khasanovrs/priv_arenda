@@ -56,11 +56,12 @@ class StockClass
 
     /**
      * Добавление нового склада
-     * @param $id_branch ,
-     * @param $name ,
+     * @param $id_branch
+     * @param $name
+     * @param $val
      * @return bool|array
      */
-    public static function AddStock($id_branch, $name)
+    public static function AddStock($id_branch, $name, $val)
     {
         Yii::info('Запуск функции добавления нового склада', __METHOD__);
 
@@ -73,7 +74,7 @@ class StockClass
             ];
         }
 
-        if ($id_branch === '') {
+        if ($id_branch == '' && $val === '') {
             Yii::error('Ни передан идентификатор филиала, id_branch:' . serialize($id_branch), __METHOD__);
 
             return [
@@ -84,7 +85,7 @@ class StockClass
 
         $branch = Branch::find()->where('id=:id', [':id' => $id_branch])->one();
 
-        if (!is_object($branch)) {
+        if (!is_object($branch) && $val === '') {
             Yii::error('Указанный филиал ни найден, id_branch:' . serialize($id_branch), __METHOD__);
 
             return [
@@ -93,10 +94,24 @@ class StockClass
             ];
         }
 
-        $new_stock = new Stock();
+        if ($val !== '') {
+            $new_stock = Stock::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new_stock)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new_stock = new Stock();
+            $new_stock->id_branch = $id_branch;
+            $new_stock->date_create = date('Y-m-d H:i:s');
+        }
+
         $new_stock->name = $name;
-        $new_stock->id_branch = $id_branch;
-        $new_stock->date_create = date('Y-m-d H:i:s');
         $new_stock->date_update = date('Y-m-d H:i:s');
 
         try {
@@ -113,7 +128,7 @@ class StockClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Склад успешно добавлен'
+            'msg' => $val === '' ? 'Склад успешно добавлен' : 'Склад для клиента успешно обновлен'
         ];
     }
 

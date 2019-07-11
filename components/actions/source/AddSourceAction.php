@@ -18,8 +18,9 @@ class AddSourceAction extends Action
         $request = Yii::$app->request;
 
         $name = $request->getBodyParam('name');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = SourceClass::AddSource($name);
+        $resultChange = SourceClass::AddSource($name, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового источника', __METHOD__);
@@ -38,7 +39,7 @@ class AddSourceAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Источник успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

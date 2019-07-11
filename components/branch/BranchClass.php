@@ -57,12 +57,27 @@ class BranchClass
     /**
      * Функци добавления филиала
      * @param $branch
+     * @param $val
      * @return array|bool
      */
-    public static function AddBranch($branch) {
+    public static function AddBranch($branch, $val)
+    {
         Yii::info('Запуск функции AddBranch', __METHOD__);
 
-        $newBranch = new Branch();
+        if ($val !== '') {
+            $newBranch = Branch::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($newBranch)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $newBranch = new Branch();
+        }
 
         $newBranch->name = $branch;
 
@@ -78,7 +93,7 @@ class BranchClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Филиал успешно добавлен'
+            'msg' => $val === '' ? 'Филиал успешно добавлен' : 'Филиал успешно обновлен'
         ];
     }
 
@@ -87,7 +102,8 @@ class BranchClass
      * @param $branch
      * @return array|bool
      */
-    public static function DeleteBranch($branch) {
+    public static function DeleteBranch($branch)
+    {
         Yii::info('Запуск функции DeleteBranch', __METHOD__);
 
         $check_status = Applications::find()->where('branch_id=:branch_id', [':branch_id' => $branch])->one();

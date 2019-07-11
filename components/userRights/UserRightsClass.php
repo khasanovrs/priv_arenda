@@ -56,13 +56,27 @@ class UserRightsClass
     /**
      * Функция добавления роли
      * @param $right
+     * @param $val
      * @return array|bool
      */
-    public static function AddRight($right)
+    public static function AddRight($right, $val)
     {
         Yii::info('Запуск функции AddRight', __METHOD__);
 
-        $newRight = new UsersRights();
+        if ($val !== '') {
+            $newRight = UsersRights::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($newRight)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $newRight = new UsersRights();
+        }
 
         $newRight->name = $right;
 
@@ -78,7 +92,7 @@ class UserRightsClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Права успешно добавлены'
+            'msg' => $val === '' ? 'Права успешно добавлены' : 'Права успешно обновлены'
         ];
     }
 
@@ -87,7 +101,8 @@ class UserRightsClass
      * @param $right
      * @return array|bool
      */
-    public static function DeleteRight($id) {
+    public static function DeleteRight($id)
+    {
         Yii::info('Запуск функции DeleteRight', __METHOD__);
 
         $check_status = BunchUserRight::find()->where('right_id=:status', [':status' => $id])->one();

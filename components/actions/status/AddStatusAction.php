@@ -19,8 +19,9 @@ class AddStatusAction extends Action
 
         $name = $request->getBodyParam('name');
         $color = $request->getBodyParam('color');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = StatusClass::AddStatus($name, $color);
+        $resultChange = StatusClass::AddStatus($name, $color, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового статуса для клиента', __METHOD__);
@@ -39,7 +40,7 @@ class AddStatusAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Статус успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

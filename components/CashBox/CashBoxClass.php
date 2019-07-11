@@ -55,9 +55,10 @@ class CashBoxClass
      * Функция добавления кассы
      * @param $name
      * @param $sum
+     * @param $val
      * @return array|bool
      */
-    public static function addCashBox($name, $sum)
+    public static function addCashBox($name, $sum, $val)
     {
         Yii::info('Запуск функции addCashBox', __METHOD__);
 
@@ -70,7 +71,20 @@ class CashBoxClass
             ];
         }
 
-        $newCashBox = new FinanceCashbox();
+        if ($val !== '') {
+            $newCashBox = FinanceCashbox::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($newCashBox)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $newCashBox = new FinanceCashbox();
+        }
 
         $newCashBox->name = $name;
         $newCashBox->sum = $sum;
@@ -87,7 +101,7 @@ class CashBoxClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Касса успешно добавлена'
+            'msg' => $val === '' ? 'Касса успешно добавлена' : 'Касса успешно обновлена'
         ];
     }
 

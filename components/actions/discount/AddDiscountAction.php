@@ -18,8 +18,9 @@ class AddDiscountAction extends Action
         $request = Yii::$app->request;
 
         $discount = $request->getBodyParam('name');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = DiscountClass::AddDiscount($discount);
+        $resultChange = DiscountClass::AddDiscount($discount, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении новой скидки', __METHOD__);
@@ -38,7 +39,7 @@ class AddDiscountAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Скидка успешно добавлена',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

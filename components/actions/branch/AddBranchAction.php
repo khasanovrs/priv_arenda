@@ -18,8 +18,9 @@ class AddBranchAction extends Action
         $request = Yii::$app->request;
 
         $branch = $request->getBodyParam('name');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = BranchClass::AddBranch($branch);
+        $resultChange = BranchClass::AddBranch($branch, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового филиала', __METHOD__);
@@ -38,7 +39,7 @@ class AddBranchAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Филиал успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

@@ -809,11 +809,12 @@ class ApplicationsClass
 
     /**
      * Добавление нового статуса для заявки
-     * @param $name ,
-     * @param $color ,
+     * @param $name
+     * @param $color
+     * @param $val
      * @return bool|array
      */
-    public static function AddStatus($name, $color)
+    public static function AddStatus($name, $color, $val)
     {
         Yii::info('Запуск функции добавления нового статуса для оборудования', __METHOD__);
 
@@ -826,7 +827,21 @@ class ApplicationsClass
             ];
         }
 
-        $new_status = new ApplicationsStatus();
+        if ($val !== '') {
+            $new_status = ApplicationsStatus::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new_status)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new_status = new ApplicationsStatus();
+        }
+
         $new_status->name = $name;
         $new_status->color = $color;
 
@@ -844,7 +859,7 @@ class ApplicationsClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Статус для заявки успешно добавлен'
+            'msg' => $val === '' ? 'Статус для заявки успешно добавлен' : 'Статус для заявки успешно обновлен'
         ];
     }
 

@@ -19,8 +19,9 @@ class AddStockAction extends Action
 
         $name = $request->getBodyParam('name');
         $id_branch = $request->getBodyParam('branch');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = StockClass::AddStock($id_branch, $name);
+        $resultChange = StockClass::AddStock($id_branch, $name, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового склада', __METHOD__);
@@ -39,7 +40,7 @@ class AddStockAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Склад успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

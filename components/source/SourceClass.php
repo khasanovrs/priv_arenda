@@ -54,10 +54,11 @@ class SourceClass
 
     /**
      * Добавление нового источника
-     * @param $name ,
+     * @param $name
+     * @param $val
      * @return bool|array
      */
-    public static function AddSource($name)
+    public static function AddSource($name, $val)
     {
         Yii::info('Запуск функции добавления нового источника', __METHOD__);
 
@@ -70,7 +71,21 @@ class SourceClass
             ];
         }
 
-        $new_source = new Source();
+        if ($val !== '') {
+            $new_source = Source::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new_source)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new_source = new Source();
+        }
+
         $new_source->name = $name;
 
         try {
@@ -87,7 +102,7 @@ class SourceClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Источник успешно добавлен'
+            'msg' => $val === '' ? 'Источник успешно добавлен' : 'Источник успешно обновлен'
         ];
     }
 

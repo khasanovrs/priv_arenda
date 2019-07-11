@@ -18,8 +18,9 @@ class AddRightAction extends Action
         $request = Yii::$app->request;
 
         $name = $request->getBodyParam('name');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = UserRightsClass::AddRight($name);
+        $resultChange = UserRightsClass::AddRight($name, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового права', __METHOD__);
@@ -38,7 +39,7 @@ class AddRightAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Права успешно добавлены',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

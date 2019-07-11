@@ -19,8 +19,9 @@ class AddEquipmentStatusAction extends Action
 
         $name = $request->getBodyParam('name');
         $color = $request->getBodyParam('color');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = EquipmentsClass::AddStatus($name, $color);
+        $resultChange = EquipmentsClass::AddStatus($name, $color, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового статуса для оборудования', __METHOD__);
@@ -39,7 +40,7 @@ class AddEquipmentStatusAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Статус успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

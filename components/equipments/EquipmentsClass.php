@@ -1113,11 +1113,12 @@ class EquipmentsClass
 
     /**
      * Добавление нового статуса для оборудования
-     * @param $name ,
-     * @param $color ,
+     * @param $name
+     * @param $color
+     * @param $val
      * @return bool|array
      */
-    public static function AddStatus($name,$color)
+    public static function AddStatus($name, $color, $val)
     {
         Yii::info('Запуск функции добавления нового статуса для оборудования', __METHOD__);
 
@@ -1130,7 +1131,21 @@ class EquipmentsClass
             ];
         }
 
-        $new_status = new EquipmentsStatus();
+        if ($val !== '') {
+            $new_status = EquipmentsStatus::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new_status)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new_status = new EquipmentsStatus();
+        }
+
         $new_status->name = $name;
         $new_status->color = $color;
 
@@ -1148,7 +1163,7 @@ class EquipmentsClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Статус для оборудования успешно добавлен'
+            'msg' => $val === '' ? 'Статус для оборудования успешно добавлен' : 'Статус для оборудования успешно обновлен'
         ];
     }
 

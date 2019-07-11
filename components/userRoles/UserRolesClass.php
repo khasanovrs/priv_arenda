@@ -54,13 +54,27 @@ class UserRolesClass
     /**
      * Функция добавления роли
      * @param $role
+     * @param $val
      * @return array|bool
      */
-    public static function AddRole($role)
+    public static function AddRole($role, $val)
     {
         Yii::info('Запуск функции AddRole', __METHOD__);
 
-        $newRole = new UsersRole();
+        if ($val !== '') {
+            $newRole = UsersRole::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($newRole)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $newRole = new UsersRole();
+        }
 
         $newRole->name = $role;
 
@@ -76,7 +90,7 @@ class UserRolesClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Роль успешно добавлена'
+            'msg' => $val === '' ? 'Роль успешно добавлена' : 'Роль успешно обновлена'
         ];
     }
 
@@ -85,7 +99,8 @@ class UserRolesClass
      * @param $role
      * @return array|bool
      */
-    public static function DeleteRole($id) {
+    public static function DeleteRole($id)
+    {
         Yii::info('Запуск функции DeleteRole', __METHOD__);
 
         $check_status = Users::find()->where('user_type=:status', [':status' => $id])->one();

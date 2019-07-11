@@ -19,8 +19,9 @@ class AddApplicationsStatusAction extends Action
 
         $name = $request->getBodyParam('name');
         $color = $request->getBodyParam('color');
+        $val = $request->getBodyParam('val');
 
-        $resultChange = ApplicationsClass::AddStatus($name, $color);
+        $resultChange = ApplicationsClass::AddStatus($name, $color, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового статуса для заявки', __METHOD__);
@@ -39,7 +40,7 @@ class AddApplicationsStatusAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Статус успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }
