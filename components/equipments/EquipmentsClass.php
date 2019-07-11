@@ -125,7 +125,8 @@ class EquipmentsClass
         foreach ($equipmentsAvailabilityList as $value) {
             $result[] = [
                 'val' => $value->id,
-                'name' => $value->name
+                'name' => $value->name,
+                'color' => $value->color
             ];
         }
 

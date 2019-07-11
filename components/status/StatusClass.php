@@ -38,6 +38,7 @@ class StatusClass
             $result[] = [
                 'val' => $value->id,
                 'name' => $value->name,
+                'color' => $value->color,
             ];
         }
 

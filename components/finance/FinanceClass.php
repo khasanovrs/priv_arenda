@@ -313,7 +313,7 @@ class FinanceClass
             return [
                 'status' => 'SUCCESS',
                 'msg' => 'Список финансов пуст',
-                'data' => $result
+                'data' => ['list' => $result, 'sum' => $sum]
             ];
         }
 

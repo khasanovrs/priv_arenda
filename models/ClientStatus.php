@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ * @property string $color
  *
  * @property Clients[] $clients
  */
@@ -30,6 +31,7 @@ class ClientStatus extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 150],
+            [['color'], 'string', 'max' => 45],
         ];
     }
 
@@ -41,6 +43,7 @@ class ClientStatus extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'color' => 'Color',
         ];
     }
 

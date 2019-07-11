@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ * @property string $color
  */
 class EquipmentsStatus extends \yii\db\ActiveRecord
 {
@@ -29,6 +30,7 @@ class EquipmentsStatus extends \yii\db\ActiveRecord
             [['id', 'name'], 'required'],
             [['id'], 'integer'],
             [['name'], 'string', 'max' => 150],
+            [['color'], 'string', 'max' => 45],
             [['id'], 'unique'],
         ];
     }
@@ -41,6 +43,7 @@ class EquipmentsStatus extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'color' => 'Color',
         ];
     }
 }
