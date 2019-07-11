@@ -76,18 +76,6 @@ class ApiController extends Controller
                 'class' => 'app\components\actions\client\UpdateStatusUrClientAction',
             ],
             /**
-             * Управление филиалами
-             */
-            'get-branch' => [
-                'class' => 'app\components\actions\branch\GetBranchAction',
-            ],
-            'add-branch' => [
-                'class' => 'app\components\actions\branch\AddBranchAction',
-            ],
-            'delete-branch' => [
-                'class' => 'app\components\actions\branch\DeleteBranchAction',
-            ],
-            /**
              * Управление статусами для клиентов
              */
             'get-client-status' => [
@@ -98,6 +86,18 @@ class ApiController extends Controller
             ],
             'delete-client-status' => [
                 'class' => 'app\components\actions\status\DeleteStatusAction',
+            ],
+            /**
+             * Управление филиалами
+             */
+            'get-branch' => [
+                'class' => 'app\components\actions\branch\GetBranchAction',
+            ],
+            'add-branch' => [
+                'class' => 'app\components\actions\branch\AddBranchAction',
+            ],
+            'delete-branch' => [
+                'class' => 'app\components\actions\branch\DeleteBranchAction',
             ],
             /**
              * Управление источниками
@@ -221,9 +221,6 @@ class ApiController extends Controller
             ],
             'update-applications-status' => [
                 'class' => 'app\components\actions\applications\UpdateApplicationsStatusAction',
-            ],
-            'get-applications-source' => [
-                'class' => 'app\components\actions\applications\GetApplicationsSourceAction',
             ],
             'get-applications-type-lease' => [
                 'class' => 'app\components\actions\applications\GetApplicationsTypeLeaseAction',

@@ -5,7 +5,7 @@
 
 namespace app\components\actions\stock;
 
-use app\components\Stock\StockClass;
+use app\components\stock\StockClass;
 use Yii;
 use yii\base\Action;
 
@@ -18,7 +18,7 @@ class AddStockAction extends Action
         $request = Yii::$app->request;
 
         $name = $request->getBodyParam('name');
-        $id_branch = $request->getBodyParam('id_branch');
+        $id_branch = $request->getBodyParam('branch');
 
         $resultChange = StockClass::AddStock($id_branch, $name);
 
@@ -38,7 +38,7 @@ class AddStockAction extends Action
         Yii::info('Склад успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Склад успешно добавлен',
         ];
     }

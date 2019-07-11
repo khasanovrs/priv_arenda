@@ -5,21 +5,22 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "client_source".
+ * This is the model class for table "source".
  *
  * @property int $id
  * @property string $name
  *
+ * @property Applications[] $applications
  * @property ClientsInfo[] $clientsInfos
  */
-class ClientSource extends \yii\db\ActiveRecord
+class Source extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'client_source';
+        return 'source';
     }
 
     /**
@@ -42,6 +43,14 @@ class ClientSource extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplications()
+    {
+        return $this->hasMany(Applications::className(), ['source_id' => 'id']);
     }
 
     /**

@@ -37,7 +37,7 @@ class DeleteRightAction extends Action
         Yii::info('Право успешно удалено', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Право успешно удалено',
         ];
     }

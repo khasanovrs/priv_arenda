@@ -6,6 +6,7 @@
 namespace app\components\Stock;
 
 use app\models\Branch;
+use app\models\Equipments;
 use app\models\Stock;
 use Yii;
 
@@ -131,6 +132,26 @@ class StockClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Ни передан идентификатор склада',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('stock_id=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для оборудований, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для оборудований',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('stock_id=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для оборудований, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для оборудований',
             ];
         }
 

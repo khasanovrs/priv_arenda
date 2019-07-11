@@ -5,7 +5,7 @@
 
 namespace app\components\actions\status;
 
-use app\components\Status\StatusClass;
+use app\components\status\StatusClass;
 use Yii;
 use yii\base\Action;
 
@@ -37,7 +37,7 @@ class DeleteStatusAction extends Action
         Yii::info('Статус успешно удален', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Статус успешно удален',
         ];
     }

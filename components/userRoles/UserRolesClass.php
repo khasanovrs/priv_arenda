@@ -5,6 +5,7 @@
 
 namespace app\components\userRoles;
 
+use app\models\Users;
 use app\models\UsersRole;
 use Yii;
 
@@ -84,11 +85,21 @@ class UserRolesClass
      * @param $role
      * @return array|bool
      */
-    public static function DeleteRole($role) {
+    public static function DeleteRole($id) {
         Yii::info('Запуск функции DeleteRole', __METHOD__);
 
+        $check_status = Users::find()->where('user_type=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется',
+            ];
+        }
+
         try {
-            UsersRole::deleteAll('id=:id', [':id' => $role]);
+            UsersRole::deleteAll('id=:id', [':id' => $id]);
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при удалении роли: ' . serialize($e->getMessage()), __METHOD__);
             return false;

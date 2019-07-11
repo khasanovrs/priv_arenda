@@ -38,7 +38,7 @@ class AddCashBoxAction extends Action
         Yii::info('Касса успешно добавлена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Касса успешно добавлена',
         ];
     }

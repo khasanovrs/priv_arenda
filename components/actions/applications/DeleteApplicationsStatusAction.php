@@ -37,7 +37,7 @@ class DeleteApplicationsStatusAction extends Action
         Yii::info('Статус для заявки успешно удалена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Статус успешно удален',
         ];
     }

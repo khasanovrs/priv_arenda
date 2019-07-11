@@ -1114,9 +1114,10 @@ class EquipmentsClass
     /**
      * Добавление нового статуса для оборудования
      * @param $name ,
+     * @param $color ,
      * @return bool|array
      */
-    public static function AddStatus($name)
+    public static function AddStatus($name,$color)
     {
         Yii::info('Запуск функции добавления нового статуса для оборудования', __METHOD__);
 
@@ -1131,6 +1132,7 @@ class EquipmentsClass
 
         $new_status = new EquipmentsStatus();
         $new_status->name = $name;
+        $new_status->color = $color;
 
         try {
             if (!$new_status->save(false)) {
@@ -1168,7 +1170,7 @@ class EquipmentsClass
             ];
         }
 
-        $check_status = Equipments::find()->where('id=:id', [':id' => $id])->one();
+        $check_status = Equipments::find()->where('status=:status', [':status' => $id])->one();
 
         if (is_object($check_status)) {
             Yii::error('Данный статус нельзя удалить. Статус используется:' . serialize($id), __METHOD__);

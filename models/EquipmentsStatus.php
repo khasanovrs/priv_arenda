@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $color
+ *
+ * @property Equipments[] $equipments
  */
 class EquipmentsStatus extends \yii\db\ActiveRecord
 {
@@ -27,11 +29,9 @@ class EquipmentsStatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name'], 'required'],
-            [['id'], 'integer'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 150],
             [['color'], 'string', 'max' => 45],
-            [['id'], 'unique'],
         ];
     }
 
@@ -45,5 +45,13 @@ class EquipmentsStatus extends \yii\db\ActiveRecord
             'name' => 'Name',
             'color' => 'Color',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipments()
+    {
+        return $this->hasMany(Equipments::className(), ['status' => 'id']);
     }
 }

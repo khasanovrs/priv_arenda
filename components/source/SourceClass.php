@@ -5,7 +5,9 @@
 
 namespace app\components\source;
 
-use app\models\ClientSource;
+use app\models\Applications;
+use app\models\ClientsInfo;
+use app\models\Source;
 use Yii;
 
 class SourceClass
@@ -19,7 +21,7 @@ class SourceClass
         Yii::info('Запуск функции GetSource', __METHOD__);
         $result = [];
 
-        $sourceList = ClientSource::find()->all();
+        $sourceList = Source::find()->all();
 
         if (!is_array($sourceList)) {
             Yii::error('Список источников пуст', __METHOD__);
@@ -32,7 +34,7 @@ class SourceClass
         }
 
         /**
-         * @var ClientSource $value
+         * @var Source $value
          */
         foreach ($sourceList as $value) {
             $result[] = [
@@ -68,7 +70,7 @@ class SourceClass
             ];
         }
 
-        $new_source = new ClientSource();
+        $new_source = new Source();
         $new_source->name = $name;
 
         try {
@@ -107,8 +109,28 @@ class SourceClass
             ];
         }
 
+        $check_status = ClientsInfo::find()->where('source=:source', [':source' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется',
+            ];
+        }
+
+        $check_status = Applications::find()->where('source_id=:source', [':source' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется',
+            ];
+        }
+
         try {
-            ClientSource::deleteAll('id=:id', array(':id' => $id));
+            Source::deleteAll('id=:id', array(':id' => $id));
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при удалении источника: ' . serialize($e->getMessage()), __METHOD__);
             return false;

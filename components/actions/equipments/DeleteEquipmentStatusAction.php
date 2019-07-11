@@ -37,7 +37,7 @@ class DeleteEquipmentStatusAction extends Action
         Yii::info('Статус для оборудования успешно удален', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Статус успешно удален',
         ];
     }

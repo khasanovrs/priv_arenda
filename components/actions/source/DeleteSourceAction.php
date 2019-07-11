@@ -37,7 +37,7 @@ class DeleteSourceAction extends Action
         Yii::info('Источник успешно удален', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Источник успешно удален',
         ];
     }

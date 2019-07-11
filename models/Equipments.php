@@ -15,7 +15,6 @@ use Yii;
  * @property int $type тип инструмента
  * @property int $discount
  * @property int $status Доступность
- * @property int $sale
  * @property string $count
  * @property string $selling_price Цена продажи
  * @property string $price_per_day Цена за сутки
@@ -33,6 +32,7 @@ use Yii;
  * @property ApplicationEquipment[] $applicationEquipments
  * @property EquipmentsCategory $category
  * @property Stock $stock
+ * @property EquipmentsStatus $status0
  * @property EquipmentsType $type0
  * @property EquipmentsMark $mark0
  * @property Discount $discount0
@@ -54,13 +54,14 @@ class Equipments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount', 'status', 'sale'], 'required'],
-            [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status', 'sale'], 'integer'],
+            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
+            [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],
             [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio'], 'string', 'max' => 45],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
+            [['status'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsStatus::className(), 'targetAttribute' => ['status' => 'id']],
             [['type'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsType::className(), 'targetAttribute' => ['type' => 'id']],
             [['mark'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsMark::className(), 'targetAttribute' => ['mark' => 'id']],
             [['discount'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount' => 'id']],
@@ -81,7 +82,6 @@ class Equipments extends \yii\db\ActiveRecord
             'type' => 'Type',
             'discount' => 'Discount',
             'status' => 'Status',
-            'sale' => 'Sale',
             'count' => 'Count',
             'selling_price' => 'Selling Price',
             'price_per_day' => 'Price Per Day',
@@ -120,6 +120,14 @@ class Equipments extends \yii\db\ActiveRecord
     public function getStock()
     {
         return $this->hasOne(Stock::className(), ['id' => 'stock_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStatus0()
+    {
+        return $this->hasOne(EquipmentsStatus::className(), ['id' => 'status']);
     }
 
     /**

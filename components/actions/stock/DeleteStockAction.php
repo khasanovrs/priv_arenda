@@ -5,7 +5,7 @@
 
 namespace app\components\actions\stock;
 
-use app\components\Stock\StockClass;
+use app\components\stock\StockClass;
 use Yii;
 use yii\base\Action;
 
@@ -37,7 +37,7 @@ class DeleteStockAction extends Action
         Yii::info('Склад успешно удален', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Склад успешно удален',
         ];
     }

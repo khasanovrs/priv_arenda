@@ -24,7 +24,7 @@ class DeleteCashBoxAction extends Action
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при удалении кассы', __METHOD__);
 
-            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'SUCCESS') {
+            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
                 return $resultChange;
             }
 
@@ -37,7 +37,7 @@ class DeleteCashBoxAction extends Action
         Yii::info('Касса успешно удалена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Касса успешно удалена',
         ];
     }

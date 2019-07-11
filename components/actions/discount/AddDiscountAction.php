@@ -17,7 +17,7 @@ class AddDiscountAction extends Action
 
         $request = Yii::$app->request;
 
-        $discount = $request->getBodyParam('discount');
+        $discount = $request->getBodyParam('name');
 
         $resultChange = DiscountClass::AddDiscount($discount);
 
@@ -37,7 +37,7 @@ class AddDiscountAction extends Action
         Yii::info('Скидка успешно добавлена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Скидка успешно добавлена',
         ];
     }

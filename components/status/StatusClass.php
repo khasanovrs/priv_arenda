@@ -3,8 +3,9 @@
  * Управление статусами
  */
 
-namespace app\components\Status;
+namespace app\components\status;
 
+use app\models\Clients;
 use app\models\ClientStatus;
 use Yii;
 
@@ -53,10 +54,11 @@ class StatusClass
 
     /**
      * Добавление нового статуса для клиента
-     * @param $name ,
+     * @param $name
+     * @param $color
      * @return bool|array
      */
-    public static function AddStatus($name)
+    public static function AddStatus($name, $color)
     {
         Yii::info('Запуск функции добавления нового статуса для юр. лиц', __METHOD__);
 
@@ -71,6 +73,7 @@ class StatusClass
 
         $new_status = new ClientStatus();
         $new_status->name = $name;
+        $new_status->color = $color;
 
         try {
             if (!$new_status->save(false)) {
@@ -100,7 +103,7 @@ class StatusClass
         Yii::info('Запуск функции удаления статуса для клиента', __METHOD__);
 
         if ($id === '') {
-            Yii::error('Ни передано идентификатор статуса, id:' . serialize($id), __METHOD__);
+            Yii::error('Ни передан идентификатор статуса, id:' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -108,10 +111,9 @@ class StatusClass
             ];
         }
 
-        $check_status = ClientStatus::find()->where('id=:id', [':id' => $id])->one();
-
+        $check_status = Clients::find()->where('status=:status', [':status' => $id])->one();
         if (is_object($check_status)) {
-            Yii::error('Ни передан идентификатор статуса, id:' . serialize($id), __METHOD__);
+            Yii::error('Данный статус нельзя удалить. Статус используется, id:' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',

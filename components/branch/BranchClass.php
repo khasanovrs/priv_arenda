@@ -5,7 +5,11 @@
 
 namespace app\components\branch;
 
+use app\models\Applications;
 use app\models\Branch;
+use app\models\Clients;
+use app\models\Stock;
+use app\models\Users;
 use Yii;
 
 class BranchClass
@@ -84,7 +88,37 @@ class BranchClass
      * @return array|bool
      */
     public static function DeleteBranch($branch) {
-        Yii::info('Запуск функции AddBranch', __METHOD__);
+        Yii::info('Запуск функции DeleteBranch', __METHOD__);
+
+        $check_status = Applications::find()->where('branch_id=:branch_id', [':branch_id' => $branch])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется в заявках, id:' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется в заявках',
+            ];
+        }
+
+        $check_status = Stock::find()->where('id_branch=:branch_id', [':branch_id' => $branch])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для складов, id:' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для складов',
+            ];
+        }
+
+        $check_status = Users::find()->where('branch_id=:branch_id', [':branch_id' => $branch])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для пользователей, id:' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для пользователей',
+            ];
+        }
 
         try {
             Branch::deleteAll('id=:id', [':id' => $branch]);

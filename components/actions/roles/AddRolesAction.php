@@ -17,7 +17,7 @@ class AddRolesAction extends Action
 
         $request = Yii::$app->request;
 
-        $role = $request->getBodyParam('role');
+        $role = $request->getBodyParam('name');
 
         $resultChange = UserRolesClass::AddRole($role);
 
@@ -37,7 +37,7 @@ class AddRolesAction extends Action
         Yii::info('Роль успешно добавлена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Роль успешно добавлена',
         ];
     }

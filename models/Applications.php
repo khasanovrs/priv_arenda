@@ -24,7 +24,7 @@ use Yii;
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property Clients $client
- * @property ApplicationsSource $source
+ * @property Source $source
  * @property Discount $discount
  * @property ApplicationsDelivery $delivery
  * @property ApplicationsTypeLease $typeLease
@@ -52,7 +52,7 @@ class Applications extends \yii\db\ActiveRecord
             [['rent_start', 'rent_end', 'date_create'], 'safe'],
             [['comment'], 'string', 'max' => 500],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
-            [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsSource::className(), 'targetAttribute' => ['source_id' => 'id']],
+            [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
             [['delivery_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsDelivery::className(), 'targetAttribute' => ['delivery_id' => 'id']],
             [['type_lease_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsTypeLease::className(), 'targetAttribute' => ['type_lease_id' => 'id']],
@@ -105,7 +105,7 @@ class Applications extends \yii\db\ActiveRecord
      */
     public function getSource()
     {
-        return $this->hasOne(ApplicationsSource::className(), ['id' => 'source_id']);
+        return $this->hasOne(Source::className(), ['id' => 'source_id']);
     }
 
     /**

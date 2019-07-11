@@ -37,7 +37,7 @@ class AddRightAction extends Action
         Yii::info('Права успешно добавлены', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Права успешно добавлены',
         ];
     }

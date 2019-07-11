@@ -17,14 +17,14 @@ class DeleteDiscountAction extends Action
 
         $request = Yii::$app->request;
 
-        $discount = $request->getBodyParam('discount');
+        $discount = $request->getBodyParam('id');
 
         $resultChange = DiscountClass::DeleteDiscount($discount);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при удалении скидки', __METHOD__);
 
-            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'SUCCESS') {
+            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
                 return $resultChange;
             }
 
@@ -37,7 +37,7 @@ class DeleteDiscountAction extends Action
         Yii::info('Скидка успешно удалена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Скидка успешно удалена',
         ];
     }

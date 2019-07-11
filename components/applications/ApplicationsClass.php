@@ -810,9 +810,10 @@ class ApplicationsClass
     /**
      * Добавление нового статуса для заявки
      * @param $name ,
+     * @param $color ,
      * @return bool|array
      */
-    public static function AddStatus($name)
+    public static function AddStatus($name, $color)
     {
         Yii::info('Запуск функции добавления нового статуса для оборудования', __METHOD__);
 
@@ -827,6 +828,7 @@ class ApplicationsClass
 
         $new_status = new ApplicationsStatus();
         $new_status->name = $name;
+        $new_status->color = $color;
 
         try {
             if (!$new_status->save(false)) {
@@ -864,7 +866,7 @@ class ApplicationsClass
             ];
         }
 
-        $check_status = Applications::find()->where('id=:id', [':id' => $id])->one();
+        $check_status = ApplicationEquipment::find()->where('status_id=:status', [':status' => $id])->one();
 
         if (is_object($check_status)) {
             Yii::error('Данный статус нельзя удалить. Статус используется, id:' . serialize($id), __METHOD__);

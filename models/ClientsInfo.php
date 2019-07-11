@@ -32,7 +32,7 @@ use Yii;
  * @property string $date_update дата создания записи
  *
  * @property Clients $client
- * @property ClientSource $source0
+ * @property Source $source0
  * @property Discount $sale0
  */
 class ClientsInfo extends \yii\db\ActiveRecord
@@ -59,7 +59,7 @@ class ClientsInfo extends \yii\db\ActiveRecord
             [['occupation'], 'string', 'max' => 450],
             [['name_chief', 'phone_chief', 'email', 'number_passport', 'where_passport', 'date_passport', 'address_passport'], 'string', 'max' => 150],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
-            [['source'], 'exist', 'skipOnError' => true, 'targetClass' => ClientSource::className(), 'targetAttribute' => ['source' => 'id']],
+            [['source'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source' => 'id']],
             [['sale'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['sale' => 'id']],
         ];
     }
@@ -109,7 +109,7 @@ class ClientsInfo extends \yii\db\ActiveRecord
      */
     public function getSource0()
     {
-        return $this->hasOne(ClientSource::className(), ['id' => 'source']);
+        return $this->hasOne(Source::className(), ['id' => 'source']);
     }
 
     /**

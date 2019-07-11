@@ -5,7 +5,10 @@
 
 namespace app\components\discount;
 
+use app\models\Applications;
+use app\models\ClientsInfo;
 use app\models\Discount;
+use app\models\Equipments;
 use Yii;
 
 class DiscountClass
@@ -61,7 +64,7 @@ class DiscountClass
         $newDiscount = new Discount();
 
         $newDiscount->code = (int)$discount;
-        $newDiscount->name = $discount;
+        $newDiscount->name = $discount . '%';
 
         try {
             if (!$newDiscount->save(false)) {
@@ -81,14 +84,55 @@ class DiscountClass
 
     /**
      * Функция удаления филиала
-     * @param $discount
+     * @param $id
      * @return array|bool
      */
-    public static function DeleteDiscount($discount) {
+    public static function DeleteDiscount($id)
+    {
         Yii::info('Запуск функции AddBranch', __METHOD__);
 
+        $check_status = Applications::find()->where('discount_id=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется в заявках, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется в заявках',
+            ];
+        }
+
+        $check_status = ClientsInfo::find()->where('sale=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для клиентов, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для клиентов',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('discount=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для оборудования, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для оборудования',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('discount=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется для оборудования, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется для оборудования',
+            ];
+        }
+
         try {
-            Discount::deleteAll('id=:id', [':id' => $discount]);
+            Discount::deleteAll('id=:id', [':id' => $id]);
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при удалении скидки: ' . serialize($e->getMessage()), __METHOD__);
             return false;

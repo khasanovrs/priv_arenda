@@ -37,7 +37,7 @@ class AddSourceAction extends Action
         Yii::info('Источник успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Источник успешно добавлен',
         ];
     }

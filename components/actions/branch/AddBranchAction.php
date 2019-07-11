@@ -5,7 +5,7 @@
 
 namespace app\components\actions\branch;
 
-use app\components\Branch\BranchClass;
+use app\components\branch\BranchClass;
 use Yii;
 use yii\base\Action;
 
@@ -17,7 +17,7 @@ class AddBranchAction extends Action
 
         $request = Yii::$app->request;
 
-        $branch = $request->getBodyParam('branch');
+        $branch = $request->getBodyParam('name');
 
         $resultChange = BranchClass::AddBranch($branch);
 
@@ -37,7 +37,7 @@ class AddBranchAction extends Action
         Yii::info('Филиал успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Филиал успешно добавлен',
         ];
     }

@@ -63,7 +63,7 @@ class ChangeUserAction extends Action
         Yii::info('Данные пользователя успешно обновлены', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Данные пользователя успешно обновлены',
         ];
     }

@@ -6,7 +6,7 @@ return [
     'username' => 'arenda_stroika',
     'password' => 'arenda_stroika',
 
-    /*'dsn' => 'mysql:host=localhost;dbname=rdwork_arenda',
+  /*  'dsn' => 'mysql:host=localhost;dbname=rdwork_arenda',
     'username' => 'rdwork_arenda',
     'password' => 'rdwork_arenda',*/
     'charset' => 'utf8',

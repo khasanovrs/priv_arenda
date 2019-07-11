@@ -5,7 +5,7 @@
 
 namespace app\components\actions\status;
 
-use app\components\Status\StatusClass;
+use app\components\status\StatusClass;
 use Yii;
 use yii\base\Action;
 
@@ -18,8 +18,9 @@ class AddStatusAction extends Action
         $request = Yii::$app->request;
 
         $name = $request->getBodyParam('name');
+        $color = $request->getBodyParam('color');
 
-        $resultChange = StatusClass::AddStatus($name);
+        $resultChange = StatusClass::AddStatus($name, $color);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового статуса для клиента', __METHOD__);
@@ -37,7 +38,7 @@ class AddStatusAction extends Action
         Yii::info('Статус для клиента успешно добавлен', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Статус успешно добавлен',
         ];
     }

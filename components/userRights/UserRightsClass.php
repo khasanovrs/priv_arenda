@@ -5,6 +5,7 @@
 
 namespace app\components\userRights;
 
+use app\models\BunchUserRight;
 use app\models\UsersRights;
 use Yii;
 
@@ -86,11 +87,21 @@ class UserRightsClass
      * @param $right
      * @return array|bool
      */
-    public static function DeleteRight($right) {
+    public static function DeleteRight($id) {
         Yii::info('Запуск функции DeleteRight', __METHOD__);
 
+        $check_status = BunchUserRight::find()->where('right_id=:status', [':status' => $id])->one();
+        if (is_object($check_status)) {
+            Yii::error('Данный статус нельзя удалить. Статус используется, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный статус нельзя удалить. Статус используется',
+            ];
+        }
+
         try {
-            UsersRights::deleteAll('id=:id', [':id' => $right]);
+            UsersRights::deleteAll('id=:id', [':id' => $id]);
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при удалении права: ' . serialize($e->getMessage()), __METHOD__);
             return false;

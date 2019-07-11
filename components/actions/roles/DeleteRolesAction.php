@@ -18,14 +18,14 @@ class DeleteRolesAction extends Action
 
         $request = Yii::$app->request;
 
-        $role = $request->getBodyParam('role');
+        $role = $request->getBodyParam('id');
 
         $resultChange = UserRolesClass::DeleteRole($role);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при удалении роли', __METHOD__);
 
-            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'SUCCESS') {
+            if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
                 return $resultChange;
             }
 
@@ -38,7 +38,7 @@ class DeleteRolesAction extends Action
         Yii::info('Роль успешно удалена', __METHOD__);
 
         return [
-            'status' => 'ОК',
+            'status' => 'OK',
             'msg' => 'Роль успешно удалена',
         ];
     }
