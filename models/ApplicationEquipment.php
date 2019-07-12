@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $status_id
+ * @property int $hire_status_id
  * @property int $application_id
  * @property int $equipments_id
  * @property int $equipments_count
@@ -16,6 +17,7 @@ use Yii;
  * @property Applications $application
  * @property Equipments $equipments
  * @property ApplicationsStatus $status
+ * @property HireStatus $hireStatus
  */
 class ApplicationEquipment extends \yii\db\ActiveRecord
 {
@@ -34,10 +36,11 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
     {
         return [
             [['status_id', 'application_id', 'equipments_id', 'equipments_count'], 'required'],
-            [['status_id', 'application_id', 'equipments_id', 'equipments_count'], 'integer'],
+            [['status_id', 'hire_status_id', 'application_id', 'equipments_id', 'equipments_count'], 'integer'],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Applications::className(), 'targetAttribute' => ['application_id' => 'id']],
             [['equipments_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['equipments_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsStatus::className(), 'targetAttribute' => ['status_id' => 'id']],
+            [['hire_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => HireStatus::className(), 'targetAttribute' => ['hire_status_id' => 'id']],
         ];
     }
 
@@ -49,6 +52,7 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'status_id' => 'Status ID',
+            'hire_status_id' => 'Hire Status ID',
             'application_id' => 'Application ID',
             'equipments_id' => 'Equipments ID',
             'equipments_count' => 'Equipments Count',
@@ -77,5 +81,13 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
     public function getStatus()
     {
         return $this->hasOne(ApplicationsStatus::className(), ['id' => 'status_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHireStatus()
+    {
+        return $this->hasOne(HireStatus::className(), ['id' => 'hire_status_id']);
     }
 }

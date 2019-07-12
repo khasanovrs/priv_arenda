@@ -282,6 +282,24 @@ class ApiController extends Controller
             'delete-cashBox' => [
                 'class' => 'app\components\actions\cashBox\DeleteCashBoxAction',
             ],
+            /**
+             * Управление прокатом
+             */
+            'get-hire-field' => [
+                'class' => 'app\components\actions\hire\GetHireFieldAction',
+            ],
+            'change-hire-field' => [
+                'class' => 'app\components\actions\hire\ChangeHireFieldAction',
+            ],
+            'get-hire-status' => [
+                'class' => 'app\components\actions\hire\GetHireStatusAction',
+            ],
+            'update-hire-status' => [
+                'class' => 'app\components\actions\hire\UpdateHireStatusAction',
+            ],
+            'get-hire' => [
+                'class' => 'app\components\actions\hire\GetHireAction',
+            ],
         ];
     }
 
