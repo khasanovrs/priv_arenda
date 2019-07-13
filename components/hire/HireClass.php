@@ -299,18 +299,21 @@ class HireClass
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
             $category = $value->equipments->category->name;
+            $sum = $value->equipments->price_per_day;
+            $sale = $application->discount->name;
+            $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
 
             $result[] = [
                 'client' => $client = $application->client->name,
                 'equipments' => $category . ' ' . $mark . ' ' . $model,
-                'start_hire' => '',
-                'end_hire' => '',
+                'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
+                'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
                 'status' => $value->hire_status_id,
-                'sum' => $application->total_sum,
-                'sale_sum' => $application->sum,
-                'total_paid' => $value->equipments->total_paid,
+                'sum' => $sum,
+                'sale_sum' => $total_paid,
+                'total_paid' => '',
                 'remainder' => '',
-                'date_create' => $application->date_create,
+                'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
                 'date_end' => '',
                 'branch' => $application->branch->name,

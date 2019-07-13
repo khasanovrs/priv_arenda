@@ -773,14 +773,6 @@ class EquipmentsClass
             ];
         }
 
-        if ($count === '') {
-            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передано количество оборудования',
-            ];
-        }
-
         if ($tool_number === '') {
             Yii::error('Не передан номер оборудования, tool_number: ' . serialize($tool_number), __METHOD__);
             return [
