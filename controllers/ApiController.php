@@ -300,6 +300,12 @@ class ApiController extends Controller
             'get-hire' => [
                 'class' => 'app\components\actions\hire\GetHireAction',
             ],
+            'get-hire-info' => [
+                'class' => 'app\components\actions\hire\GetHireInfoAction',
+            ],
+            'update-hire' => [
+                'class' => 'app\components\actions\hire\UpdateHireAction',
+            ],
         ];
     }
 

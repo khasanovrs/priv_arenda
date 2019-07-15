@@ -254,6 +254,7 @@ class HireClass
     /**
      * Получение списка прокатов
      * @param $status
+     * @param $like
      * @param $branch
      * @param $date_start
      * @param $date_end
@@ -261,7 +262,7 @@ class HireClass
      * @param $sum_end
      * @return array
      */
-    public static function GetHire($status, $branch, $date_start, $date_end, $sum_start, $sum_end)
+    public static function GetHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end)
     {
         Yii::info('Запуск функции GetHire', __METHOD__);
         $result = [];
@@ -298,8 +299,16 @@ class HireClass
             $params[':date_end'] = $date_end;
         }
 
+        if ($like !== '' and $like !== null) {
+            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $like = strtolower($like);
+            $like = '%' . $like . '%';
+            $listFilter[] = 'lower(equipments.model) like :like';
+            $params[':like'] = $like;
+        }
+
         if (!empty($listFilter)) {
-            $list = ApplicationEquipment::find()->joinWith('application')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->orderBy('id desc')->all();
         }
@@ -341,6 +350,7 @@ class HireClass
             $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
 
             $result[] = [
+                'id' => $value->id,
                 'client' => $client = $application->client->name,
                 'equipments' => $category . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
@@ -348,8 +358,8 @@ class HireClass
                 'status' => $value->hire_status_id,
                 'sum' => $sum,
                 'sale_sum' => $total_paid,
-                'total_paid' => '',
-                'remainder' => '',
+                'total_paid' => $value->total_paid,
+                'remainder' => $total_paid - $value->total_paid,
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
                 'date_end' => '',
@@ -364,6 +374,163 @@ class HireClass
             'status' => 'SUCCESS',
             'msg' => 'Список прокатов получен',
             'data' => $result
+        ];
+    }
+
+
+    /**
+     * Получение списка прокатов
+     * @param $id
+     * @return array
+     */
+    public static function getHireInfo($id)
+    {
+        if ($id === '') {
+            Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор клиента',
+            ];
+        }
+
+        /**
+         * @var ApplicationEquipment $applicationEq
+         */
+        $applicationEq = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($applicationEq)) {
+            Yii::info('Ошибка при получении оборудования у заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+
+        $application = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
+
+        if (!is_object($application)) {
+            Yii::info('Ошибка при получении заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+        /**
+         * @var Applications $application
+         */
+
+        $sum_sale = (float)$applicationEq->sum - ((float)$applicationEq->sum * (float)$application->discount->name / 100);
+
+        $result = [
+            'id' => $applicationEq->id,
+            'branch' => $application->branch->name,
+            'delivery' => $application->delivery->name,
+            'typeLease' => $application->typeLease->name,
+            'sale' => $application->discount->name,
+            'source' => $application->source->name,
+            'comment' => $application->comment,
+            'rent_start' => date('d.m.Y', strtotime($application->rent_start)),
+            'rent_end' => date('d.m.Y', strtotime($application->rent_end)),
+            'client_fio' => $application->client->name,
+            'client_phone' => $application->client->phone,
+            'delivery_sum' => $applicationEq->delivery_sum,
+            'sum' => $applicationEq->sum,
+            'sum_sale' => $sum_sale,
+            'total_paid' => $applicationEq->total_paid,
+            'remainder' => $sum_sale - $applicationEq->total_paid,
+            'count' => $applicationEq->equipments_count,
+
+        ];
+
+        $mark = $applicationEq->equipments->mark0->name;
+        $model = $applicationEq->equipments->model;
+        $category = $applicationEq->equipments->category->name;
+
+        $result['equipments'] = [
+            'equipments_id' => $applicationEq->equipments_id,
+            'name' => $category . ' ' . $mark . ' ' . $model,
+            'status' => $applicationEq->status_id,
+            'photo' => $applicationEq->equipments->photo
+        ];
+
+        Yii::info('Заявка успешно получена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно получена',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Функция изменения заявки
+     * @param $id
+     * @param $status
+     * @param $comment
+     * @param $total_paid
+     * @return array|bool
+     */
+    public static function UpdateHire($id, $status, $comment, $total_paid)
+    {
+        if ($id === '') {
+            Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор клиента',
+            ];
+        }
+
+        /**
+         * @var ApplicationEquipment $applicationEq
+         */
+        $applicationEq = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($applicationEq)) {
+            Yii::info('Ошибка при получении заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+        $applicationEq->hire_status_id = $status;
+        $applicationEq->total_paid = $total_paid;
+        $applicationEq->application->comment = $comment;
+
+        try {
+            if (!$applicationEq->save(false)) {
+                Yii::error('Ошибка при изменении заявки: ' . serialize($applicationEq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении заявки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+
+        try {
+            if (!$applicationEq->application->save(false)) {
+                Yii::error('Ошибка при изменении заявки: ' . serialize($applicationEq->application->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении заявки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+
+        Yii::info('Заявка успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно изменена'
         ];
     }
 }

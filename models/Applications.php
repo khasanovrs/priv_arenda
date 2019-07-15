@@ -18,8 +18,6 @@ use Yii;
  * @property string $comment
  * @property string $rent_start
  * @property string $rent_end
- * @property int $delivery_sum
- * @property int $total_sum
  * @property string $date_create
  *
  * @property ApplicationEquipment[] $applicationEquipments
@@ -48,7 +46,7 @@ class Applications extends \yii\db\ActiveRecord
     {
         return [
             [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
-            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum', 'total_sum'], 'integer'],
+            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'integer'],
             [['rent_start', 'rent_end', 'date_create'], 'safe'],
             [['comment'], 'string', 'max' => 500],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
@@ -78,8 +76,6 @@ class Applications extends \yii\db\ActiveRecord
             'comment' => 'Comment',
             'rent_start' => 'Rent Start',
             'rent_end' => 'Rent End',
-            'delivery_sum' => 'Delivery Sum',
-            'total_sum' => 'Total Sum',
             'date_create' => 'Date Create',
         ];
     }

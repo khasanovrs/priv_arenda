@@ -13,6 +13,10 @@ use Yii;
  * @property int $application_id
  * @property int $equipments_id
  * @property int $equipments_count
+ * @property string $delivery_sum
+ * @property string $sum
+ * @property string $total_paid
+ * @property string $remainder
  *
  * @property Applications $application
  * @property Equipments $equipments
@@ -37,6 +41,7 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
         return [
             [['status_id', 'application_id', 'equipments_id', 'equipments_count'], 'required'],
             [['status_id', 'hire_status_id', 'application_id', 'equipments_id', 'equipments_count'], 'integer'],
+            [['delivery_sum', 'sum', 'total_paid', 'remainder'], 'string', 'max' => 45],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Applications::className(), 'targetAttribute' => ['application_id' => 'id']],
             [['equipments_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['equipments_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsStatus::className(), 'targetAttribute' => ['status_id' => 'id']],
@@ -56,6 +61,10 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
             'application_id' => 'Application ID',
             'equipments_id' => 'Equipments ID',
             'equipments_count' => 'Equipments Count',
+            'delivery_sum' => 'Delivery Sum',
+            'sum' => 'Sum',
+            'total_paid' => 'Total Paid',
+            'remainder' => 'Remainder',
         ];
     }
 

@@ -575,8 +575,6 @@ class ApplicationsClass
         $newApplications->comment = $comment;
         $newApplications->rent_start = $rent_start;
         $newApplications->rent_end = $rent_end;
-        $newApplications->delivery_sum = $delivery_sum;
-        $newApplications->total_sum = $sum;
         $newApplications->date_create = date('Y-m-d H:i:s');
 
         try {
@@ -595,6 +593,9 @@ class ApplicationsClass
             $newApplicationEquipment->equipments_id = $value->id;
             $newApplicationEquipment->status_id = $status;
             $newApplicationEquipment->equipments_count = $value->count;
+            $newApplicationEquipment->count = $value->count;
+            $newApplicationEquipment->sum = $value->price;
+            $newApplicationEquipment->delivery_sum = $delivery_sum;
 
             try {
                 if (!$newApplicationEquipment->save(false)) {
@@ -678,10 +679,9 @@ class ApplicationsClass
             'client_id' => $application->client->id,
             'client_fio' => $application->client->name,
             'client_phone' => $application->client->phone,
-            'delivery_sum' => $application->delivery_sum,
-            'sum' => $application->total_sum,
+            'delivery_sum' => $applicationEq->delivery_sum,
+            'sum' => $applicationEq->sum,
         ];
-
 
         $mark = $applicationEq->equipments->mark0->name;
         $model = $applicationEq->equipments->model;
