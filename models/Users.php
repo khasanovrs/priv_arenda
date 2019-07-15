@@ -18,6 +18,7 @@ use Yii;
  * @property string $date_create дата создания записи
  * @property string $date_update Время последнего запроса sms-кода
  *
+ * @property ApplicationPay[] $applicationPays
  * @property Applications[] $applications
  * @property ApplicationsShowField[] $applicationsShowFields
  * @property BunchUserRight[] $bunchUserRights
@@ -74,6 +75,14 @@ class Users extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationPays()
+    {
+        return $this->hasMany(ApplicationPay::className(), ['user_id' => 'id']);
     }
 
     /**

@@ -7,6 +7,7 @@ namespace app\components\hire;
 
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
+use app\models\ApplicationPay;
 use app\models\Applications;
 use app\models\HireField;
 use app\models\HireShowField;
@@ -342,6 +343,10 @@ class HireClass
                 ];
             }
 
+            $date_cr = date('Y-m-d');
+
+            $checkPay = ApplicationPay::find()->where('application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->one();
+
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
             $category = $value->equipments->category->name;
@@ -362,9 +367,9 @@ class HireClass
                 'remainder' => $total_paid - $value->total_paid,
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
-                'date_end' => '',
+                'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
-                'current_pay' => ''
+                'current_pay' => is_object($checkPay) ? 'Да' : 'Нет'
             ];
         }
 

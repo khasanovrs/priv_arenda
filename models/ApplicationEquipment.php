@@ -22,6 +22,7 @@ use Yii;
  * @property Equipments $equipments
  * @property ApplicationsStatus $status
  * @property HireStatus $hireStatus
+ * @property ApplicationPay[] $applicationPays
  */
 class ApplicationEquipment extends \yii\db\ActiveRecord
 {
@@ -98,5 +99,13 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
     public function getHireStatus()
     {
         return $this->hasOne(HireStatus::className(), ['id' => 'hire_status_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationPays()
+    {
+        return $this->hasMany(ApplicationPay::className(), ['application_equipment_id' => 'id']);
     }
 }

@@ -19,6 +19,7 @@ use Yii;
  * @property string $rent_start
  * @property string $rent_end
  * @property string $date_create
+ * @property string $date_end
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property Clients $client
@@ -47,7 +48,7 @@ class Applications extends \yii\db\ActiveRecord
         return [
             [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
             [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'integer'],
-            [['rent_start', 'rent_end', 'date_create'], 'safe'],
+            [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment'], 'string', 'max' => 500],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
@@ -77,6 +78,7 @@ class Applications extends \yii\db\ActiveRecord
             'rent_start' => 'Rent Start',
             'rent_end' => 'Rent End',
             'date_create' => 'Date Create',
+            'date_end' => 'Date End',
         ];
     }
 
