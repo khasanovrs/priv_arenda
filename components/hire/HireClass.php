@@ -265,8 +265,45 @@ class HireClass
     {
         Yii::info('Запуск функции GetHire', __METHOD__);
         $result = [];
+        $listFilter = [];
+        $params = [];
 
-        $list = ApplicationEquipment::find()->where('status_id in (2,3)')->all();
+        if ($status !== '' and $status !== null) {
+            Yii::info('Параметр status: ' . serialize($status), __METHOD__);
+            $listFilter[] = 'hire_status_id=:status';
+            $params[':status'] = $status;
+        }
+
+        if ($branch !== '' and $branch !== null) {
+            Yii::info('Параметр branch: ' . serialize($branch), __METHOD__);
+            $listFilter[] = 'applications.branch_id=:branch';
+            $params[':branch'] = $branch;
+        }
+
+        if ($date_start !== '' and $date_start !== null) {
+            Yii::info('Параметр date_start: ' . serialize($date_start), __METHOD__);
+            $listFilter[] = 'applications.date_create>:date_start';
+            $params[':date_start'] = $date_start;
+        }
+
+        if ($date_end !== '' and $date_end !== null) {
+            Yii::info('Параметр date_end: ' . serialize($date_end), __METHOD__);
+            $listFilter[] = 'applications.date_create<:date_end';
+            $params[':date_end'] = $date_end;
+        }
+
+        if ($date_end !== '' and $date_end !== null) {
+            Yii::info('Параметр date_end: ' . serialize($date_end), __METHOD__);
+            $listFilter[] = 'applications.date_create<:date_end';
+            $params[':date_end'] = $date_end;
+        }
+
+        if (!empty($listFilter)) {
+            $list = ApplicationEquipment::find()->joinWith('application')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+        } else {
+            $list = ApplicationEquipment::find()->orderBy('id desc')->all();
+        }
+
 
         if (empty($list)) {
             Yii::info('Список прокатов пуст', __METHOD__);
