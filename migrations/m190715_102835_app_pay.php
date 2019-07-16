@@ -12,7 +12,18 @@ class m190715_102835_app_pay extends Migration
      */
     public function safeUp()
     {
-        $this->execute("ALTER TABLE `application_pay` ADD COLUMN `date_create` DATETIME NULL DEFAULT NULL AFTER `user_id`;");
+        $this->execute("CREATE TABLE `application_pay` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `application_equipment_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `date_create` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_application_pay_1_idx` (`application_equipment_id`),
+  KEY `fk_application_pay_2_idx` (`user_id`),
+  CONSTRAINT `fk_application_pay_1` FOREIGN KEY (`application_equipment_id`) REFERENCES `application_equipment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_application_pay_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+");
     }
 
     /**
