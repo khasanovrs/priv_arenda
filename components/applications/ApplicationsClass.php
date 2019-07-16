@@ -787,6 +787,7 @@ class ApplicationsClass
                     'equipments_name' => $category . ' ' . $mark . ' ' . $model,
                     'equipments_count' => $equipments->equipments_count,
                     'status' => $equipments->status_id,
+                    'color' => $equipments->status->color,
                     'client' => $application->client->name,
                     'phone' => $application->client->phone,
                     'typeLease' => $application->typeLease->name,

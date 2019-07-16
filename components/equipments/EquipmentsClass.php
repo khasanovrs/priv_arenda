@@ -340,6 +340,7 @@ class EquipmentsClass
                 'stock' => $value->stock->name,
                 'type' => $value->type0->name,
                 'status' => $value->status,
+                'color' => $value->status0->color,
                 'count' => $value->count,
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,

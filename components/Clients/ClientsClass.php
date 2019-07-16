@@ -638,6 +638,7 @@ class ClientsClass
                     'type' => $value->type,
                     'phone' => $value->phone,
                     'status' => $value->status,
+                    'color' => $value->status0->color,
                     'date_create' => date('d.m.Y', strtotime($value->date_create)),
                     'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
                     'source' => ['id' => $sourceBD->id, 'name' => $sourceBD->name],

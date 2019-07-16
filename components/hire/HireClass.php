@@ -361,6 +361,7 @@ class HireClass
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
                 'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
                 'status' => $value->hire_status_id,
+                'color' => $value->hireStatus->color,
                 'sum' => $sum,
                 'sale_sum' => $total_paid,
                 'total_paid' => $value->total_paid,
