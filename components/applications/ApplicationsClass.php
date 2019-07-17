@@ -593,7 +593,6 @@ class ApplicationsClass
             $newApplicationEquipment->equipments_id = $value->id;
             $newApplicationEquipment->status_id = $status;
             $newApplicationEquipment->equipments_count = $value->count;
-            $newApplicationEquipment->count = $value->count;
             $newApplicationEquipment->sum = $value->price;
             $newApplicationEquipment->delivery_sum = $delivery_sum;
 
