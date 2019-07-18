@@ -9,6 +9,7 @@ use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use app\models\Applications;
+use app\models\EquipmentsStatus;
 use app\models\HireField;
 use app\models\HireShowField;
 use app\models\HireStatus;
@@ -176,6 +177,62 @@ class HireClass
             'status' => 'SUCCESS',
             'msg' => 'Список статусов проката получен',
             'data' => $result
+        ];
+    }
+
+    /**
+     * Добавление нового статуса для проката
+     * @param $name
+     * @param $color
+     * @param $val
+     * @return bool|array
+     */
+    public static function AddStatus($name, $color, $val)
+    {
+        Yii::info('Запуск функции добавления нового статуса для проката', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Ни передано наименование статуса, name:' . serialize($name), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передано наименование статуса',
+            ];
+        }
+
+        if ($val !== '') {
+            $new_status = HireStatus::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new_status)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new_status = new HireStatus();
+        }
+
+        $new_status->name = $name;
+        $new_status->color = $color;
+
+        try {
+            if (!$new_status->save(false)) {
+                Yii::error('Ошибка при добавлении нового статуса для проката: ' . serialize($new_status->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении нового статуса для проката: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Статус для проката успешно добавлен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => $val === '' ? 'Статус для проката успешно добавлен' : 'Статус для проката успешно обновлен'
         ];
     }
 
