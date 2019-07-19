@@ -1161,6 +1161,168 @@ class EquipmentsClass
     }
 
     /**
+     * Добавление новой категории для оборудования
+     * @param $name
+     * @param $val
+     * @return bool|array
+     */
+    public static function AddCategory($name, $val)
+    {
+        Yii::info('Запуск функции добавления новой категории для оборудования', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Ни передано наименование категории, name:' . serialize($name), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передано наименование категории',
+            ];
+        }
+
+        if ($val !== '') {
+            $new = EquipmentsCategory::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new = new EquipmentsCategory();
+        }
+
+        $new->name = $name;
+
+        try {
+            if (!$new->save(false)) {
+                Yii::error('Ошибка при добавлении новой категории для оборудования: ' . serialize($new->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении новой категории для оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Категория для оборудования успешно добавлен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => $val === '' ? 'Категория для оборудования успешно добавлена' : 'Категория для оборудования успешно обновлена'
+        ];
+    }
+
+    /**
+     * Добавление нового типа для оборудования
+     * @param $name
+     * @param $val
+     * @return bool|array
+     */
+    public static function AddType($name, $val)
+    {
+        Yii::info('Запуск функции добавления нового типа для оборудования', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Ни передано наименование типа, name:' . serialize($name), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передано наименование типа',
+            ];
+        }
+
+        if ($val !== '') {
+            $new = EquipmentsType::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new = new EquipmentsType();
+        }
+
+        $new->name = $name;
+
+        try {
+            if (!$new->save(false)) {
+                Yii::error('Ошибка при добавлении нового типа для оборудования: ' . serialize($new->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении нового типа для оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Тип для оборудования успешно добавлен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => $val === '' ? 'Тип для оборудования успешно добавлена' : 'Тип для оборудования успешно обновлена'
+        ];
+    }
+
+    /**
+     * Добавление новой марки для оборудования
+     * @param $name
+     * @param $val
+     * @return bool|array
+     */
+    public static function AddMark($name, $val)
+    {
+        Yii::info('Запуск функции добавления новой марки для оборудования', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Ни передано наименование марки, name:' . serialize($name), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передано наименование марки',
+            ];
+        }
+
+        if ($val !== '') {
+            $new = EquipmentsMark::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new = new EquipmentsMark();
+        }
+
+        $new->name = $name;
+
+        try {
+            if (!$new->save(false)) {
+                Yii::error('Ошибка при добавлении новой марки для оборудования: ' . serialize($new->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении новой марки для оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Марка для оборудования успешно добавлена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => $val === '' ? 'Марка для оборудования успешно добавлена' : 'Марка для оборудования успешно обновлена'
+        ];
+    }
+
+    /**
      * Удаление статуса оборудования
      * @param $id ,
      * @return bool|array
@@ -1201,6 +1363,138 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Статус успешно удален'
+        ];
+    }
+
+    /**
+     * Удаление категории оборудования
+     * @param $id ,
+     * @return bool|array
+     */
+    public static function DeleteCategory($id)
+    {
+        Yii::info('Запуск функции удаления категории оборудования', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передано идентификатор категории, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор категории',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('category_id=:id', [':id' => $id])->one();
+
+        if (is_object($check_status)) {
+            Yii::error('Данную категорию нельзя удалить. Категория используется:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данную категорию нельзя удалить. Категория используется',
+            ];
+        }
+
+        try {
+            EquipmentsCategory::deleteAll('id=:id', array(':id' => $id));
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении категории: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Категория успешно удалена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Категория успешно удалена'
+        ];
+    }
+
+    /**
+     * Удаление типа оборудования
+     * @param $id ,
+     * @return bool|array
+     */
+    public static function DeleteType($id)
+    {
+        Yii::info('Запуск функции удаления типа оборудования', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передано идентификатор типа, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор типа',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('type=:id', [':id' => $id])->one();
+
+        if (is_object($check_status)) {
+            Yii::error('Данный тип нельзя удалить. Тип используется:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данный тип нельзя удалить. Тип используется',
+            ];
+        }
+
+        try {
+            EquipmentsType::deleteAll('id=:id', array(':id' => $id));
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении типа: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Тип успешно удален', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Тип успешно удален'
+        ];
+    }
+
+    /**
+     * Удаление марки оборудования
+     * @param $id ,
+     * @return bool|array
+     */
+    public static function DeleteMark($id)
+    {
+        Yii::info('Запуск функции удаления марки оборудования', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передано идентификатор марки, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор марки',
+            ];
+        }
+
+        $check_status = Equipments::find()->where('mark=:id', [':id' => $id])->one();
+
+        if (is_object($check_status)) {
+            Yii::error('Данную марку нельзя удалить. Марка используется:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данную марку нельзя удалить. Марка используется',
+            ];
+        }
+
+        try {
+            EquipmentsMark::deleteAll('id=:id', array(':id' => $id));
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении марки: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Марка успешно удалена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Марка успешно удалена'
         ];
     }
 }

@@ -168,8 +168,20 @@ class ApiController extends Controller
             'get-equipments-type' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentTypeAction',
             ],
+            'add-equipments-type' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentTypeAction',
+            ],
+            'delete-equipments-type' => [
+                'class' => 'app\components\actions\equipments\DeleteEquipmentTypeAction',
+            ],
             'get-equipments-category' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentCategoryAction',
+            ],
+            'add-equipments-category' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentCategoryAction',
+            ],
+            'delete-equipments-category' => [
+                'class' => 'app\components\actions\equipments\DeleteEquipmentCategoryAction',
             ],
             'get-equipments-status' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentStatusAction',
@@ -197,6 +209,12 @@ class ApiController extends Controller
             ],
             'get-equipment-mark' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentMarkAction',
+            ],
+            'add-equipments-mark' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentMarkAction',
+            ],
+            'delete-equipments-mark' => [
+                'class' => 'app\components\actions\equipments\DeleteEquipmentMarkAction',
             ],
             'get-equipments-info' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentInfoAction',

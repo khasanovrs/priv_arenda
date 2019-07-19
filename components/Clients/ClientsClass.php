@@ -19,6 +19,7 @@ use app\models\ClientUr;
 use app\models\ClientUrInfo;
 use app\models\Discount;
 use app\models\ShowFieldClient;
+use app\models\Source;
 use Yii;
 
 class ClientsClass
@@ -145,7 +146,7 @@ class ClientsClass
             ];
         }
 
-        $check_source = ClientSource::find()->where('id=:id', [':id' => $source])->one();
+        $check_source = Source::find()->where('id=:id', [':id' => $source])->one();
 
         if (!is_object($check_source)) {
             Yii::error('Передан некорректный исчтоник, :' . serialize($source), __METHOD__);
@@ -372,7 +373,7 @@ class ClientsClass
             ];
         }
 
-        $check_source = ClientSource::find()->where('id=:id', [':id' => $source])->one();
+        $check_source = Source::find()->where('id=:id', [':id' => $source])->one();
 
         if (!is_object($check_source)) {
             Yii::error('Передан некорректный исчтоник, :' . serialize($source), __METHOD__);
