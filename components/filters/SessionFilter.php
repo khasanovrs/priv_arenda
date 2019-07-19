@@ -33,9 +33,6 @@ class SessionFilter extends ActionFilter
         $request = Yii::$app->request;
         $sessionId = $request->getBodyParam('sessionId');
 
-        //@todo убрать полсе разработки сессии
-        $sessionId = 'kzp9MxczO45jfFFGUDg9';
-
         if (!$sessionId && !in_array($url, Yii::$app->params['openMethods'])) {
             Yii::error('Вызванный url не входит в список запросов без сессии - возвращаем ошибку NEED SESSION', __METHOD__);
             throw new HttpException(400, 'NEED SESSION');

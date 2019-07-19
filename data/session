@@ -1,5 +1,5 @@
 -- users:
-INSERT INTO `arenda_stroika`.`users` (`id`, `fio`, `telephone`, `status`, `user_type`, `email`, `branch_id`, `password`) VALUES ('1', 'Иванов Иван', '79173936213', '1', '1', '', '1', '123');
+INSERT INTO `arenda_stroika`.`users` (`id`, `fio`, `telephone`, `status`, `user_type`, `email`, `branch_id`, `password`) VALUES ('1', 'Иванов Иван', '79173936213', '1', '1', '', '1', '$2y$10$n9RUv5blmdiMI5I42Jjqm.o7n/CZ0DFh5dkVz/VCnbOEM/H3SaZoq');
 
 -- session:
 INSERT INTO `arenda_stroika`.`session` (`id`, `user_id`, `session_date`, `session_date_end`, `session_id`, `status`) VALUES ('1', '1', '2019-05-22 10:39:53', '2019-06-03 12:46:49.000000', 'kzp9MxczO45jfFFGUDg9', '1');
