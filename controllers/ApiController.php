@@ -276,6 +276,12 @@ class ApiController extends Controller
             'get-finance-category' => [
                 'class' => 'app\components\actions\finance\GetFinanceCategoryAction',
             ],
+            'add-finance-category' => [
+                'class' => 'app\components\actions\finance\AddFinanceCategoryAction',
+            ],
+            'delete-finance-category' => [
+                'class' => 'app\components\actions\finance\DeleteFinanceCategoryAction',
+            ],
             'get-finance-type' => [
                 'class' => 'app\components\actions\finance\GetFinanceTypeAction',
             ],

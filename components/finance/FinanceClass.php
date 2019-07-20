@@ -7,6 +7,9 @@ namespace app\components\finance;
 
 use app\components\Session\Sessions;
 use app\models\Branch;
+use app\models\Equipments;
+use app\models\EquipmentsMark;
+use app\models\EquipmentsStatus;
 use app\models\Finance;
 use app\models\FinanceCashbox;
 use app\models\FinanceCategory;
@@ -690,6 +693,104 @@ class FinanceClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Финансовая запись успешно изменена'
+        ];
+    }
+
+    /**
+     * Функция добавления категория
+     * @param $name
+     * @param $val
+     * @return array|bool
+     */
+    public static function AddCategory($name, $val)
+    {
+        Yii::info('Запуск функции AddCategory', __METHOD__);
+
+        if ($name === '') {
+            Yii::error('Не передано наименование категории, name:' . serialize($name), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование категории',
+            ];
+        }
+
+        if ($val !== '') {
+            $new = FinanceCategory::find()->where('id=:id', [':id' => $val])->one();
+
+            if (!is_object($new)) {
+                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор',
+                ];
+            }
+        } else {
+            $new = new FinanceCategory();
+        }
+
+        $new->name = $name;
+
+        try {
+            if (!$new->save(false)) {
+                Yii::error('Ошибка при добавлении новой категории: ' . serialize($new->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении новой категории: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Категория успешно добавлена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => $val === '' ? 'Категория успешно добавлена' : 'Категория успешно обновлена'
+        ];
+    }
+
+    /**
+     * Удаление категории
+     * @param $id ,
+     * @return bool|array
+     */
+    public static function DeleteCategory($id)
+    {
+        Yii::info('Запуск функции удаления категории', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передано идентификатор статуса, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор статуса',
+            ];
+        }
+
+        $check_status = Finance::find()->where('category_id=:id', [':id' => $id])->one();
+
+        if (is_object($check_status)) {
+            Yii::error('Данную категорию нельзя удалить. Категория используется:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Данную категорию нельзя удалить. Категория используется',
+            ];
+        }
+
+        try {
+            FinanceCategory::deleteAll('id=:id', array(':id' => $id));
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении категории: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Категория успешно удалена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Категория успешно удалена'
         ];
     }
 }
