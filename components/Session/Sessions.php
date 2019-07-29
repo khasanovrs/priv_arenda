@@ -63,7 +63,7 @@ class Sessions extends Component
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при отключении сессии пользователя: ' . serialize($e->getMessage()), __METHOD__);
         }
-        $this->_session->session_date_end = date('Y-m-d H:i:s.u', strtotime('+30 minute'));
+        $this->_session->session_date_end = date('Y-m-d H:i:s.u', strtotime('+6 hour'));
         try {
             if (!$this->_session->save(false)) {
                 Yii::error('Не смогли продлить сессию пользователя: ' . serialize($this->_session->getErrors()), __METHOD__);

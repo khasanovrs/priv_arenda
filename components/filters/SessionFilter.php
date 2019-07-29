@@ -48,10 +48,18 @@ class SessionFilter extends ActionFilter
 
         Yii::info('Получен идентификатор сессии: ' . serialize($sessionId), __METHOD__);
 
+        /**
+         * @var Session $session
+         */
         $session = Session::find()->where('session_id=:session_id and status=1', [':session_id' => $sessionId])->one();
 
         if (!is_object($session)) {
             Yii::error('Сессия не найдена!', __METHOD__);
+            throw new HttpException(400, 'NEED SESSION');
+        }
+
+        if ($session->session_date_end < date('Y-m-d H:i:s')) {
+            Yii::error('Вышел срок сессии: id=' . serialize($session->id), __METHOD__);
             throw new HttpException(400, 'NEED SESSION');
         }
 
