@@ -336,6 +336,15 @@ class ApiController extends Controller
             'update-hire' => [
                 'class' => 'app\components\actions\hire\UpdateHireAction',
             ],
+            /**
+             * Работа с отчетами
+             */
+            'get-report-equipment' => [
+                'class' => 'app\components\actions\report\GetReportEquipmentAction',
+            ],
+            'get-report-mini-block' => [
+                'class' => 'app\components\actions\report\GetReportMiniBlockAction',
+            ],
         ];
     }
 
