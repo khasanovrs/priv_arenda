@@ -8,6 +8,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Methods : GET,POST,PUT,DELETE,OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');
 
