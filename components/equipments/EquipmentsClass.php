@@ -464,6 +464,7 @@ class EquipmentsClass
             'tool_number' => $equipment->tool_number,
             'revenue' => $equipment->revenue,
             'profit' => $equipment->profit,
+            'photo' => $equipment->photo,
             'degree_wear' => $equipment->degree_wear,
             'payback_ratio' => $equipment->payback_ratio,
             'power_energy' => $equipment->equipmentsInfos[0]->power_energy,
@@ -861,15 +862,13 @@ class EquipmentsClass
             ];
         }
 
-        //@todo указать папку для сохранения фото
-        $uploadFile = "/home/fox/" . $file_name;
+        $uploadFile = dirname(__FILE__) . "/../../web/uploads/" . $file_name;
 
         if (!file_exists($uploadFile)) {
             $fp = fopen($uploadFile, "w"); // ("r" - считывать "w" - создавать "a" - добовлять к тексту),мы создаем файл
             fwrite($fp, base64_decode($file));
             fclose($fp);
         }
-
 
         return [
             'status' => 'SUCCESS',
