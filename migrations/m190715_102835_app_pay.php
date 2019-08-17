@@ -14,7 +14,7 @@ class m190715_102835_app_pay extends Migration
     {
         $this->execute("CREATE TABLE `application_pay` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `application_equipment_id` int NOT NULL,
+  `application_equipment_id` INT NOT NULL,
   `user_id` int(11) NOT NULL,
   `date_create` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
