@@ -40,7 +40,7 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status_id', 'application_id', 'equipments_id', 'equipments_count'], 'required'],
+            [['status_id', 'application_id', 'equipments_id', 'equipments_count', 'sum'], 'required'],
             [['status_id', 'hire_status_id', 'application_id', 'equipments_id', 'equipments_count'], 'integer'],
             [['delivery_sum', 'sum', 'total_paid', 'remainder'], 'string', 'max' => 45],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Applications::className(), 'targetAttribute' => ['application_id' => 'id']],

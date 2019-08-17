@@ -11,6 +11,7 @@ use Yii;
  * @property int $application_equipment_id
  * @property int $user_id
  * @property string $date_create
+ * @property double $sum
  *
  * @property ApplicationEquipment $applicationEquipment
  * @property Users $user
@@ -31,9 +32,10 @@ class ApplicationPay extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['application_equipment_id', 'user_id'], 'required'],
+            [['application_equipment_id', 'user_id', 'sum'], 'required'],
             [['application_equipment_id', 'user_id'], 'integer'],
             [['date_create'], 'safe'],
+            [['sum'], 'number'],
             [['application_equipment_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationEquipment::className(), 'targetAttribute' => ['application_equipment_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -49,6 +51,7 @@ class ApplicationPay extends \yii\db\ActiveRecord
             'application_equipment_id' => 'Application Equipment ID',
             'user_id' => 'User ID',
             'date_create' => 'Date Create',
+            'sum' => 'Sum',
         ];
     }
 

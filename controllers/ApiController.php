@@ -36,6 +36,9 @@ class ApiController extends Controller
             'exit' => [
                 'class' => 'app\components\actions\auth\ExitAction',
             ],
+            'get-main-info' => [
+                'class' => 'app\components\actions\main\GetInfoAction',
+            ],
             /**
              * Управление пользователями
              */
