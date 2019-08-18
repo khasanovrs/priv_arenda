@@ -735,7 +735,7 @@ class EquipmentsClass
             ];
         }
 
-        if ($discount === '') {
+        if ($discount === '' || $discount === null) {
             Yii::error('Не передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
             return [
                 'status' => 'ERROR',
