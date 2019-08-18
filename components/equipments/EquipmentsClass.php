@@ -739,7 +739,7 @@ class EquipmentsClass
             Yii::error('Не передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
             return [
                 'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор скидки',
+                'msg' => 'Не указан размер скидки',
             ];
         }
 
