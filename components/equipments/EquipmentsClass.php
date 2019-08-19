@@ -17,6 +17,7 @@ use app\models\EquipmentsMark;
 use app\models\EquipmentsShowField;
 use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
+use app\models\Stock;
 use Yii;
 
 class EquipmentsClass
@@ -388,7 +389,79 @@ class EquipmentsClass
         $filter = strtolower($filter);
         $filter = '%' . $filter . '%';
 
-        $equipments = Equipments::find()->joinWith(['mark0','type0'])->where('lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter', [':filter' => $filter])->orderBy('id desc')->all();
+        $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->where('lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter', [':filter' => $filter])->orderBy('id desc')->all();
+
+        if (empty($equipments)) {
+            Yii::error('Список оборудования пуст', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Список оборудования пуст',
+                'data' => $result
+            ];
+        }
+
+        /**
+         * @var Equipments $value
+         */
+        foreach ($equipments as $value) {
+            $result[] = [
+                'id' => $value->id,
+                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
+                'price_per_day' => $value->price_per_day,
+                'count' => $value->count,
+                'photo' => $value->photo
+            ];
+        }
+
+        Yii::info('Список оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список оборудования получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение списка оборудования по поиску
+     * @param $branch
+     * @return array
+     */
+    public static function GetAllEquipmentsBranch($branch)
+    {
+        Yii::info('Запуск функции GetEquipmentsSearch', __METHOD__);
+        $result = [];
+
+        if ($branch === '') {
+            Yii::error('Филиал не передан', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Филиал не передан'
+            ];
+        }
+
+        $stock = Stock::find()->where('id_branch = :branch', [':branch' => $branch])->all();
+
+        if (empty($stock)) {
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Склады в данном филиале не найдены',
+                'data' => []
+            ];
+        }
+
+        $arr = [];
+
+        /**
+         * @var Stock $value
+         */
+        foreach ($stock as $value) {
+            array_push($arr, $value->id);
+        }
+
+        $equipments = Equipments::find()->where(['in', 'stock_id', $arr])->all();
 
         if (empty($equipments)) {
             Yii::error('Список оборудования пуст', __METHOD__);

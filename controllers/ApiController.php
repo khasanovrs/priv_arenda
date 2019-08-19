@@ -195,6 +195,9 @@ class ApiController extends Controller
             'get-equipments-search' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentSearchAction',
             ],
+            'get-all-equipments-branch' => [
+                'class' => 'app\components\actions\equipments\GetAllEquipmentsBranchAction',
+            ],
             'get-equipments-fields' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentActionFields',
             ],
