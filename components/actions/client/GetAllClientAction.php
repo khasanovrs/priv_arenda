@@ -19,7 +19,7 @@ class GetAllClientAction extends Action
 
         $filter = $request->getBodyParam('filter');
 
-        $result = ClientsClass::GetAllClient($filter);
+        $result = ClientsClass::GetAllClient();
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка клиентов', __METHOD__);

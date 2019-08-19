@@ -915,25 +915,13 @@ class ClientsClass
 
     /**
      * Получение списка всех клиентов
-     * @param $like
      * @return bool|array
      */
-    public static function GetAllClient($like)
+    public static function GetAllClient()
     {
         Yii::info('Запуск функции GetAllClient', __METHOD__);
 
         $result = [];
-
-        if ($like === '') {
-            Yii::error('Не передан параметр поиска', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан параметр поиска'
-            ];
-        }
-
-        $like = '%' . $like . '%';
 
         $clients = Clients::find()->all();
 
@@ -942,7 +930,8 @@ class ClientsClass
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Клиенты не найдены'
+                'msg' => 'Клиенты не найдены',
+                'data' => []
             ];
         }
 
