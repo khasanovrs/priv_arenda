@@ -63,6 +63,9 @@ class ApiController extends Controller
             'get-search-client' => [
                 'class' => 'app\components\actions\client\GetSearchClientAction',
             ],
+            'get-all-client' => [
+                'class' => 'app\components\actions\client\GetAllClientAction',
+            ],
             'add-client' => [
                 'class' => 'app\components\actions\client\AddUrClientAction',
             ],

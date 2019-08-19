@@ -913,5 +913,66 @@ class ClientsClass
         ];
     }
 
+    /**
+     * Получение списка всех клиентов
+     * @param $like
+     * @return bool|array
+     */
+    public static function GetAllClient($like)
+    {
+        Yii::info('Запуск функции GetAllClient', __METHOD__);
+
+        $result = [];
+
+        if ($like === '') {
+            Yii::error('Не передан параметр поиска', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан параметр поиска'
+            ];
+        }
+
+        $like = '%' . $like . '%';
+
+        $clients = Clients::find()->all();
+
+        if (!is_array($clients)) {
+            Yii::error('Клиенты не найдены, like: ' . serialize($like), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Клиенты не найдены'
+            ];
+        }
+
+        /**
+         * @var Clients $value
+         */
+        foreach ($clients as $value) {
+
+
+            $result[] = [
+                'client_id' => $value->id,
+                'client_fio' => $value->name,
+                'client_email' => $value->clientsInfos[0]->inn,
+                'client_phone' => $value->phone,
+                'client_number_passport' => $value->clientsInfos[0]->number_passport,
+                'client_where_passport' => $value->clientsInfos[0]->where_passport,
+                'client_date_passport' => date('Y-m-d', strtotime($value->clientsInfos[0]->date_passport)),
+                'client_address_passport' => $value->clientsInfos[0]->address_passport
+            ];
+        }
+
+
+        Yii::info('Клиенты успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Клиенты успешно получены',
+            'data' => $result
+        ];
+    }
+
 
 }
