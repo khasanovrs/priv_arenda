@@ -407,6 +407,7 @@ class HireClass
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
             $category = $value->equipments->category->name;
+            $type = $value->equipments->type0->name;
             $sum = $value->equipments->price_per_day;
             $sale = $application->discount->name;
             $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
@@ -414,7 +415,7 @@ class HireClass
             $result[] = [
                 'id' => $value->id,
                 'client' => $client = $application->client->name,
-                'equipments' => $category . ' ' . $mark . ' ' . $model,
+                'equipments' => $type . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
                 'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
                 'status' => $value->hire_status_id,
