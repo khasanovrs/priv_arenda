@@ -336,8 +336,8 @@ class EquipmentsClass
         foreach ($equipmentsTypeList as $value) {
             $result[] = [
                 'id' => $value->id,
-                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
-                'category' => $value->category->name,
+                'name' => $value->category->name . ' ' . $value->mark0->name . ' ' . $value->model,
+                'category' => $value->type0->name,
                 'stock' => $value->stock->name,
                 'type' => $value->type0->name,
                 'status' => $value->status,
