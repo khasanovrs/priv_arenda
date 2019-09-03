@@ -30,25 +30,18 @@ class ClientsClass
      * @param $branch ,
      * @param $status ,
      * @param $source ,
-     * @param $name ,
      * @param $inn ,
-     * @param $occupation ,
-     * @param $address ,
-     * @param $ogrn ,
-     * @param $bic ,
      * @param $kpp ,
-     * @param $schet ,
      * @param $name_chief ,
-     * @param $phone_chief ,
-     * @param $phone ,
+     * @param $fio ,
+     * @param $phone_1,
+     * @param $phone_2,
+     * @param $phone_3,
      * @param $email ,
-     * @param $number_passport ,
-     * @param $where_passport ,
-     * @param $date_passport ,
-     * @param $address_passport
+     * @param $number_passport
      * @return bool|array
      */
-    public static function AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email, $number_passport, $where_passport, $date_passport, $address_passport)
+    public static function AddClient($sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -88,14 +81,14 @@ class ClientsClass
             ];
         }
 
-        if ($phone_chief === '' && $phone === '' && $phone_2 === '') {
+        if ($phone_1 === '') {
             Yii::error('Не передан номер телефона', __METHOD__);
 
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан номер телефона',
             ];
-        } else if (($phone_chief !== '' && strlen($phone_chief) !== 11) || ($phone !== '' && strlen($phone) !== 11) || ($phone_2 !== '' && strlen($phone_2) !== 11)) {
+        } else if (($phone_1 !== '' && strlen($phone_1) !== 11) || ($phone_2 !== '' && strlen($phone_2) !== 11) || ($phone_3 !== '' && strlen($phone_3) !== 11)) {
             Yii::error('Указан некорректный номер телефона', __METHOD__);
 
             return [
@@ -159,10 +152,10 @@ class ClientsClass
 
         Yii::info('Добавляем нового клиента', __METHOD__);
 
-        $check_phone = Clients::find()->where('phone=:phone', [':phone' => $phone])->one();
+        $check_phone = Clients::find()->where('phone=:phone', [':phone' => $phone_1])->one();
 
         if (is_object($check_phone)) {
-            Yii::error('Клиент с данным номер телефона уже зарегестрирован, phone:' . serialize($phone), __METHOD__);
+            Yii::error('Клиент с данным номер телефона уже зарегестрирован, phone:' . serialize($phone_1), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -171,9 +164,9 @@ class ClientsClass
         }
 
         $newClient = new Clients();
-        $newClient->name = $name === '' ? $name_chief : $name;
-        $newClient->type = $name !== '' ? 2 : 1;
-        $newClient->phone = $phone;
+        $newClient->name = $fio === '' ? $name_chief : $fio;
+        $newClient->type = $fio === '' ? 2 : 1;
+        $newClient->phone = $phone_1;
         $newClient->status = $status;
         $newClient->branch_id = $branch;
         $newClient->last_contact = date('Y-m-d H:i:s');
@@ -192,10 +185,10 @@ class ClientsClass
         /**
          * @var Clients $client
          */
-        $client = Clients::find()->where('phone=:phone', [':phone' => $phone])->one();
+        $client = Clients::find()->where('phone=:phone', [':phone' => $phone_1])->one();
 
         if (!is_object($client)) {
-            Yii::error('Клиент с данным номер телефона не найден, phone:' . serialize($phone), __METHOD__);
+            Yii::error('Клиент с данным номер телефона не найден, phone:' . serialize($phone_1), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -210,20 +203,12 @@ class ClientsClass
         $newClientInfo->rentals = 0;
         $newClientInfo->dohod = 0;
         $newClientInfo->sale = $sale;
-        $newClientInfo->address = $address;
         $newClientInfo->inn = $inn;
-        $newClientInfo->occupation = $occupation;
-        $newClientInfo->ogrn = $ogrn;
-        $newClientInfo->bic = $bic;
         $newClientInfo->kpp = $kpp;
-        $newClientInfo->schet = $schet;
         $newClientInfo->name_chief = $name_chief;
-        $newClientInfo->phone_chief = $phone_chief;
+        $newClientInfo->phone_chief = $phone_3;
         $newClientInfo->phone_second = $phone_2;
         $newClientInfo->number_passport = $number_passport;
-        $newClientInfo->where_passport = $where_passport;
-        $newClientInfo->date_passport = $date_passport;
-        $newClientInfo->address_passport = $address_passport;
         $newClientInfo->date_create = date('Y-m-d H:i:s');
         $newClientInfo->date_update = date('Y-m-d H:i:s');
 
@@ -432,13 +417,8 @@ class ClientsClass
         $clientsInfo->source = $source;
         $clientsInfo->sale = $sale;
         $clientsInfo->email = $email;
-        $clientsInfo->address = $address;
         $clientsInfo->inn = $inn;
-        $clientsInfo->occupation = $occupation;
-        $clientsInfo->ogrn = $ogrn;
-        $clientsInfo->bic = $bic;
         $clientsInfo->kpp = $kpp;
-        $clientsInfo->schet = $schet;
         $clientsInfo->name_chief = $name_chief;
         $clientsInfo->phone_chief = $phone_chief;
         $clientsInfo->phone_second = $phone_2;
@@ -827,18 +807,14 @@ class ClientsClass
             'branch' => $branch->id,
             'status' => $status->id,
             'source' => $sourceBD->id,
+            'phone_1' => $client->phone,
             'fio' => $client->type === 1 ? $client->name : '',
             'name' => $client->type === 2 ? $client->name : '',
             'inn' => $client->clientsInfos[0]->inn,
             'email' => $client->clientsInfos[0]->email,
-            'occupation' => $client->clientsInfos[0]->occupation,
-            'address' => $client->clientsInfos[0]->address,
-            'ogrn' => $client->clientsInfos[0]->ogrn,
-            'bic' => $client->clientsInfos[0]->bic,
             'kpp' => $client->clientsInfos[0]->kpp,
-            'schet' => $client->clientsInfos[0]->schet,
             'name_chief' => $client->clientsInfos[0]->name_chief,
-            'phone_chief' => $client->clientsInfos[0]->phone_chief,
+            'phone_3' => $client->clientsInfos[0]->phone_chief,
             'phone_2' => $client->clientsInfos[0]->phone_second,
             'phone' => $client->phone,
         ];

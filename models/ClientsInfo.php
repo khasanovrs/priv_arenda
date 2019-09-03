@@ -13,21 +13,13 @@ use Yii;
  * @property int $rentals прокаты
  * @property int $dohod доход
  * @property int $sale скидки
- * @property string $address
  * @property string $inn
- * @property string $occupation
- * @property string $ogrn
- * @property string $bic
  * @property string $kpp
- * @property string $schet
  * @property string $name_chief
  * @property string $phone_chief
  * @property string $phone_second
  * @property string $email
  * @property string $number_passport
- * @property string $where_passport
- * @property string $date_passport
- * @property string $address_passport
  * @property string $date_create дата создания записи
  * @property string $date_update дата создания записи
  *
@@ -54,10 +46,9 @@ class ClientsInfo extends \yii\db\ActiveRecord
             [['client_id', 'source', 'rentals'], 'required'],
             [['client_id', 'source', 'rentals', 'dohod', 'sale'], 'integer'],
             [['date_create', 'date_update'], 'safe'],
-            [['address', 'ogrn', 'bic', 'kpp', 'schet', 'phone_second'], 'string', 'max' => 45],
             [['inn'], 'string', 'max' => 20],
-            [['occupation'], 'string', 'max' => 450],
-            [['name_chief', 'phone_chief', 'email', 'number_passport', 'where_passport', 'date_passport', 'address_passport'], 'string', 'max' => 150],
+            [['kpp', 'phone_second'], 'string', 'max' => 45],
+            [['name_chief', 'phone_chief', 'email', 'number_passport'], 'string', 'max' => 150],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source' => 'id']],
             [['sale'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['sale' => 'id']],
@@ -76,21 +67,13 @@ class ClientsInfo extends \yii\db\ActiveRecord
             'rentals' => 'Rentals',
             'dohod' => 'Dohod',
             'sale' => 'Sale',
-            'address' => 'Address',
             'inn' => 'Inn',
-            'occupation' => 'Occupation',
-            'ogrn' => 'Ogrn',
-            'bic' => 'Bic',
             'kpp' => 'Kpp',
-            'schet' => 'Schet',
             'name_chief' => 'Name Chief',
             'phone_chief' => 'Phone Chief',
             'phone_second' => 'Phone Second',
             'email' => 'Email',
             'number_passport' => 'Number Passport',
-            'where_passport' => 'Where Passport',
-            'date_passport' => 'Date Passport',
-            'address_passport' => 'Address Passport',
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
         ];

@@ -7,6 +7,7 @@ namespace app\components\applications;
 
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
+use app\models\ApplicationPay;
 use app\models\Applications;
 use app\models\ApplicationsDelivery;
 use app\models\ApplicationsField;
@@ -694,6 +695,31 @@ class ApplicationsClass
             'status' => $applicationEq->status_id,
             'photo' => $applicationEq->equipments->photo
         ];
+
+        Yii::info('Получаем платежи', __METHOD__);
+
+        $pay_list = [];
+
+        $pay_list_arr = $applicationEq->applicationPays;
+
+        if (empty($pay_list_arr)) {
+            Yii::info('Платежей нет', __METHOD__);
+        } else {
+            /**
+             * @var ApplicationPay $value
+             */
+            foreach ($pay_list_arr as $value) {
+                $arr = [
+                    'date' => $value->date_create,
+                    'user_id' => $value->user->fio,
+                    'sum' => $value->sum
+                ];
+
+                array_push($pay_list, $arr);
+            }
+        }
+
+        $result['pay_list'] = $pay_list;
 
         Yii::info('Заявка успешно получена', __METHOD__);
 

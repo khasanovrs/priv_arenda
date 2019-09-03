@@ -21,25 +21,17 @@ class AddUrClientAction extends Action
         $branch = $request->getBodyParam('branch');
         $status = $request->getBodyParam('status');
         $source = $request->getBodyParam('source');
-        $name = $request->getBodyParam('name');
         $inn = $request->getBodyParam('inn');
-        $occupation = $request->getBodyParam('occupation');
-        $address = $request->getBodyParam('address');
-        $ogrn = $request->getBodyParam('ogrn');
-        $bic = $request->getBodyParam('bic');
         $kpp = $request->getBodyParam('kpp');
-        $schet = $request->getBodyParam('schet');
         $name_chief = $request->getBodyParam('name_chief');
-        $phone_chief = $request->getBodyParam('phone_chief');
-        $phone = $request->getBodyParam('phone');
+        $fio = $request->getBodyParam('fio');
+        $phone_1 = $request->getBodyParam('phone_1');
         $phone_2 = $request->getBodyParam('phone_2');
+        $phone_3 = $request->getBodyParam('phone_3');
         $email = $request->getBodyParam('email');
         $number_passport = $request->getBodyParam('number_passport');
-        $where_passport = $request->getBodyParam('where_passport');
-        $date_passport = $request->getBodyParam('date_passport');
-        $address_passport = $request->getBodyParam('address_passport');
 
-        $resultChange = ClientsClass::AddClient($sale, $branch, $status, $source, $name, $inn, $occupation, $address, $ogrn, $bic, $kpp, $schet, $name_chief, $phone_chief, $phone, $phone_2, $email, $number_passport, $where_passport, $date_passport, $address_passport);
+        $resultChange = ClientsClass::AddClient($sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового клиента', __METHOD__);
