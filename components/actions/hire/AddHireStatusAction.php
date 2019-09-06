@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\HireClass;
+use app\components\hire\PayClass;
 use Yii;
 use yii\base\Action;
 
@@ -21,7 +21,7 @@ class AddHireStatusAction extends Action
         $color = $request->getBodyParam('color');
         $val = $request->getBodyParam('val');
 
-        $resultChange = HireClass::AddStatus($name, $color, $val);
+        $resultChange = PayClass::AddStatus($name, $color, $val);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового статуса для проката', __METHOD__);

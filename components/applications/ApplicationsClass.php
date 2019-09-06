@@ -5,6 +5,7 @@
 
 namespace app\components\applications;
 
+use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
@@ -18,9 +19,6 @@ use app\models\ApplicationsTypeLease;
 use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
-use app\models\EquipmentsShowField;
-use app\models\Stock;
-use Codeception\Application;
 use Yii;
 
 class ApplicationsClass
@@ -605,6 +603,19 @@ class ApplicationsClass
             } catch (\Exception $e) {
                 Yii::error('Поймали Exception при добавлении списка оборудования: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
+            }
+
+            if ($sum!=='') {
+                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum);
+
+                if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при добавлении платежа', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при добавлении платежа',
+                    ];
+                }
             }
         }
 

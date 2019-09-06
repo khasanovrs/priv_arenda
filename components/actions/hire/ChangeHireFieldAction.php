@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\HireClass;
+use app\components\hire\PayClass;
 use Yii;
 use yii\base\Action;
 
@@ -19,7 +19,7 @@ class ChangeHireFieldAction extends Action
 
         $params = $request->getBodyParam('data');
 
-        $result = HireClass::ChangeHireFields($params);
+        $result = PayClass::ChangeHireFields($params);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении списка полей для проката', __METHOD__);

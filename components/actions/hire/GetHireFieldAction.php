@@ -6,7 +6,7 @@
 namespace app\components\actions\hire;
 
 use app\components\applications\ApplicationsClass;
-use app\components\hire\HireClass;
+use app\components\hire\PayClass;
 use Yii;
 use yii\base\Action;
 
@@ -16,7 +16,7 @@ class GetHireFieldAction extends Action
     {
         Yii::info('Запуск функции получения списка полей для проката', __METHOD__);
 
-        $result = HireClass::GetHireFields();
+        $result = PayClass::GetHireFields();
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка полей для проката', __METHOD__);
