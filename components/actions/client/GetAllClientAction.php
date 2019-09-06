@@ -17,9 +17,9 @@ class GetAllClientAction extends Action
 
         $request = Yii::$app->request;
 
-        $filter = $request->getBodyParam('filter');
+        $branch = $request->getBodyParam('branch');
 
-        $result = ClientsClass::GetAllClient();
+        $result = ClientsClass::GetAllClient($branch);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка клиентов', __METHOD__);

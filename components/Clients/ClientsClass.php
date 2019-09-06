@@ -866,7 +866,7 @@ class ClientsClass
      * @param $like
      * @return bool|array
      */
-    public static function GetSearchClient($like)
+    public static function  GetSearchClient($like)
     {
         Yii::info('Запуск функции GetSearchClient', __METHOD__);
 
@@ -906,9 +906,6 @@ class ClientsClass
                 'client_email' => $value->clientsInfos[0]->inn,
                 'client_phone' => $value->phone,
                 'client_number_passport' => $value->clientsInfos[0]->number_passport,
-                'client_where_passport' => $value->clientsInfos[0]->where_passport,
-                'client_date_passport' => date('Y-m-d', strtotime($value->clientsInfos[0]->date_passport)),
-                'client_address_passport' => $value->clientsInfos[0]->address_passport
             ];
         }
 
@@ -924,21 +921,22 @@ class ClientsClass
 
     /**
      * Получение списка всех клиентов
+     * @param $branch
      * @return bool|array
      */
-    public static function GetAllClient()
+    public static function GetAllClient($branch)
     {
         Yii::info('Запуск функции GetAllClient', __METHOD__);
 
         $result = [];
 
-        $clients = Clients::find()->all();
+        $clients = Clients::find()->where('branch_id = :branch', [':branch' => $branch])->all();
 
-        if (!is_array($clients)) {
-            Yii::error('Клиенты не найдены, like: ' . serialize($like), __METHOD__);
+        if (empty($clients)) {
+            Yii::error('Клиенты не найдены, like: ' . serialize($branch), __METHOD__);
 
             return [
-                'status' => 'ERROR',
+                'status' => 'SUCCESS',
                 'msg' => 'Клиенты не найдены',
                 'data' => []
             ];
@@ -956,9 +954,6 @@ class ClientsClass
                 'client_email' => $value->clientsInfos[0]->inn,
                 'client_phone' => $value->phone,
                 'client_number_passport' => $value->clientsInfos[0]->number_passport,
-                'client_where_passport' => $value->clientsInfos[0]->where_passport,
-                'client_date_passport' => date('Y-m-d', strtotime($value->clientsInfos[0]->date_passport)),
-                'client_address_passport' => $value->clientsInfos[0]->address_passport
             ];
         }
 
