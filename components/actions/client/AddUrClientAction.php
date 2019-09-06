@@ -17,6 +17,7 @@ class AddUrClientAction extends Action
 
         $request = Yii::$app->request;
 
+        $clientId = $request->getBodyParam('clientId');
         $sale = $request->getBodyParam('sale');
         $branch = $request->getBodyParam('branch');
         $status = $request->getBodyParam('status');
@@ -25,13 +26,14 @@ class AddUrClientAction extends Action
         $kpp = $request->getBodyParam('kpp');
         $name_chief = $request->getBodyParam('name_chief');
         $fio = $request->getBodyParam('fio');
+        $name = $request->getBodyParam('name');
         $phone_1 = $request->getBodyParam('phone_1');
         $phone_2 = $request->getBodyParam('phone_2');
         $phone_3 = $request->getBodyParam('phone_3');
         $email = $request->getBodyParam('email');
         $number_passport = $request->getBodyParam('number_passport');
 
-        $resultChange = ClientsClass::AddClient($sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport);
+        $resultChange = ClientsClass::AddClient($clientId, $name, $sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового клиента', __METHOD__);
@@ -50,7 +52,7 @@ class AddUrClientAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Клиент успешно добавлен',
+            'msg' => $resultChange['msg'],
         ];
     }
 }

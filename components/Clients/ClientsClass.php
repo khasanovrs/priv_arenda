@@ -26,7 +26,9 @@ class ClientsClass
 {
     /**
      * Добавление нового клиента
+     * @param $clientId
      * @param $sale ,
+     * @param $name ,
      * @param $branch ,
      * @param $status ,
      * @param $source ,
@@ -34,14 +36,14 @@ class ClientsClass
      * @param $kpp ,
      * @param $name_chief ,
      * @param $fio ,
-     * @param $phone_1,
-     * @param $phone_2,
-     * @param $phone_3,
+     * @param $phone_1 ,
+     * @param $phone_2 ,
+     * @param $phone_3 ,
      * @param $email ,
      * @param $number_passport
      * @return bool|array
      */
-    public static function AddClient($sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
+    public static function AddClient($clientId, $name, $sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -152,9 +154,12 @@ class ClientsClass
 
         Yii::info('Добавляем нового клиента', __METHOD__);
 
+        /**
+         * @var Clients $check_phone
+         */
         $check_phone = Clients::find()->where('phone=:phone', [':phone' => $phone_1])->one();
 
-        if (is_object($check_phone)) {
+        if (is_object($check_phone) && $clientId != $check_phone->id) {
             Yii::error('Клиент с данным номер телефона уже зарегестрирован, phone:' . serialize($phone_1), __METHOD__);
 
             return [
@@ -163,8 +168,29 @@ class ClientsClass
             ];
         }
 
-        $newClient = new Clients();
-        $newClient->name = $fio === '' ? $name_chief : $fio;
+        if ($clientId === '') {
+            Yii::info('Создание нового клиента', __METHOD__);
+
+            $newClient = new Clients();
+        } else {
+            Yii::info('Обновление информациии о клиенте', __METHOD__);
+
+            /**
+             * @var Clients $clients
+             */
+            $newClient = Clients::find()->where('id=:id', [':id' => $clientId])->one();
+
+            if (!is_object($newClient)) {
+                Yii::error('Клиент не найден, id:' . serialize($newClient), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Клиент не найден',
+                ];
+            }
+        }
+
+        $newClient->name = $fio === '' ? $name : $fio;
         $newClient->type = $fio === '' ? 2 : 1;
         $newClient->phone = $phone_1;
         $newClient->status = $status;
@@ -224,10 +250,17 @@ class ClientsClass
 
         Yii::info('Клиент успешно добавлен', __METHOD__);
 
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Клиент успешно добавлен'
-        ];
+        if ($clientId !== '') {
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Клиент успешно изменен'
+            ];
+        } else {
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Клиент успешно добавлен'
+            ];
+        }
     }
 
     /**
