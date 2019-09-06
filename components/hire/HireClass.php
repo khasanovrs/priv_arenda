@@ -12,6 +12,7 @@ use app\models\Applications;
 use app\models\EquipmentsStatus;
 use app\models\HireField;
 use app\models\HireShowField;
+use app\models\HireState;
 use app\models\HireStatus;
 use Yii;
 
@@ -176,6 +177,45 @@ class HireClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список статусов проката получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение состояний проката
+     * @return bool|array
+     */
+    public static function GetHireState()
+    {
+        Yii::info('Запуск функции GetHireState', __METHOD__);
+        $result = [];
+
+        $list = HireState::find()->orderBy('id')->all();
+
+        if (!is_array($list)) {
+            Yii::error('Список состояний проката пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список состояний проката пуст'
+            ];
+        }
+
+        /**
+         * @var HireStatus $value
+         */
+        foreach ($list as $value) {
+            $result[] = [
+                'val' => $value->id,
+                'name' => $value->name,
+            ];
+        }
+
+        Yii::info('Список состояний проката получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список состояний проката получен',
             'data' => $result
         ];
     }
@@ -406,7 +446,6 @@ class HireClass
 
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
-            $category = $value->equipments->category->name;
             $type = $value->equipments->type0->name;
             $sum = $value->equipments->price_per_day;
             $sale = $application->discount->name;
@@ -419,6 +458,7 @@ class HireClass
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
                 'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
                 'status' => $value->hire_status_id,
+                'state' => $value->hireState->name,
                 'color' => $value->hireStatus->color,
                 'sum' => $sum,
                 'sale_sum' => $total_paid,
