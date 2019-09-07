@@ -605,7 +605,7 @@ class ApplicationsClass
                 return false;
             }
 
-            if ($sum!=='') {
+            if ($sum !== '') {
                 $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum);
 
                 if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
@@ -673,6 +673,22 @@ class ApplicationsClass
             ];
         }
 
+        $payList = ApplicationPay::find()->where('application_equipment_id=:id', [':id' => $applicationEq->id])->all();
+
+        $arrPay = [];
+        if (!empty($payList)) {
+
+            /**
+             * @var ApplicationPay $pay
+             */
+            foreach ($payList as $pay) {
+                $date = date('d.m.Y H:i:s', strtotime($pay->date_create));
+                $user = $pay->user->fio;
+
+                array_push($arrPay, ['date' => $date, 'user' => $user, 'sum' => $pay->sum]);
+            }
+        }
+
         /**
          * @var Applications $application
          */
@@ -692,6 +708,7 @@ class ApplicationsClass
             'client_phone' => $application->client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
+            'pay_list' => $arrPay
         ];
 
         $mark = $applicationEq->equipments->mark0->name;

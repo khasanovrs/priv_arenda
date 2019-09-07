@@ -357,6 +357,12 @@ class ApiController extends Controller
             'get-report-mini-block' => [
                 'class' => 'app\components\actions\report\GetReportMiniBlockAction',
             ],
+            /**
+             * Управление платежами
+             */
+            'add-pay' => [
+                'class' => 'app\components\actions\pay\AddPayAction',
+            ]
         ];
     }
 
