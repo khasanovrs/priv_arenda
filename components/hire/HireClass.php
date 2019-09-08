@@ -539,14 +539,14 @@ class HireClass
             'id' => $applicationEq->id,
             'branch' => $application->branch->name,
             'app_id' => $application->id,
-            'delivery' => $application->delivery->name,
+            'delivery' => $application->delivery_id,
             'typeLease' => $application->typeLease->name,
             'typeLease_id' => $application->type_lease_id,
-            'sale' => $application->discount->name,
+            'sale' => $application->discount_id,
             'source' => $application->source->name,
             'comment' => $application->comment,
-            'rent_start' => date('d.m.Y', strtotime($application->rent_start)),
-            'rent_end' => date('d.m.Y', strtotime($application->rent_end)),
+            'rent_start' => $application->rent_start,
+            'rent_end' => $application->rent_end,
             'client_fio' => $application->client->name,
             'client_phone' => $application->client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
@@ -600,10 +600,14 @@ class HireClass
      * @param $id
      * @param $status
      * @param $comment
-     * @param $total_paid
+     * @param $total_paid ,
+     * @param $delivery ,
+     * @param $sale ,
+     * @param $rent_start ,
+     * @param $rent_end
      * @return array|bool
      */
-    public static function UpdateHire($id, $status, $comment, $total_paid)
+    public static function UpdateHire($id, $status, $comment, $total_paid, $delivery, $sale, $rent_start, $rent_end)
     {
         if ($id === '') {
             Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($id), __METHOD__);
@@ -642,17 +646,34 @@ class HireClass
             return false;
         }
 
+        /**
+         * @var Applications $app
+         */
+        $app = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
+
+        if (!is_object($app)) {
+            Yii::info('Ошибка при получении основной заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+        $app->discount_id = $sale;
+        $app->delivery_id = $delivery;
+        $app->rent_start = $rent_start;
+        $app->rent_end = $rent_end;
 
         try {
-            if (!$applicationEq->application->save(false)) {
-                Yii::error('Ошибка при изменении заявки: ' . serialize($applicationEq->application->getErrors()), __METHOD__);
+            if (!$app->save(false)) {
+                Yii::error('Ошибка при изменении основной заявки: ' . serialize($app->getErrors()), __METHOD__);
                 return false;
             }
         } catch (\Exception $e) {
-            Yii::error('Поймали Exception при изменении заявки: ' . serialize($e->getMessage()), __METHOD__);
+            Yii::error('Поймали Exception при изменении основной заявки: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
-
 
         Yii::info('Заявка успешно изменена', __METHOD__);
 
@@ -763,7 +784,7 @@ class HireClass
         $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
 
         if ((int)$applications->discount->code !== 0) {
-            $price = $price- ($price * $applications->discount->code / 100);
+            $price = $price - ($price * $applications->discount->code / 100);
         }
 
         $app_eq->sum = $price;

@@ -22,7 +22,12 @@ class UpdateHireAction extends Action
         $comment = $request->getBodyParam('comment');
         $total_paid = $request->getBodyParam('total_paid');
 
-        $result = HireClass::UpdateHire($id, $status, $comment, $total_paid);
+        $delivery = $request->getBodyParam('delivery');
+        $sale = $request->getBodyParam('sale');
+        $rent_start = $request->getBodyParam('rent_start');
+        $rent_end = $request->getBodyParam('rent_end');
+
+        $result = HireClass::UpdateHire($id, $status, $comment, $total_paid, $delivery, $sale, $rent_start, $rent_end);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении информации проката', __METHOD__);
