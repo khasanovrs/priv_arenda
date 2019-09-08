@@ -348,6 +348,9 @@ class ApiController extends Controller
             'update-hire' => [
                 'class' => 'app\components\actions\hire\UpdateHireAction',
             ],
+            'extend-rental' => [
+                'class' => 'app\components\actions\hire\ExtendRentalAction',
+            ],
             /**
              * Работа с отчетами
              */

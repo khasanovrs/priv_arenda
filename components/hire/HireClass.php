@@ -454,6 +454,8 @@ class HireClass
 
             $result[] = [
                 'id' => $value->id,
+                'app_id' => $application->id,
+                'typeLease_id' => $application->type_lease_id,
                 'client' => $client = $application->client->name,
                 'equipments' => $type . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
@@ -534,8 +536,10 @@ class HireClass
         $result = [
             'id' => $applicationEq->id,
             'branch' => $application->branch->name,
+            'app_id' => $application->id,
             'delivery' => $application->delivery->name,
             'typeLease' => $application->typeLease->name,
+            'typeLease_id' => $application->type_lease_id,
             'sale' => $application->discount->name,
             'source' => $application->source->name,
             'comment' => $application->comment,
@@ -646,6 +650,74 @@ class HireClass
             Yii::error('Поймали Exception при изменении заявки: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
+
+
+        Yii::info('Заявка успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно изменена'
+        ];
+    }
+
+    /**
+     * Функция прлдения проката
+     * @param $app_id
+     * @param $count
+     * @return array|bool
+     */
+    public static function ExtendRental($app_id, $count)
+    {
+        if ($app_id === '') {
+            Yii::error('Не передан идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор заявки',
+            ];
+        }
+
+        if ($count === '') {
+            Yii::error('Не передано поличество', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано поличество',
+            ];
+        }
+
+        /**
+         * @var Applications $applications
+         */
+        $applications = Applications::find()->where('id=:id', [':id' => $app_id])->one();
+
+        if (!is_object($applications)) {
+            Yii::info('Ошибка при получении заявки', __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+        if ($applications->type_lease_id === 1) {
+            $date = date("Y-m-d H:i:s", strtotime($applications->rent_end . " +" . $count . " days"));
+        } else {
+            $date = date("Y-m-d H:i:s", strtotime($applications->rent_end . " +" . $count . " month"));
+        }
+
+        $applications->rent_end = $date;
+
+        try {
+            if (!$applications->save(false)) {
+                Yii::error('Ошибка при изменении даты: ' . serialize($applications->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении даты: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
 
 
         Yii::info('Заявка успешно изменена', __METHOD__);
