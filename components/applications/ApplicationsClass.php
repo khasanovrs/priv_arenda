@@ -387,6 +387,7 @@ class ApplicationsClass
      * @param $rent_end
      * @param $delivery
      * @param $sum
+     * @param $sum_pay
      * @param $delivery_sum
      * @param $status
      * @param $comment
@@ -394,7 +395,7 @@ class ApplicationsClass
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -591,6 +592,7 @@ class ApplicationsClass
             $newApplicationEquipment->application_id = $newApplications->id;
             $newApplicationEquipment->equipments_id = $value->id;
             $newApplicationEquipment->status_id = $status;
+            $newApplicationEquipment->hire_state_id = 1;
             $newApplicationEquipment->equipments_count = $value->count;
             $newApplicationEquipment->sum = $value->price;
             $newApplicationEquipment->delivery_sum = $delivery_sum;
@@ -605,8 +607,8 @@ class ApplicationsClass
                 return false;
             }
 
-            if ($sum !== '') {
-                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum);
+            if ($sum_pay !== '') {
+                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay);
 
                 if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при добавлении платежа', __METHOD__);
