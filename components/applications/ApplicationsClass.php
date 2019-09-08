@@ -19,6 +19,7 @@ use app\models\ApplicationsTypeLease;
 use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
+use app\models\Equipments;
 use Yii;
 
 class ApplicationsClass
@@ -588,13 +589,48 @@ class ApplicationsClass
         }
 
         foreach ($equipments as $value) {
+            /**
+             * @var Discount $disc
+             */
+            $disc = Discount::find()->where('id=:id',[':id'=>$sale])->one();
+
+            if (!is_object($disc)) {
+                Yii::info('Ошибка при получении скидки', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении скидки'
+                ];
+            }
+
+            /**
+             * @var Equipments $equipments
+             */
+            $equipments = Equipments::find()->where('id=:id',[':id'=>$value->id])->one();
+
+            if (!is_object($disc)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
+
+            $datediff = strtotime($rent_end) - strtotime($rent_start);
+            $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
+
+            if ((int)$disc->code !== 0) {
+                $price = $price - ($price * $disc->code / 100);
+            }
+
             $newApplicationEquipment = new ApplicationEquipment();
             $newApplicationEquipment->application_id = $newApplications->id;
             $newApplicationEquipment->equipments_id = $value->id;
             $newApplicationEquipment->status_id = $status;
             $newApplicationEquipment->hire_state_id = 1;
             $newApplicationEquipment->equipments_count = $value->count;
-            $newApplicationEquipment->sum = $value->price;
+            $newApplicationEquipment->sum = $price;
             $newApplicationEquipment->delivery_sum = $delivery_sum;
 
             try {

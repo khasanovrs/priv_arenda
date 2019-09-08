@@ -763,7 +763,7 @@ class HireClass
         $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
 
         if ((int)$applications->discount->code !== 0) {
-            $price = $price * $applications->discount->code / 100;
+            $price = $price- ($price * $applications->discount->code / 100);
         }
 
         $app_eq->sum = $price;
