@@ -808,4 +808,56 @@ class HireClass
             'msg' => 'Заявка успешно изменена'
         ];
     }
+
+    /**
+     * Функция возврата товара на склад
+     * @param $app_id
+     * @return array|bool
+     */
+    public static function closeHire($app_id)
+    {
+        Yii::info('Запуск функции closeHire', __METHOD__);
+
+        if ($app_id === '') {
+            Yii::error('Не передан идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор заявки',
+            ];
+        }
+
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', ['id' => $app_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении заявки с оборудованием'
+            ];
+        }
+
+        $app_eq->hire_state_id = 3;
+
+        try {
+            if (!$app_eq->save(false)) {
+                Yii::error('Ошибка при сохранении состояния: ' . serialize($app_eq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Заявка успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно изменена'
+        ];
+    }
 }
