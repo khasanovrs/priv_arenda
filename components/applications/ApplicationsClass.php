@@ -738,7 +738,7 @@ class ApplicationsClass
              */
             foreach ($pay_list_arr as $value) {
                 $arr = [
-                    'date' => $value->date_create,
+                    'date' => date('d.m.Y H:i', strtotime($value->date_create)),
                     'user_id' => $value->user->fio,
                     'sum' => $value->sum
                 ];

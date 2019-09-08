@@ -6,6 +6,7 @@
 namespace app\components\pay;
 
 use app\components\Session\Sessions;
+use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use Yii;
 
@@ -76,4 +77,49 @@ class PayClass
             'msg' => 'Платеж успешно добавлен'
         ];
     }
+
+    public static function getPayList($application_equipment_id)
+    {
+        Yii::info('Запуск функции getPayList', __METHOD__);
+
+        if ($application_equipment_id === '') {
+            Yii::error('Не указана идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана идентификатор заявки'
+            ];
+        }
+
+        $pay_list = [];
+
+        $pay_list_arr = ApplicationPay::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->all();
+
+        if (empty($pay_list_arr)) {
+            Yii::info('Платежей нет', __METHOD__);
+        } else {
+            /**
+             * @var ApplicationPay $value
+             */
+            foreach ($pay_list_arr as $value) {
+                $arr = [
+                    'date' => date('d.m.Y H:i', strtotime($value->date_create)),
+                    'user_id' => $value->user->fio,
+                    'sum' => $value->sum
+                ];
+
+                array_push($pay_list, $arr);
+            }
+        }
+
+        Yii::info('Платежи успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Платежи успешно получены',
+            'data' => $pay_list
+        ];
+    }
+
+
 }
