@@ -72,6 +72,30 @@ class PayClass
             return false;
         }
 
+        Yii::info('Обновляем общую сумму', __METHOD__);
+
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $application_equipment_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::error('Заявка на оборудование не найдено: ' . serialize($app_eq), __METHOD__);
+            return false;
+        }
+
+        $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
+
+        try {
+            if (!$app_eq->save(false)) {
+                Yii::error('Ошибка при сохранении общей суммы платежа: ' . serialize($app_eq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении общей суммы платежа: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
         return [
             'status' => 'SUCCESS',
             'msg' => 'Платеж успешно добавлен'
