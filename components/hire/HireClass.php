@@ -10,11 +10,13 @@ use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use app\models\Applications;
+use app\models\Equipments;
 use app\models\EquipmentsStatus;
 use app\models\HireField;
 use app\models\HireShowField;
 use app\models\HireState;
 use app\models\HireStatus;
+use Symfony\Component\Console\Application;
 use Yii;
 
 class HireClass
@@ -663,11 +665,14 @@ class HireClass
     /**
      * Функция прлдения проката
      * @param $app_id
+     * @param $app_eq_id
      * @param $count
      * @return array|bool
      */
-    public static function ExtendRental($app_id, $count)
+    public static function ExtendRental($app_eq_id, $app_id, $count)
     {
+        Yii::info('Запуск функции ExtendRental', __METHOD__);
+
         if ($app_id === '') {
             Yii::error('Не передан идентификатор заявки', __METHOD__);
 
@@ -686,6 +691,8 @@ class HireClass
             ];
         }
 
+        Yii::info('Получаем заявку', __METHOD__);
+
         /**
          * @var Applications $applications
          */
@@ -695,7 +702,7 @@ class HireClass
             Yii::info('Ошибка при получении заявки', __METHOD__);
 
             return [
-                'status' => 'SUCCESS',
+                'status' => 'ERROR',
                 'msg' => 'Ошибка при получении заявки'
             ];
         }
@@ -708,6 +715,8 @@ class HireClass
 
         $applications->rent_end = $date;
 
+        Yii::info('Сохраняем заявку', __METHOD__);
+
         try {
             if (!$applications->save(false)) {
                 Yii::error('Ошибка при изменении даты: ' . serialize($applications->getErrors()), __METHOD__);
@@ -718,7 +727,58 @@ class HireClass
             return false;
         }
 
+        Yii::info('Получаем информацию заявки с оборудованием', __METHOD__);
 
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', ['id' => $app_eq_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении заявки с оборудованием'
+            ];
+        }
+
+        Yii::info('Получаем оборудование', __METHOD__);
+
+        /**
+         * @var Equipments $equipments
+         */
+        $equipments = Equipments::find()->where('id=:id', [':id' => $app_eq->equipments_id])->one();
+
+        if (!is_object($equipments)) {
+            Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении оборудования'
+            ];
+        }
+
+        $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
+        $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
+
+        if ((int)$applications->discount->code !== 0) {
+            $price = $price * $applications->discount->code / 100;
+        }
+
+        $app_eq->sum = $price;
+
+        Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
+
+        try {
+            if (!$app_eq->save(false)) {
+                Yii::error('Ошибка при сохранении новой суммы: ' . serialize($app_eq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
 
         Yii::info('Заявка успешно изменена', __METHOD__);
 
