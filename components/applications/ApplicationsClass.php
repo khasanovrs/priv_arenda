@@ -726,28 +726,22 @@ class ApplicationsClass
 
         Yii::info('Получаем платежи', __METHOD__);
 
-        $pay_list = [];
+        $pay_list = PayClass::getPayList($applicationEq->id);
 
-        $pay_list_arr = $applicationEq->applicationPays;
+        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении платежей', __METHOD__);
 
-        if (empty($pay_list_arr)) {
-            Yii::info('Платежей нет', __METHOD__);
-        } else {
-            /**
-             * @var ApplicationPay $value
-             */
-            foreach ($pay_list_arr as $value) {
-                $arr = [
-                    'date' => date('d.m.Y H:i', strtotime($value->date_create)),
-                    'user_id' => $value->user->fio,
-                    'sum' => $value->sum
-                ];
-
-                array_push($pay_list, $arr);
+            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
+                return $pay_list;
             }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении платежей',
+            ];
         }
 
-        $result['pay_list'] = $pay_list;
+        $result['pay_list'] = $pay_list['data'];
 
         Yii::info('Заявка успешно получена', __METHOD__);
 

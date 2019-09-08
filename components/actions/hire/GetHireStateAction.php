@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\PayClass;
+use app\components\hire\HireClass;
 use Yii;
 use yii\base\Action;
 
@@ -15,7 +15,7 @@ class GetHireStateAction extends Action
     {
         Yii::info('Запуск функции получения состояний проката', __METHOD__);
 
-        $result = PayClass::GetHireState();
+        $result = HireClass::GetHireState();
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка состояний проката', __METHOD__);

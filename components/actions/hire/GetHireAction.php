@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\PayClass;
+use app\components\hire\HireClass;
 use Yii;
 use yii\base\Action;
 
@@ -25,7 +25,7 @@ class GetHireAction extends Action
         $sum_start = $request->getBodyParam('sum_start');
         $sum_end = $request->getBodyParam('sum_end');
 
-        $result = PayClass::getHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end);
+        $result = HireClass::getHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка прокатов', __METHOD__);

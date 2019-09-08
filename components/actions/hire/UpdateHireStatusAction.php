@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\PayClass;
+use app\components\hire\HireClass;
 use Yii;
 use yii\base\Action;
 
@@ -20,7 +20,7 @@ class UpdateHireStatusAction extends Action
         $id = $request->getBodyParam('id');
         $status = $request->getBodyParam('status');
 
-        $result = PayClass::UpdateHireStatus($id, $status);
+        $result = HireClass::UpdateHireStatus($id, $status);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении статуса проката', __METHOD__);

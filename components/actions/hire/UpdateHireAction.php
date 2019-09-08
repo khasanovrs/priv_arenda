@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\PayClass;
+use app\components\hire\HireClass;
 use Yii;
 use yii\base\Action;
 
@@ -22,7 +22,7 @@ class UpdateHireAction extends Action
         $comment = $request->getBodyParam('comment');
         $total_paid = $request->getBodyParam('total_paid');
 
-        $result = PayClass::UpdateHire($id, $status, $comment, $total_paid);
+        $result = HireClass::UpdateHire($id, $status, $comment, $total_paid);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении информации проката', __METHOD__);

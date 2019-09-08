@@ -5,6 +5,7 @@
 
 namespace app\components\hire;
 
+use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
@@ -561,6 +562,23 @@ class HireClass
             'status' => $applicationEq->status_id,
             'photo' => $applicationEq->equipments->photo
         ];
+
+        $pay_list = PayClass::getPayList($applicationEq->id);
+
+        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении платежей', __METHOD__);
+
+            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
+                return $pay_list;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении платежей',
+            ];
+        }
+
+        $result['pay_list'] = $pay_list['data'];
 
         Yii::info('Заявка успешно получена', __METHOD__);
 

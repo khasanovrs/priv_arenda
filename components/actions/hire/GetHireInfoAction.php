@@ -5,7 +5,7 @@
 
 namespace app\components\actions\hire;
 
-use app\components\hire\PayClass;
+use app\components\hire\HireClass;
 use Yii;
 use yii\base\Action;
 
@@ -19,7 +19,7 @@ class GetHireInfoAction extends Action
 
         $id = $request->getBodyParam('id');
 
-        $result = PayClass::getHireInfo($id);
+        $result = HireClass::getHireInfo($id);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении информации по прокату', __METHOD__);

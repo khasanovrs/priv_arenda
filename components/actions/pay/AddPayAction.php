@@ -55,7 +55,8 @@ class AddPayAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Платеж успешно добавлен'
+            'msg' => 'Платеж успешно добавлен',
+            'data' => $result['data']
         ];
     }
 }

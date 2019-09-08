@@ -93,7 +93,7 @@ class PayClass
 
         $pay_list = [];
 
-        $pay_list_arr = ApplicationPay::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->all();
+        $pay_list_arr = ApplicationPay::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->orderBy('id desc')->all();
 
         if (empty($pay_list_arr)) {
             Yii::info('Платежей нет', __METHOD__);
