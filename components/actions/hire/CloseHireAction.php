@@ -18,8 +18,9 @@ class CloseHireAction extends Action
         $request = Yii::$app->request;
 
         $id = $request->getBodyParam('id');
+        $checkPrim = $request->getBodyParam('checkPrim');
 
-        $result = HireClass::closeHire($id);
+        $result = HireClass::closeHire($id, $checkPrim);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при возврате оборудования на склад', __METHOD__);

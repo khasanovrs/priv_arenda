@@ -812,9 +812,10 @@ class HireClass
     /**
      * Функция возврата товара на склад
      * @param $app_id
+     * @param $checkPrim
      * @return array|bool
      */
-    public static function closeHire($app_id)
+    public static function closeHire($app_id, $checkPrim)
     {
         Yii::info('Запуск функции closeHire', __METHOD__);
 
@@ -847,6 +848,10 @@ class HireClass
         } else {
             Yii::info('Сумма не совпадает', __METHOD__);
             $app_eq->hire_state_id = 5;
+        }
+
+        if ($checkPrim) {
+            $app_eq->hire_state_id = 6;
         }
 
         try {
