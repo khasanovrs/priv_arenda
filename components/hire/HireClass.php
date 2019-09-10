@@ -841,7 +841,13 @@ class HireClass
             ];
         }
 
-        $app_eq->hire_state_id = 3;
+        if ($app_eq->sum == $app_eq->total_paid) {
+            Yii::info('Сумма совпадает', __METHOD__);
+            $app_eq->hire_state_id = 3;
+        } else {
+            Yii::info('Сумма не совпадает', __METHOD__);
+            $app_eq->hire_state_id = 5;
+        }
 
         try {
             if (!$app_eq->save(false)) {
