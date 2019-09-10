@@ -7,18 +7,34 @@
 
 namespace app\commands;
 
+use app\models\ApplicationEquipment;
+use app\models\ApplicationPay;
+use Yii;
 use yii\console\Controller;
-use yii\console\ExitCode;
 
 class CheckStateHireEqController extends Controller
 {
     /**
-     * This command echoes what you have entered as the message.
-     * @param string $message the message to be echoed.
-     * @return int Exit code
+     * Проверка состояний
      */
     public function actionIndex()
     {
+        Yii::info('Запуск функции actionIndex', __METHOD__);
 
+        $arr_eq = ApplicationEquipment::find()->where('hire_state_id!=3')->all();
+
+        if (empty($arr_eq)) {
+            Yii::info('Заявки не обноружены', __METHOD__);
+            return true;
+        }
+
+        /**
+         * @var ApplicationEquipment $value
+         */
+        foreach ($arr_eq as $value) {
+
+        }
+
+        Yii::info('Заявки успешно обработаны', __METHOD__);
     }
 }

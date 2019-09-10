@@ -871,4 +871,58 @@ class HireClass
             'msg' => 'Заявка успешно изменена'
         ];
     }
+
+    /**
+     * Проверка и изменение состояния
+     * @return array|bool
+     */
+    public static function checkHire($id)
+    {
+        Yii::info('Заявка успешно проверена', __METHOD__);
+
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $id]);
+
+        if (!is_object($app_eq)) {
+            Yii::info('Заявка оборудования не найдена', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка оборудования не найдена'
+            ];
+        }
+
+        /**
+         * @var Applications $app
+         */
+        $app = Applications::find()->where('id=:id', [':id' => $app_eq->application_id])->one();
+
+        if (!is_object($app)) {
+            Yii::info('Заявка не найдена', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена'
+            ];
+        }
+
+        $state = '';
+
+        if (strtotime($app->rent_start) > date('Y-m-d H:i:s')) {
+            $state = '1';
+        }
+
+        if (strtotime($app->rent_end) > date('Y-m-d H:i:s')) {
+            $state = '2';
+        }
+
+
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно проверена'
+        ];
+    }
 }
