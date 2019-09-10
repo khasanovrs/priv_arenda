@@ -565,7 +565,7 @@ class HireClass
         $result['equipments'] = [
             'equipments_id' => $applicationEq->equipments_id,
             'name' => $category . ' ' . $mark . ' ' . $model,
-            'status' => $applicationEq->status_id,
+            'state' => $applicationEq->hireState->name,
             'photo' => $applicationEq->equipments->photo
         ];
 
