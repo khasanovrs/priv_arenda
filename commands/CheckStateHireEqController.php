@@ -7,8 +7,7 @@
 
 namespace app\commands;
 
-use app\models\ApplicationEquipment;
-use app\models\ApplicationPay;
+use app\components\hire\HireClass;
 use Yii;
 use yii\console\Controller;
 
@@ -21,18 +20,19 @@ class CheckStateHireEqController extends Controller
     {
         Yii::info('Запуск функции actionIndex', __METHOD__);
 
-        $arr_eq = ApplicationEquipment::find()->where('hire_state_id!=3')->all();
+        $result = HireClass::checkHire();
 
-        if (empty($arr_eq)) {
-            Yii::info('Заявки не обноружены', __METHOD__);
-            return true;
-        }
+        if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при добавлении нового статуса для заявки', __METHOD__);
 
-        /**
-         * @var ApplicationEquipment $value
-         */
-        foreach ($arr_eq as $value) {
+            if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
+                return $result;
+            }
 
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при проверке статусов заявки',
+            ];
         }
 
         Yii::info('Заявки успешно обработаны', __METHOD__);
