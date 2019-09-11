@@ -237,6 +237,9 @@ class ApiController extends Controller
             'delete-equipment-status' => [
                 'class' => 'app\components\actions\equipments\DeleteEquipmentStatusAction',
             ],
+            'get-equipments-branch' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentBranchAction',
+            ],
             /**
              * Управление заявками
              */

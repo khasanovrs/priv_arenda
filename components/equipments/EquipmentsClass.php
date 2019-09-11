@@ -6,6 +6,7 @@
 namespace app\components\equipments;
 
 use app\components\Session\Sessions;
+use app\models\ApplicationEquipment;
 use app\models\Clients;
 use app\models\ClientStatus;
 use app\models\Equipments;
@@ -19,6 +20,7 @@ use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
 use app\models\Stock;
 use Yii;
+use yii\base\Application;
 
 class EquipmentsClass
 {
@@ -354,6 +356,69 @@ class EquipmentsClass
                 'degree_wear' => $value->degree_wear,
                 'payback_ratio' => $value->payback_ratio,
                 'date_create' => $value->date_create
+            ];
+        }
+
+        Yii::info('Список оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список оборудования получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение списка оборудования
+     * @param $branch
+     * @return array
+     */
+    public static function GetEquipmentsBranch($branch)
+    {
+        Yii::info('Запуск функции GetEquipments', __METHOD__);
+
+        $result = [];
+
+        $applicationEquipment = ApplicationEquipment::find()
+            ->select('equipments_id,count(*) as status_id')
+            ->joinWith('application')
+            ->where('applications.branch_id=:branch', [':branch' => $branch])
+            ->groupBy('equipments_id')
+            ->orderBy('COUNT(*) desc')
+            ->limit(10)
+            ->all();
+
+        if (!is_array($applicationEquipment)) {
+            Yii::error('Список оборудований пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список оборудований пуст'
+            ];
+        }
+
+
+        foreach ($applicationEquipment as $value) {
+            /**
+             * @var Equipments $eq
+             */
+            $eq = Equipments::find()->where('id=:id', [':id' => $value->equipments_id])->one();
+
+            if (!is_object($eq)) {
+                Yii::error('Оборудование не найдено', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Оборудование не найдено'
+                ];
+            }
+
+            $result[] = [
+                'id' => $value->equipments_id,
+                'count' => $value->status_id,
+                'name' => $eq->category->name . ' ' . $eq->mark0->name . ' ' . $eq->model,
+                'price' => $eq->price_per_day,
+                'photo' => $eq->photo
             ];
         }
 
