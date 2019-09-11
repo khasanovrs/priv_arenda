@@ -18,8 +18,10 @@ class GetInfoAction extends Action
         $request = Yii::$app->request;
 
         $branch = $request->getBodyParam('branch');
+        $date_start = $request->getBodyParam('date_start');
+        $date_end = $request->getBodyParam('date_end');
 
-        $result_income = MainClass::getIncome($branch);
+        $result_income = MainClass::getIncome($branch, $date_start, $date_end);
 
         if (!is_array($result_income) || !isset($result_income['status']) || $result_income['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении информации для рабочего стола', __METHOD__);
