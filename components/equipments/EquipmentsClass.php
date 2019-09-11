@@ -371,18 +371,22 @@ class EquipmentsClass
     /**
      * Получение списка оборудования
      * @param $branch
+     * @param $date_start ,
+     * @param $date_end
      * @return array
      */
-    public static function GetEquipmentsBranch($branch)
+    public static function GetEquipmentsBranch($branch, $date_start, $date_end)
     {
         Yii::info('Запуск функции GetEquipments', __METHOD__);
 
+        $date_start .= ' 00:00:00';
+        $date_end .= ' 23:59:59';
         $result = [];
 
         $applicationEquipment = ApplicationEquipment::find()
             ->select('equipments_id,count(*) as status_id')
             ->joinWith('application')
-            ->where('applications.branch_id=:branch', [':branch' => $branch])
+            ->where('applications.branch_id=:branch and applications.date_create between :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->groupBy('equipments_id')
             ->orderBy('COUNT(*) desc')
             ->limit(10)

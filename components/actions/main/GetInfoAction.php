@@ -5,6 +5,7 @@
 
 namespace app\components\actions\main;
 
+use app\components\equipments\EquipmentsClass;
 use app\components\main\MainClass;
 use Yii;
 use yii\base\Action;
@@ -32,10 +33,26 @@ class GetInfoAction extends Action
             ];
         }
 
+        $eqResult = EquipmentsClass::GetEquipmentsBranch($branch, $date_start, $date_end);
+
+        if (!is_array($eqResult) || !isset($eqResult['status']) || $eqResult['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении списка популярных оборудований', __METHOD__);
+
+            if (is_array($eqResult) && isset($eqResult['status']) && $eqResult['status'] === 'ERROR') {
+                return $eqResult;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении списка популярных оборудований',
+            ];
+        }
+
         Yii::info('Информация для рабочего стола успешно получена', __METHOD__);
 
         $result['data'] = [
-            'income' => $result_income['data']
+            'income' => [],
+            'equipments' => $eqResult['data']
         ];
 
         return [

@@ -113,16 +113,6 @@ class MainClass
             ];
         }
 
-        /**
-         * @var ApplicationPay $value
-         */
-        foreach ($applications as $value) {
-            $result['month'] += $value->sum;
-
-            if (date('d', strtotime($value->date_create)) === date('d')) {
-                $result['sum_day'] += $value->sum;
-            }
-        }
 
         Yii::info('Доходы успешно получены', __METHOD__);
 
