@@ -23,21 +23,12 @@ class MainClass
     {
         Yii::info('Запуск функции получении доходов', __METHOD__);
 
-        /*
-        выручка за период(по умолчанию сегодня),
-        средний чек,
-        сумма долгов
-
-        количество прокатов,
-        количество продлений,
-        */
-
         $result = [
-            'revenue' => '0',
-            'average_amount' => '0',
-            'debt' => '0',
-            'renewals' => '',
-            'hire' => ''
+            'revenue' => ['name' => 'Выручка', 'count' => '0', 'currency' => true],
+            'average_amount' => ['name' => 'Средний чек', 'count' => '0', 'currency' => true],
+            'debt' => ['name' => 'Сумма долга', 'count' => '0', 'currency' => true],
+            'renewals' => ['name' => 'Количество продлений', 'count' => 0, 'currency' => false],
+            'hire' => ['name' => 'Количество прокатов', 'count' => 0, 'currency' => false],
         ];
 
         if ($branch === '') {
@@ -63,9 +54,25 @@ class MainClass
         $date_start .= ' 00:00:00';
         $date_end .= ' 23:59:59';
 
+        $applicationEquipmentHire = ApplicationEquipment::find()
+            ->joinWith('application')
+            ->where('applications.branch_id=:branch and hire_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->count();
+
+        $result['hire']['count'] = $applicationEquipmentHire;
+
+
+        $applicationEquipmentRenewals = ApplicationEquipment::find()
+            ->joinWith('application')
+            ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->count();
+
+        $result['renewals']['count'] = $applicationEquipmentRenewals;
+
+
         $applicationEquipment = ApplicationEquipment::find()
             ->joinWith('application')
-            ->where('applications.branch_id=:branch and applications.date_create BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->all();
 
         if (!is_array($applicationEquipment)) {
@@ -77,7 +84,6 @@ class MainClass
             ];
         }
 
-        $debtor = [];
         /**
          * @var ApplicationEquipment $value
          */
@@ -87,32 +93,23 @@ class MainClass
             }
         }
 
-
         Yii::info('Получаем средний чек и общая сумма', __METHOD__);
 
         $sum = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
 
-        if (!empty($applications)) {
-            $allSum = 0;
-            $debtSum = 0;
-            $count = 0;
-            if (!empty($sum)) {
-                /**
-                 * @var ApplicationPay $value
-                 */
-                foreach ($sum as $value) {
-                    if (in_array($value->application_equipment_id, $debtor)) {
-                        $debtSum += (float)$value->sum;
-                    }
-
-                    $allSum += (float)$value->sum;
-                    $count++;
-                }
-
-                $result['debt'] = $debtSum;
-                $result['revenue'] = $allSum;
-                $result['average_amount'] = $allSum / $count;
+        $allSum = 0;
+        $count = 0;
+        if (!empty($sum)) {
+            /**
+             * @var ApplicationPay $value
+             */
+            foreach ($sum as $value) {
+                $allSum += (float)$value->sum;
+                $count++;
             }
+
+            $result['revenue']['count'] = $allSum;
+            $result['average_amount']['count'] = $allSum / $count;
         }
 
         Yii::info('Доходы успешно получены', __METHOD__);
@@ -120,7 +117,7 @@ class MainClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Доходы успешно получены',
-            'date' => $result
+            'data' => $result
         ];
     }
 }

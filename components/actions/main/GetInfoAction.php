@@ -51,7 +51,7 @@ class GetInfoAction extends Action
         Yii::info('Информация для рабочего стола успешно получена', __METHOD__);
 
         $result['data'] = [
-            'income' => [],
+            'income' => $result_income['data'],
             'equipments' => $eqResult['data']
         ];
 
