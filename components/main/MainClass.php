@@ -23,14 +23,21 @@ class MainClass
     {
         Yii::info('Запуск функции получении доходов', __METHOD__);
 
-        /*выручка за период(по умолчанию сегодня),
-        количество прокатов,
+        /*
+        выручка за период(по умолчанию сегодня),
         средний чек,
+        сумма долгов
+
+        количество прокатов,
         количество продлений,
-        сумма долгов*/
+        */
 
         $result = [
-            'sum' => ''
+            'revenue' => '0',
+            'average_amount' => '0',
+            'debt' => '0',
+            'renewals' => '',
+            'hire' => ''
         ];
 
         if ($branch === '') {
@@ -70,49 +77,43 @@ class MainClass
             ];
         }
 
-        $eqArr = [];
+        $debtor = [];
         /**
          * @var ApplicationEquipment $value
          */
         foreach ($applicationEquipment as $value) {
-            array_push($eqArr,$value->id);
+            if ($value->hire_state_id === 5) {
+                array_push($debtor, $value->id);
+            }
         }
 
 
-        Yii::info('Получаем средний чек', __METHOD__);
+        Yii::info('Получаем средний чек и общая сумма', __METHOD__);
 
         $sum = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
 
-        $allSum = 0;
-        $count = 0;
-        if (!empty($sum)) {
-            /**
-             * @var ApplicationPay $value
-             */
-            foreach ($sum as $value) {
-                $allSum += (float)$value->sum;
-                $count++;
+        if (!empty($applications)) {
+            $allSum = 0;
+            $debtSum = 0;
+            $count = 0;
+            if (!empty($sum)) {
+                /**
+                 * @var ApplicationPay $value
+                 */
+                foreach ($sum as $value) {
+                    if (in_array($value->application_equipment_id, $debtor)) {
+                        $debtSum += (float)$value->sum;
+                    }
+
+                    $allSum += (float)$value->sum;
+                    $count++;
+                }
+
+                $result['debt'] = $debtSum;
+                $result['revenue'] = $allSum;
+                $result['average_amount'] = $allSum / $count;
             }
-
-            $result['sum'] = $allSum / $count;
         }
-
-
-        $date_start = date('Y-m-' . '01' . ' 00:00:00');
-        $date_end = date('Y-m-' . '31' . ' 23:59:59');
-
-        $applications = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
-
-        if (empty($applications)) {
-            Yii::info('Доходов за текущий месяц нет', __METHOD__);
-
-            return [
-                'status' => 'SUCCESS',
-                'msg' => 'Доходов за текущий месяц нет',
-                'data' => $result
-            ];
-        }
-
 
         Yii::info('Доходы успешно получены', __METHOD__);
 
