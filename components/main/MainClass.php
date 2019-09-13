@@ -131,6 +131,8 @@ class MainClass
         Yii::info('Запуск функции получении информации для шапки', __METHOD__);
 
         $allSum = 0;
+        $date_start = date('Y-m-d') . ' 00:00:00';
+        $date_end = date('Y-m-d') . ' 23:59:59';
 
         if ($branch === '') {
             Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
@@ -152,28 +154,16 @@ class MainClass
             ];
         }
 
-
-        $applicationEquipment = ApplicationEquipment::find()
-            ->joinWith('application')
-            ->where('applications.branch_id=:branch', [':branch' => $branch])
+        $applicationPayArr = ApplicationPay::find()
+            ->joinWith(['applicationEquipment', 'applicationEquipment.application'])
+            ->where('applications.branch_id=:branch and application_pay.date_create BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->all();
 
-        if (!is_array($applicationEquipment)) {
-            Yii::error('Список оборудований пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список оборудований пуст'
-            ];
-        }
-
-        $sum = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
-
-        if (!empty($sum)) {
+        if (!empty($applicationPayArr)) {
             /**
              * @var ApplicationPay $value
              */
-            foreach ($sum as $value) {
+            foreach ($applicationPayArr as $value) {
                 $allSum += (float)$value->sum;
             }
         }
