@@ -454,6 +454,9 @@ class HireClass
             $sale = $application->discount->name;
             $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
 
+            Yii::info('ololo1:'.serialize($value->sum), __METHOD__);
+            Yii::info('ololo2:'.serialize($value->total_paid), __METHOD__);
+
             $result[] = [
                 'id' => $value->id,
                 'app_id' => $application->id,
@@ -468,7 +471,7 @@ class HireClass
                 'sum' => $sum,
                 'sale_sum' => $total_paid,
                 'total_paid' => $value->total_paid,
-                'remainder' => $total_paid - $value->total_paid,
+                'remainder' => $value->sum - $value->total_paid,
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
@@ -598,16 +601,14 @@ class HireClass
     /**
      * Функция изменения заявки
      * @param $id
-     * @param $status
      * @param $comment
-     * @param $total_paid ,
      * @param $delivery ,
      * @param $sale ,
      * @param $rent_start ,
      * @param $rent_end
      * @return array|bool
      */
-    public static function UpdateHire($id, $status, $comment, $total_paid, $delivery, $sale, $rent_start, $rent_end)
+    public static function UpdateHire($id, $comment, $delivery, $sale, $rent_start, $rent_end)
     {
         if ($id === '') {
             Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($id), __METHOD__);
@@ -632,8 +633,6 @@ class HireClass
             ];
         }
 
-        $applicationEq->hire_status_id = $status;
-        $applicationEq->total_paid = $total_paid;
         $applicationEq->application->comment = $comment;
 
         try {
@@ -662,8 +661,8 @@ class HireClass
 
         $app->discount_id = $sale;
         $app->delivery_id = $delivery;
-        $app->rent_start = $rent_start;
-        $app->rent_end = $rent_end;
+        $app->rent_start = date('Y-m-d H:i:s',strtotime($rent_start));
+        $app->rent_end = date('Y-m-d H:i:s',strtotime($rent_end));
 
         try {
             if (!$app->save(false)) {
