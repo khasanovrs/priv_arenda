@@ -454,9 +454,6 @@ class HireClass
             $sale = $application->discount->name;
             $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
 
-            Yii::info('ololo1:'.serialize($value->sum), __METHOD__);
-            Yii::info('ololo2:'.serialize($value->total_paid), __METHOD__);
-
             $result[] = [
                 'id' => $value->id,
                 'app_id' => $application->id,
