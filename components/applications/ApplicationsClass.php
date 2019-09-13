@@ -20,6 +20,7 @@ use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
 use app\models\Equipments;
+use app\models\Source;
 use Yii;
 
 class ApplicationsClass
@@ -393,10 +394,11 @@ class ApplicationsClass
      * @param $status
      * @param $comment
      * @param $branch
+     * @param $source
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch, $source)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -424,6 +426,15 @@ class ApplicationsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор тип аренды',
+            ];
+        }
+
+        if ($source === '') {
+            Yii::error('Не передан источник, source: ' . serialize($source), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор источник',
             ];
         }
 
@@ -559,6 +570,16 @@ class ApplicationsClass
             ];
         }
 
+        $check = Source::find()->where('id=:id', [':id' => $source])->one();
+        if (!is_object($check)) {
+            Yii::error('Источник не найден, source: ' . serialize($source), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Источник не найден',
+            ];
+        }
+
         /**
          * @var Sessions $Sessions
          */
@@ -568,7 +589,7 @@ class ApplicationsClass
         $newApplications = new Applications();
         $newApplications->client_id = $client_id;
         $newApplications->user_id = $session->user_id;
-        $newApplications->source_id = $client_id;
+        $newApplications->source_id = $source;
         $newApplications->discount_id = $sale;
         $newApplications->delivery_id = $delivery;
         $newApplications->type_lease_id = $typeLease;

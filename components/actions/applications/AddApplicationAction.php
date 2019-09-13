@@ -30,8 +30,9 @@ class AddApplicationAction extends Action
         $status = $request->getBodyParam('status');
         $comment = $request->getBodyParam('comment');
         $branch = $request->getBodyParam('branch');
+        $source = $request->getBodyParam('source');
 
-        $result = ApplicationsClass::AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch);
+        $result = ApplicationsClass::AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch, $source);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении заявки', __METHOD__);
