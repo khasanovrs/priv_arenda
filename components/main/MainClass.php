@@ -31,6 +31,10 @@ class MainClass
             'hire' => ['name' => 'Количество прокатов', 'count' => 0, 'currency' => false],
         ];
 
+        $debtorSum = 0;
+        $allSum = 0;
+        $count = 0;
+
         if ($branch === '') {
             Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
 
@@ -59,16 +63,10 @@ class MainClass
             ->where('applications.branch_id=:branch and hire_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count();
 
-        $result['hire']['count'] = $applicationEquipmentHire;
-
-
         $applicationEquipmentRenewals = ApplicationEquipment::find()
             ->joinWith('application')
             ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count();
-
-        $result['renewals']['count'] = $applicationEquipmentRenewals;
-
 
         $applicationEquipment = ApplicationEquipment::find()
             ->joinWith('application')
@@ -87,9 +85,10 @@ class MainClass
         /**
          * @var ApplicationEquipment $value
          */
+
         foreach ($applicationEquipment as $value) {
             if ($value->hire_state_id === 5) {
-                array_push($debtor, $value->id);
+                $debtorSum += (float)$value->sum - (float)$value->total_paid;
             }
         }
 
@@ -97,8 +96,6 @@ class MainClass
 
         $sum = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
 
-        $allSum = 0;
-        $count = 0;
         if (!empty($sum)) {
             /**
              * @var ApplicationPay $value
@@ -107,10 +104,13 @@ class MainClass
                 $allSum += (float)$value->sum;
                 $count++;
             }
-
-            $result['revenue']['count'] = $allSum;
-            $result['average_amount']['count'] = $allSum / $count;
         }
+
+        $result['debt']['count'] = $debtorSum;
+        $result['revenue']['count'] = $allSum;
+        $result['average_amount']['count'] = $allSum / $count;
+        $result['hire']['count'] = $applicationEquipmentHire;
+        $result['renewals']['count'] = $applicationEquipmentRenewals;
 
         Yii::info('Доходы успешно получены', __METHOD__);
 
