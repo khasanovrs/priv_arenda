@@ -108,7 +108,7 @@ class MainClass
 
         $result['debt']['count'] = $debtorSum;
         $result['revenue']['count'] = $allSum;
-        $result['average_amount']['count'] = $allSum / $count;
+        $result['average_amount']['count'] = $allSum !== 0 ? $allSum / $count : 0;
         $result['hire']['count'] = $applicationEquipmentHire;
         $result['renewals']['count'] = $applicationEquipmentRenewals;
 
