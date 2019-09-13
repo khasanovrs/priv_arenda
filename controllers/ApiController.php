@@ -42,6 +42,9 @@ class ApiController extends Controller
             'get-main-info' => [
                 'class' => 'app\components\actions\main\GetInfoAction',
             ],
+            'get-header-revenue' => [
+                'class' => 'app\components\actions\main\GetRevenueAction',
+            ],
             /**
              * Управление пользователями
              */

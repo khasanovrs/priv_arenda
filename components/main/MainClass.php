@@ -120,4 +120,70 @@ class MainClass
             'data' => $result
         ];
     }
+
+    /**
+     * Получение информации для шапки
+     * @param $branch
+     * @return array
+     */
+    public static function getRevenue($branch)
+    {
+        Yii::info('Запуск функции получении информации для шапки', __METHOD__);
+
+        $allSum = 0;
+
+        if ($branch === '') {
+            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор филиала'
+            ];
+        }
+
+        $check_branch = Branch::find()->where('id=:id', [':id' => $branch])->one();
+
+        if (!is_object($check_branch)) {
+            Yii::error('Передан некорректный идентификатор филиала, branch:' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор филиала',
+            ];
+        }
+
+
+        $applicationEquipment = ApplicationEquipment::find()
+            ->joinWith('application')
+            ->where('applications.branch_id=:branch', [':branch' => $branch])
+            ->all();
+
+        if (!is_array($applicationEquipment)) {
+            Yii::error('Список оборудований пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список оборудований пуст'
+            ];
+        }
+
+        $sum = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
+
+        if (!empty($sum)) {
+            /**
+             * @var ApplicationPay $value
+             */
+            foreach ($sum as $value) {
+                $allSum += (float)$value->sum;
+            }
+        }
+
+        Yii::info('Доходы успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Доходы успешно получены',
+            'data' => $allSum
+        ];
+    }
 }
