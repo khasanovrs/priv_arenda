@@ -29,6 +29,7 @@ use Yii;
  * @property string $date_create
  * @property string $photo
  * @property string $countHire количество прокатов
+ * @property string $photo_alias
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property EquipmentsCategory $category
@@ -55,11 +56,12 @@ class Equipments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
+            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'required'],
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],
             [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio', 'countHire'], 'string', 'max' => 45],
+            [['photo_alias'], 'string', 'max' => 250],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsStatus::className(), 'targetAttribute' => ['status' => 'id']],
@@ -97,6 +99,7 @@ class Equipments extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'photo' => 'Photo',
             'countHire' => 'Count Hire',
+            'photo_alias' => 'Photo Alias',
         ];
     }
 

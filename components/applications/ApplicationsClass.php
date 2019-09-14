@@ -13,7 +13,6 @@ use app\models\Applications;
 use app\models\ApplicationsDelivery;
 use app\models\ApplicationsField;
 use app\models\ApplicationsShowField;
-use app\models\ApplicationsSource;
 use app\models\ApplicationsStatus;
 use app\models\ApplicationsTypeLease;
 use app\models\Branch;
@@ -613,7 +612,7 @@ class ApplicationsClass
             /**
              * @var Discount $disc
              */
-            $disc = Discount::find()->where('id=:id',[':id'=>$sale])->one();
+            $disc = Discount::find()->where('id=:id', [':id' => $sale])->one();
 
             if (!is_object($disc)) {
                 Yii::info('Ошибка при получении скидки', __METHOD__);
@@ -627,7 +626,7 @@ class ApplicationsClass
             /**
              * @var Equipments $equipments
              */
-            $equipments = Equipments::find()->where('id=:id',[':id'=>$value->id])->one();
+            $equipments = Equipments::find()->where('id=:id', [':id' => $value->id])->one();
 
             if (!is_object($disc)) {
                 Yii::info('Ошибка при получении оборудования', __METHOD__);
@@ -695,7 +694,6 @@ class ApplicationsClass
     public static function getApplicationInfo($applicationId)
     {
         Yii::info('Запуск функции getApplicationInfo', __METHOD__);
-        $result = [];
 
         if ($applicationId === '') {
             Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($applicationId), __METHOD__);
@@ -754,7 +752,7 @@ class ApplicationsClass
 
         $result = [
             'id' => $application->id,
-            'branch' => $application->branch_id,
+            'branch' => $application->branch->name,
             'delivery' => $application->delivery_id,
             'typeLease' => $application->type_lease_id,
             'sale' => $application->discount_id,
@@ -780,7 +778,8 @@ class ApplicationsClass
             'name' => $category . ' ' . $mark . ' ' . $model,
             'count' => $applicationEq->equipments_count,
             'status' => $applicationEq->status_id,
-            'photo' => $applicationEq->equipments->photo
+            'photo' => $applicationEq->equipments->photo,
+            'photo_alias' => $applicationEq->equipments->photo_alias
         ];
 
         Yii::info('Получаем платежи', __METHOD__);

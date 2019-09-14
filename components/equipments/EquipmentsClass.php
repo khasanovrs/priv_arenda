@@ -849,9 +849,10 @@ class EquipmentsClass
      * @param $power
      * @param $frequency_hits
      * @param $photo
+     * @param $photo_alias
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -945,6 +946,7 @@ class EquipmentsClass
         $newEquipment->profit = $profit;
         $newEquipment->payback_ratio = $payback_ratio;
         $newEquipment->photo = $photo;
+        $newEquipment->photo_alias = $photo_alias;
 
         try {
             if (!$newEquipment->save(false)) {
@@ -1083,9 +1085,10 @@ class EquipmentsClass
      * @param $network_cord
      * @param $power
      * @param $frequency_hits
+     * @param $photo_alias
      * @return array|bool
      */
-    public static function changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits)
+    public static function changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1198,6 +1201,7 @@ class EquipmentsClass
         $equipment->repairs_sum = $repairs_sum;
         $equipment->profit = $profit;
         $equipment->payback_ratio = $payback_ratio;
+        $equipment->photo_alias = $photo_alias;
 
         try {
             if (!$equipment->save(false)) {

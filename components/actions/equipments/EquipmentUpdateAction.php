@@ -41,8 +41,9 @@ class EquipmentUpdateAction extends Action
         $network_cord = $request->getBodyParam('network_cord');
         $power = $request->getBodyParam('power');
         $frequency_hits = $request->getBodyParam('frequency_hits');
+        $photo_alias = $request->getBodyParam('photo_alias');
 
-        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits);
+        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении оборудования', __METHOD__);
