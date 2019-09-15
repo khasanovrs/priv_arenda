@@ -20,8 +20,9 @@ class AddPayAction extends Action
 
         $eq_id = $request->getBodyParam('eq_app_id');
         $sum = $request->getBodyParam('sum');
+        $cashBox = $request->getBodyParam('cashBox');
 
-        $result = PayClass::AddPay($eq_id, $sum);
+        $result = PayClass::AddPay($eq_id, $sum, $cashBox);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении платежа', __METHOD__);

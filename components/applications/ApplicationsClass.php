@@ -394,10 +394,11 @@ class ApplicationsClass
      * @param $comment
      * @param $branch
      * @param $source
+     * @param $cashBox
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch, $source)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch, $source, $cashBox)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -664,7 +665,7 @@ class ApplicationsClass
             }
 
             if ($sum_pay !== '') {
-                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay);
+                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay, $cashBox);
 
                 if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при добавлении платежа', __METHOD__);

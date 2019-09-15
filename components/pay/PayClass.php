@@ -15,10 +15,11 @@ class PayClass
     /**
      * @param $sum
      * @param $application_equipment_id
+     * @param $cashBox
      * @return array | bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddPay($application_equipment_id, $sum)
+    public static function AddPay($application_equipment_id, $sum, $cashBox)
     {
         Yii::info('Запуск функции AddPay', __METHOD__);
 
@@ -37,6 +38,15 @@ class PayClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не указана идентификатор заявки'
+            ];
+        }
+
+        if ($cashBox === '') {
+            Yii::info('Не указана идентификатор кассы', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана идентификатор кассы'
             ];
         }
 
@@ -59,6 +69,7 @@ class PayClass
 
         $newPay->user_id = $session->user_id;
         $newPay->sum = $sum;
+        $newPay->cashBox = $cashBox;
         $newPay->application_equipment_id = $application_equipment_id;
         $newPay->date_create = date('Y-m-d H:i:s');
 
