@@ -566,7 +566,8 @@ class HireClass
             'equipments_id' => $applicationEq->equipments_id,
             'name' => $category . ' ' . $mark . ' ' . $model,
             'state' => $applicationEq->hireState->name,
-            'photo' => $applicationEq->equipments->photo
+            'photo' => $applicationEq->equipments->photo,
+            'photo_alias' => $applicationEq->equipments->photo_alias
         ];
 
         $pay_list = PayClass::getPayList($applicationEq->id);
