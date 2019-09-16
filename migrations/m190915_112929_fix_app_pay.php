@@ -12,9 +12,9 @@ class m190915_112929_fix_app_pay extends Migration
      */
     public function safeUp()
     {
-$this->execute("ALTER TABLE `application_pay` 
-ADD COLUMN `cashBox` int(10) NOT NULL DEFAULT '1' AFTER `date_create`,
-ADD INDEX `fk_application_pay_3_idx` (`cashBox` ASC) VISIBLE
+        $this->execute("ALTER TABLE `application_pay` 
+ADD COLUMN `cashBox` INT(10) NOT NULL DEFAULT 1 AFTER `date_create`,
+ADD INDEX `fk_application_pay_3_idx` (`cashBox` ASC);
 ALTER TABLE `application_pay` 
 ADD CONSTRAINT `fk_application_pay_3`
   FOREIGN KEY (`cashBox`)
