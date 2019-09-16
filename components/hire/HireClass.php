@@ -405,12 +405,12 @@ class HireClass
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = strtolower($like);
             $like = '%' . $like . '%';
-            $listFilter[] = 'lower(equipments.model) like :like';
+            $listFilter[] = 'lower(equipments.model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
             $params[':like'] = $like;
         }
 
         if (!empty($listFilter)) {
-            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments','equipments.mark0','equipments.type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->orderBy('id desc')->all();
         }
@@ -446,6 +446,9 @@ class HireClass
 
             $date_cr = date('Y-m-d');
 
+            /**
+             * @var ApplicationPay $checkPay
+             */
             $checkPay = ApplicationPay::find()->where('application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->one();
 
             $mark = $value->equipments->mark0->name;
@@ -476,7 +479,7 @@ class HireClass
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
-                'current_pay' => is_object($checkPay) ? 'Да' : 'Нет'
+                'current_pay' => is_object($checkPay) ? $checkPay->sum : '0'
             ];
         }
 
