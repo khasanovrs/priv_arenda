@@ -231,7 +231,7 @@ class ClientsClass
         $newClientInfo->sale = $sale;
         $newClientInfo->inn = $inn;
         $newClientInfo->kpp = $kpp;
-        $newClientInfo->name_chief = $name_chief;
+        $newClientInfo->name_chief = $newClient->type === 2 ? $name_chief : '';
         $newClientInfo->phone_chief = $phone_3;
         $newClientInfo->phone_second = $phone_2;
         $newClientInfo->number_passport = $number_passport;
@@ -645,7 +645,7 @@ class ClientsClass
 
                 $result[] = [
                     'id' => $value->id,
-                    'fio' => $value->type === 1 ? $value->name : '',
+                    'fio' => $value->type === 1 ? $value->name : $value->clientsInfos[0]->name_chief,
                     'org' => $value->type === 2 ? $value->name : '',
                     'type' => $value->type,
                     'phone' => $value->phone,
@@ -864,7 +864,7 @@ class ClientsClass
      * @param $like
      * @return bool|array
      */
-    public static function  GetSearchClient($like)
+    public static function GetSearchClient($like)
     {
         Yii::info('Запуск функции GetSearchClient', __METHOD__);
 
@@ -965,5 +965,30 @@ class ClientsClass
         ];
     }
 
+    /**
+     * Получение списка всех клиентов
+     * @param $client_id
+     * @return Clients
+     */
+    public static function GetClientInfo($client_id)
+    {
+        Yii::info('Запуск функции GetClientInfo', __METHOD__);
 
+        /**
+         * @var Clients $client
+         */
+        $client = Clients::find()->where('id=:id', [':id' => $client_id])->one();
+
+        Yii::info('Клиенты успешно получены', __METHOD__);
+
+        if (!is_object($client)) {
+            $client = (object)[
+                'id' => '',
+                'phone' => '',
+                'name' => ''
+            ];
+        }
+
+        return $client;
+    }
 }

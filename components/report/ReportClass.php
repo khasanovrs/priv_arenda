@@ -37,6 +37,10 @@ class ReportClass
              */
             $apEq = $value->applicationEquipments;
 
+            if (empty($apEq)) {
+                continue;
+            }
+
             /**
              * @var Equipments $eq
              */

@@ -5,6 +5,7 @@
 
 namespace app\components\hire;
 
+use app\components\Clients\ClientsClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -404,12 +405,12 @@ class HireClass
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = strtolower($like);
             $like = '%' . $like . '%';
-            $listFilter[] = 'lower(equipments.model) like :like';
+            $listFilter[] = 'lower(equipments.model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
             $params[':like'] = $like;
         }
 
         if (!empty($listFilter)) {
-            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments','equipments.mark0','equipments.type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->orderBy('id desc')->all();
         }
@@ -445,6 +446,9 @@ class HireClass
 
             $date_cr = date('Y-m-d');
 
+            /**
+             * @var ApplicationPay $checkPay
+             */
             $checkPay = ApplicationPay::find()->where('application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->one();
 
             $mark = $value->equipments->mark0->name;
@@ -454,11 +458,13 @@ class HireClass
             $sale = $application->discount->name;
             $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
 
+            $client = ClientsClass::GetClientInfo($application->client_id);
+
             $result[] = [
                 'id' => $value->id,
                 'app_id' => $application->id,
                 'typeLease_id' => $application->type_lease_id,
-                'client' => $client = $application->client->name,
+                'client' => $client = $client->name,
                 'equipments' => $type . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
                 'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
@@ -473,7 +479,7 @@ class HireClass
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
-                'current_pay' => is_object($checkPay) ? 'Да' : 'Нет'
+                'current_pay' => is_object($checkPay) ? $checkPay->sum : '0'
             ];
         }
 
@@ -534,6 +540,7 @@ class HireClass
          */
 
         $sum_sale = (float)$applicationEq->sum - ((float)$applicationEq->sum * (float)$application->discount->name / 100);
+        $client = ClientsClass::GetClientInfo($application->client_id);
 
         $result = [
             'id' => $applicationEq->id,
@@ -547,8 +554,8 @@ class HireClass
             'comment' => $application->comment,
             'rent_start' => $application->rent_start,
             'rent_end' => $application->rent_end,
-            'client_fio' => $application->client->name,
-            'client_phone' => $application->client->phone,
+            'client_fio' => $client->name,
+            'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
             'sum_sale' => $sum_sale,

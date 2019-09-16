@@ -5,6 +5,7 @@
 
 namespace app\components\applications;
 
+use app\components\Clients\ClientsClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -402,93 +403,12 @@ class ApplicationsClass
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
-        if (!is_array($equipments)) {
+        if (empty($equipments)) {
             Yii::error('Нет списка оборудования', __METHOD__);
 
             return [
                 'status' => 'ERROR',
                 'msg' => 'Нет списка оборудования',
-            ];
-        }
-
-        if ($client_id === '') {
-            Yii::error('Не передан идентификатор клиента, client_id: ' . serialize($client_id), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор клиента',
-            ];
-        }
-
-        if ($typeLease === '') {
-            Yii::error('Не передан идентификатор тип аренды, typeLease: ' . serialize($typeLease), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор тип аренды',
-            ];
-        }
-
-        if ($source === '') {
-            Yii::error('Не передан источник, source: ' . serialize($source), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор источник',
-            ];
-        }
-
-        if ($sale === '') {
-            Yii::error('Не передан идентификатор скидки, sale: ' . serialize($sale), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор скидки',
-            ];
-        }
-
-        if ($rent_start === '') {
-            Yii::error('Не передана дата начала аренды, rent_start: ' . serialize($rent_start), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передана дата начала аренды',
-            ];
-        }
-
-        if ($rent_end === '') {
-            Yii::error('Не передана дата окончания аренды, rent_end: ' . serialize($rent_end), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передана дата окончания аренды',
-            ];
-        }
-
-        if ($delivery === '') {
-            Yii::error('Не указан способ доставки, delivery: ' . serialize($delivery), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не указан способ доставки',
-            ];
-        }
-
-        if ($delivery_sum === '') {
-            Yii::error('Не указана сумма доставки, delivery_sum: ' . serialize($delivery_sum), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не указана сумма доставки',
-            ];
-        }
-
-        if ($sum === '') {
-            Yii::error('Не указана сумма, sum: ' . serialize($sum), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не указана сумма',
             ];
         }
 
@@ -498,55 +418,6 @@ class ApplicationsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не указан статус',
-            ];
-        }
-
-        if ($branch === '') {
-            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор филиала',
-            ];
-        }
-
-        $check = Clients::find()->where('id=:id', [':id' => $client_id])->one();
-        if (!is_object($check)) {
-            Yii::error('Клиент не найден, client_id: ' . serialize($client_id), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Клиент не найден',
-            ];
-        }
-
-        $check = ApplicationsTypeLease::find()->where('id=:id', [':id' => $typeLease])->one();
-        if (!is_object($check)) {
-            Yii::error('Тип аренда не найден, typeLease: ' . serialize($typeLease), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Тип аренда не найден',
-            ];
-        }
-
-        $check = Discount::find()->where('id=:id', [':id' => $sale])->one();
-        if (!is_object($check)) {
-            Yii::error('Тип скидки не найден, sale: ' . serialize($sale), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Тип скидки не найден',
-            ];
-        }
-
-        $check = ApplicationsDelivery::find()->where('id=:id', [':id' => $delivery])->one();
-        if (!is_object($check)) {
-            Yii::error('Тип доставки не найден, delivery: ' . serialize($delivery), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Тип доставки не найден',
             ];
         }
 
@@ -560,16 +431,101 @@ class ApplicationsClass
             ];
         }
 
-        $check = Branch::find()->where('id=:id', [':id' => $branch])->one();
-        if (!is_object($check)) {
-            Yii::error('Филиал не найден, branch: ' . serialize($branch), __METHOD__);
+        if ($status === 1 || $status === 2) {
+            if (!is_numeric($client_id)) {
+                Yii::error('Не передан идентификатор клиента, client_id: ' . serialize($client_id), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Не передан идентификатор клиента',
+                ];
+            }
+
+            $check = Clients::find()->where('id=:id', [':id' => $client_id])->one();
+            if (!is_object($check)) {
+                Yii::error('Клиент не найден, client_id: ' . serialize($client_id), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Клиент не найден',
+                ];
+            }
+
+            if (!is_numeric($typeLease)) {
+                Yii::error('Не передан идентификатор тип аренды, typeLease: ' . serialize($typeLease), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Не передан идентификатор тип аренды',
+                ];
+            }
+
+            $check = ApplicationsTypeLease::find()->where('id=:id', [':id' => $typeLease])->one();
+            if (!is_object($check)) {
+                Yii::error('Тип аренда не найден, typeLease: ' . serialize($typeLease), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Тип аренда не найден',
+                ];
+            }
+
+            if ($rent_start === '') {
+                Yii::error('Не передана дата начала аренды, rent_start: ' . serialize($rent_start), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Не передана дата начала аренды',
+                ];
+            }
+
+            if ($rent_end === '') {
+                Yii::error('Не передана дата окончания аренды, rent_end: ' . serialize($rent_end), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Не передана дата окончания аренды',
+                ];
+            }
+        }
+
+        if (!is_numeric($delivery)) {
+            Yii::error('Не указан способ доставки, delivery: ' . serialize($delivery), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Филиал не найден',
+                'msg' => 'Не указан способ доставки',
             ];
         }
 
+        $check = ApplicationsDelivery::find()->where('id=:id', [':id' => $delivery])->one();
+        if (!is_object($check)) {
+            Yii::error('Тип доставки не найден, delivery: ' . serialize($delivery), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Тип доставки не найден',
+            ];
+        }
+
+        if ($delivery_sum === '') {
+            Yii::error('Не указана сумма доставки, delivery_sum: ' . serialize($delivery_sum), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана сумма доставки',
+            ];
+        }
+
+
+        if (!is_numeric($source)) {
+            Yii::error('Не передан источник, source: ' . serialize($source), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор источник',
+            ];
+        }
         $check = Source::find()->where('id=:id', [':id' => $source])->one();
         if (!is_object($check)) {
             Yii::error('Источник не найден, source: ' . serialize($source), __METHOD__);
@@ -580,6 +536,52 @@ class ApplicationsClass
             ];
         }
 
+        if (!is_numeric($sale)) {
+            Yii::error('Не передан идентификатор скидки, sale: ' . serialize($sale), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор скидки',
+            ];
+        }
+
+        $check = Discount::find()->where('id=:id', [':id' => $sale])->one();
+        if (!is_object($check)) {
+            Yii::error('Тип скидки не найден, sale: ' . serialize($sale), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Тип скидки не найден',
+            ];
+        }
+
+        if ($sum === '') {
+            Yii::error('Не указана сумма, sum: ' . serialize($sum), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана сумма',
+            ];
+        }
+
+        if (!is_numeric($branch)) {
+            Yii::error('Не передан идентификатор филиала, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор филиала',
+            ];
+        }
+        $check = Branch::find()->where('id=:id', [':id' => $branch])->one();
+        if (!is_object($check)) {
+            Yii::error('Филиал не найден, branch: ' . serialize($branch), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Филиал не найден',
+            ];
+        }
+
         /**
          * @var Sessions $Sessions
          */
@@ -587,7 +589,7 @@ class ApplicationsClass
         $session = $Sessions->getSession();
 
         $newApplications = new Applications();
-        $newApplications->client_id = $client_id;
+        $newApplications->client_id = $client_id || 0;
         $newApplications->user_id = $session->user_id;
         $newApplications->source_id = $source;
         $newApplications->discount_id = $sale;
@@ -751,6 +753,8 @@ class ApplicationsClass
          * @var Applications $application
          */
 
+        $client = ClientsClass::GetClientInfo($application->client_id);
+
         $result = [
             'id' => $application->id,
             'branch' => $application->branch->name,
@@ -761,9 +765,9 @@ class ApplicationsClass
             'comment' => $application->comment,
             'rent_start' => date('Y-m-d', strtotime($application->rent_start)),
             'rent_end' => date('Y-m-d', strtotime($application->rent_end)),
-            'client_id' => $application->client->id,
-            'client_fio' => $application->client->name,
-            'client_phone' => $application->client->phone,
+            'client_id' => $client->id,
+            'client_fio' => $client->name,
+            'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
             'pay_list' => $arrPay
@@ -886,6 +890,7 @@ class ApplicationsClass
                 $mark = $equipments->equipments->mark0->name;
                 $model = $equipments->equipments->model;
                 $category = $equipments->equipments->category->name;
+                $client = ClientsClass::GetClientInfo($application->client_id);
 
                 $result[] = [
                     'id' => $application->id,
@@ -894,8 +899,8 @@ class ApplicationsClass
                     'equipments_count' => $equipments->equipments_count,
                     'status' => $equipments->status_id,
                     'color' => $equipments->status->color,
-                    'client' => $application->client->name,
-                    'phone' => $application->client->phone,
+                    'client' => $client->name,
+                    'phone' => $client->phone,
                     'typeLease' => $application->typeLease->name,
                     'source' => $application->source->name,
                     'comment' => $application->comment,
