@@ -14,7 +14,7 @@ class m190916_150428_fix_table extends Migration
     {
         $this->execute("ALTER TABLE `extension` 
 ADD COLUMN `application_equipment_id` INT(11) NOT NULL AFTER `user_id`,
-ADD INDEX `rty_2_idx` (`application_equipment_id` ASC) VISIBLE;
+ADD INDEX `rty_2_idx` (`application_equipment_id` ASC);
 ;
 ALTER TABLE `extension` 
 ADD CONSTRAINT `rty_2`

@@ -18,7 +18,7 @@ class m190916_145944_fix_table extends Migration
   `count` VARCHAR(45) NOT NULL,
   `user_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `rty_idx` (`user_id` ASC) VISIBLE,
+  INDEX `rty_idx` (`user_id` ASC),
   CONSTRAINT `rty`
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`id`)
