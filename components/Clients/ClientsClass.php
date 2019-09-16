@@ -231,7 +231,7 @@ class ClientsClass
         $newClientInfo->sale = $sale;
         $newClientInfo->inn = $inn;
         $newClientInfo->kpp = $kpp;
-        $newClientInfo->name_chief = $name_chief;
+        $newClientInfo->name_chief = $newClient->type === 2 ? $name_chief : '';
         $newClientInfo->phone_chief = $phone_3;
         $newClientInfo->phone_second = $phone_2;
         $newClientInfo->number_passport = $number_passport;
@@ -645,7 +645,7 @@ class ClientsClass
 
                 $result[] = [
                     'id' => $value->id,
-                    'fio' => $value->type === 1 ? $value->name : '',
+                    'fio' => $value->type === 1 ? $value->name : $value->clientsInfos[0]->name_chief,
                     'org' => $value->type === 2 ? $value->name : '',
                     'type' => $value->type,
                     'phone' => $value->phone,
