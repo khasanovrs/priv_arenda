@@ -185,8 +185,9 @@ class EquipmentsClass
 
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $like = mb_strtolower($like);
             $like = '%' . $like . '%';
-            $listFilter[] = 'lower(model) like :like or lower(equipments_mark.name) like :like';
+            $listFilter[] = 'lower(model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
             $params[':like'] = strtolower($like);
         }
 
@@ -318,7 +319,7 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->joinWith('mark0')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $equipmentsTypeList = Equipments::find()->orderBy('id desc')->all();
         }
@@ -850,9 +851,10 @@ class EquipmentsClass
      * @param $frequency_hits
      * @param $photo
      * @param $photo_alias
+     * @param $comment
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -948,6 +950,7 @@ class EquipmentsClass
         $newEquipmentsInfo->length = $length;
         $newEquipmentsInfo->network_cord = $network_cord;
         $newEquipmentsInfo->power = $power;
+        $newEquipmentsInfo->comment = $comment;
         $newEquipmentsInfo->frequency_hits = $frequency_hits;
 
         try {

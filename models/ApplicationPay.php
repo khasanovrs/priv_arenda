@@ -16,6 +16,7 @@ use Yii;
  *
  * @property ApplicationEquipment $applicationEquipment
  * @property Users $user
+ * @property FinanceCashbox $cashBox0
  */
 class ApplicationPay extends \yii\db\ActiveRecord
 {
@@ -39,6 +40,7 @@ class ApplicationPay extends \yii\db\ActiveRecord
             [['sum'], 'number'],
             [['application_equipment_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationEquipment::className(), 'targetAttribute' => ['application_equipment_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['cashBox'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceCashbox::className(), 'targetAttribute' => ['cashBox' => 'id']],
         ];
     }
 
@@ -71,5 +73,13 @@ class ApplicationPay extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCashBox0()
+    {
+        return $this->hasOne(FinanceCashbox::className(), ['id' => 'cashBox']);
     }
 }

@@ -14,6 +14,7 @@ use Yii;
  * @property string $network_cord СЕТЕВОЙ ШНУР
  * @property string $power мощность
  * @property string $frequency_hits ЧАСТОТА УДАРОВ
+ * @property string $comment
  *
  * @property Equipments $equipments
  */
@@ -36,6 +37,7 @@ class EquipmentsInfo extends \yii\db\ActiveRecord
             [['equipments_id'], 'required'],
             [['equipments_id'], 'integer'],
             [['power_energy', 'length', 'network_cord', 'power', 'frequency_hits'], 'string', 'max' => 150],
+            [['comment'], 'string', 'max' => 500],
             [['equipments_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['equipments_id' => 'id']],
         ];
     }
@@ -53,6 +55,7 @@ class EquipmentsInfo extends \yii\db\ActiveRecord
             'network_cord' => 'Network Cord',
             'power' => 'Power',
             'frequency_hits' => 'Frequency Hits',
+            'comment' => 'Comment',
         ];
     }
 
