@@ -22,7 +22,6 @@ use Yii;
  * @property string $date_end
  *
  * @property ApplicationEquipment[] $applicationEquipments
- * @property Clients $client
  * @property Source $source
  * @property Discount $discount
  * @property ApplicationsDelivery $delivery
@@ -46,11 +45,10 @@ class Applications extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
             [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'integer'],
+            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
             [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment'], 'string', 'max' => 500],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
             [['delivery_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsDelivery::className(), 'targetAttribute' => ['delivery_id' => 'id']],
@@ -88,14 +86,6 @@ class Applications extends \yii\db\ActiveRecord
     public function getApplicationEquipments()
     {
         return $this->hasMany(ApplicationEquipment::className(), ['application_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getClient()
-    {
-        return $this->hasOne(Clients::className(), ['id' => 'client_id']);
     }
 
     /**

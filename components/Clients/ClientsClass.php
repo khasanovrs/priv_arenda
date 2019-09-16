@@ -864,7 +864,7 @@ class ClientsClass
      * @param $like
      * @return bool|array
      */
-    public static function  GetSearchClient($like)
+    public static function GetSearchClient($like)
     {
         Yii::info('Запуск функции GetSearchClient', __METHOD__);
 
@@ -965,5 +965,30 @@ class ClientsClass
         ];
     }
 
+    /**
+     * Получение списка всех клиентов
+     * @param $client_id
+     * @return Clients
+     */
+    public static function GetClientInfo($client_id)
+    {
+        Yii::info('Запуск функции GetClientInfo', __METHOD__);
 
+        /**
+         * @var Clients $client
+         */
+        $client = Clients::find()->where('id=:id', [':id' => $client_id])->one();
+
+        Yii::info('Клиенты успешно получены', __METHOD__);
+
+        if (!is_object($client)) {
+            $client = (object)[
+                'id' => '',
+                'phone' => '',
+                'name' => ''
+            ];
+        }
+
+        return $client;
+    }
 }

@@ -5,6 +5,7 @@
 
 namespace app\components\hire;
 
+use app\components\Clients\ClientsClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -454,11 +455,13 @@ class HireClass
             $sale = $application->discount->name;
             $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
 
+            $client = ClientsClass::GetClientInfo($application->client_id);
+
             $result[] = [
                 'id' => $value->id,
                 'app_id' => $application->id,
                 'typeLease_id' => $application->type_lease_id,
-                'client' => $client = $application->client->name,
+                'client' => $client = $client->name,
                 'equipments' => $type . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
                 'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
@@ -534,6 +537,7 @@ class HireClass
          */
 
         $sum_sale = (float)$applicationEq->sum - ((float)$applicationEq->sum * (float)$application->discount->name / 100);
+        $client = ClientsClass::GetClientInfo($application->client_id);
 
         $result = [
             'id' => $applicationEq->id,
@@ -547,8 +551,8 @@ class HireClass
             'comment' => $application->comment,
             'rent_start' => $application->rent_start,
             'rent_end' => $application->rent_end,
-            'client_fio' => $application->client->name,
-            'client_phone' => $application->client->phone,
+            'client_fio' => $client->name,
+            'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
             'sum_sale' => $sum_sale,
