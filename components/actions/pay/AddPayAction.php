@@ -38,27 +38,11 @@ class AddPayAction extends Action
             ];
         }
 
-        $result = PayClass::getPayList($eq_id);
-
-        if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при получении платежей', __METHOD__);
-
-            if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
-                return $result;
-            }
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при добавлении платежа',
-            ];
-        }
-
         Yii::info('Платеж успешно добавлен', __METHOD__);
 
         return [
             'status' => 'OK',
             'msg' => 'Платеж успешно добавлен',
-            'data' => $result['data']
         ];
     }
 }
