@@ -69,7 +69,7 @@ class PayClass
         $newPay = new ApplicationPay();
 
         $newPay->user_id = $session->user_id;
-        $newPay->sum = $revertSum ? '-' . $sum : '';
+        $newPay->sum = ($revertSum ? '-' : '') . $sum;
         $newPay->cashBox = $cashBox;
         $newPay->application_equipment_id = $application_equipment_id;
         $newPay->date_create = date('Y-m-d H:i:s');
@@ -96,7 +96,7 @@ class PayClass
             return false;
         }
 
-        if($revertSum) {
+        if ($revertSum) {
             $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
         } else {
             $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
