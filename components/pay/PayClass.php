@@ -16,10 +16,11 @@ class PayClass
      * @param $sum
      * @param $application_equipment_id
      * @param $cashBox
+     * @param $revertSum
      * @return array | bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddPay($application_equipment_id, $sum, $cashBox)
+    public static function AddPay($application_equipment_id, $sum, $cashBox, $revertSum)
     {
         Yii::info('Запуск функции AddPay', __METHOD__);
 
@@ -68,7 +69,7 @@ class PayClass
         $newPay = new ApplicationPay();
 
         $newPay->user_id = $session->user_id;
-        $newPay->sum = $sum;
+        $newPay->sum = $revertSum ? '-' . $sum : '';
         $newPay->cashBox = $cashBox;
         $newPay->application_equipment_id = $application_equipment_id;
         $newPay->date_create = date('Y-m-d H:i:s');
@@ -95,7 +96,12 @@ class PayClass
             return false;
         }
 
-        $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
+        if($revertSum) {
+            $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
+        } else {
+            $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
+        }
+
 
         try {
             if (!$app_eq->save(false)) {
