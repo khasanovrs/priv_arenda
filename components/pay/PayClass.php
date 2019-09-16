@@ -8,6 +8,7 @@ namespace app\components\pay;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
+use app\models\Extension;
 use Yii;
 
 class PayClass
@@ -159,6 +160,61 @@ class PayClass
             'status' => 'SUCCESS',
             'msg' => 'Платежи успешно получены',
             'data' => $pay_list
+        ];
+    }
+
+    /**
+     * Получение списка продлений
+     * @param $application_equipment_id
+     * @return array
+     */
+    public static function getExtensions($application_equipment_id)
+    {
+        Yii::info('Запуск функции getExtensions', __METHOD__);
+
+        if ($application_equipment_id === '') {
+            Yii::error('Не указана идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не указана идентификатор заявки'
+            ];
+        }
+
+        $extension_list = [];
+
+        $extensions_arr = Extension::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->orderBy('id desc')->all();
+
+        if (empty($extensions_arr)) {
+            Yii::info('Платежей нет', __METHOD__);
+        } else {
+            /**
+             * @var Extension $value
+             */
+            foreach ($extensions_arr as $value) {
+
+                if ($value->type == 1) {
+                    $txt = 'дней: ';
+                } else {
+                    $txt = 'месяцев: ';
+                }
+
+                $arr = [
+                    'date' => date('d.m.Y H:i', strtotime($value->date_create)),
+                    'user_id' => $value->user->fio,
+                    'count' => $txt . $value->count
+                ];
+
+                array_push($extension_list, $arr);
+            }
+        }
+
+        Yii::info('Продления успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Продленич успешно получены',
+            'data' => $extension_list
         ];
     }
 

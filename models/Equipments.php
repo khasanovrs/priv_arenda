@@ -56,7 +56,7 @@ class Equipments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
+            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'required'],
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],

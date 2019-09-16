@@ -24,6 +24,7 @@ use Yii;
  * @property BunchUserRight[] $bunchUserRights
  * @property ClientShowField[] $clientShowFields
  * @property EquipmentsShowField[] $equipmentsShowFields
+ * @property Extension[] $extensions
  * @property FinanceShowField[] $financeShowFields
  * @property HireShowField[] $hireShowFields
  * @property Session[] $sessions
@@ -123,6 +124,14 @@ class Users extends \yii\db\ActiveRecord
     public function getEquipmentsShowFields()
     {
         return $this->hasMany(EquipmentsShowField::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExtensions()
+    {
+        return $this->hasMany(Extension::className(), ['user_id' => 'id']);
     }
 
     /**

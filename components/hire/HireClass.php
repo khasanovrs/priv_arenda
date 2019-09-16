@@ -13,6 +13,7 @@ use app\models\ApplicationPay;
 use app\models\Applications;
 use app\models\Equipments;
 use app\models\EquipmentsStatus;
+use app\models\Extension;
 use app\models\HireField;
 use app\models\HireShowField;
 use app\models\HireState;
@@ -410,7 +411,7 @@ class HireClass
         }
 
         if (!empty($listFilter)) {
-            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments','equipments.mark0','equipments.type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->orderBy('id desc')->all();
         }
@@ -592,7 +593,22 @@ class HireClass
             ];
         }
 
-        $result['pay_list'] = $pay_list['data'];
+        $pay_list = PayClass::getExtensions($applicationEq->id);
+
+        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении продлений', __METHOD__);
+
+            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
+                return $pay_list;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении продлений',
+            ];
+        }
+
+        $result['extensions'] = $pay_list['data'];
 
         Yii::info('Заявка успешно получена', __METHOD__);
 
@@ -666,8 +682,8 @@ class HireClass
 
         $app->discount_id = $sale;
         $app->delivery_id = $delivery;
-        $app->rent_start = date('Y-m-d H:i:s',strtotime($rent_start));
-        $app->rent_end = date('Y-m-d H:i:s',strtotime($rent_end));
+        $app->rent_start = date('Y-m-d H:i:s', strtotime($rent_start));
+        $app->rent_end = date('Y-m-d H:i:s', strtotime($rent_end));
 
         try {
             if (!$app->save(false)) {
@@ -688,11 +704,11 @@ class HireClass
     }
 
     /**
-     * Функция прлдения проката
-     * @param $app_id
      * @param $app_eq_id
+     * @param $app_id
      * @param $count
      * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
     public static function ExtendRental($app_eq_id, $app_id, $count)
     {
@@ -806,6 +822,39 @@ class HireClass
             Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        $extension = new Extension();
+        $extension->count = $count;
+        $extension->date_create = date('Y-m-d H:i:s');
+        $extension->user_id = $session->user_id;
+        $extension->type = $app_eq->application->type_lease_id;
+        $extension->application_equipment_id = $app_eq->id;
+
+        try {
+            if (!$extension->save(false)) {
+                Yii::error('Ошибка при сохранении продления: ' . serialize($extension->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении продления: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
 
         Yii::info('Заявка успешно изменена', __METHOD__);
 

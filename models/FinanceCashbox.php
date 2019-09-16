@@ -11,7 +11,6 @@ use Yii;
  * @property string $name Наименование категории
  * @property string $sum
  *
- * @property ApplicationPay[] $applicationPays
  * @property Finance[] $finances
  */
 class FinanceCashbox extends \yii\db\ActiveRecord
@@ -46,14 +45,6 @@ class FinanceCashbox extends \yii\db\ActiveRecord
             'name' => 'Name',
             'sum' => 'Sum',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getApplicationPays()
-    {
-        return $this->hasMany(ApplicationPay::className(), ['cashBox' => 'id']);
     }
 
     /**
