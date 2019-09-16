@@ -14,7 +14,7 @@ class m190915_112929_fix_app_pay extends Migration
     {
 $this->execute("ALTER TABLE `application_pay` 
 ADD COLUMN `cashBox` int(10) NOT NULL DEFAULT '1' AFTER `date_create`,
-ADD INDEX `fk_application_pay_3_idx` (`cashBox` ASC) VISIBLE;
+ADD INDEX `fk_application_pay_3_idx` (`cashBox` ASC) VISIBLE
 ALTER TABLE `application_pay` 
 ADD CONSTRAINT `fk_application_pay_3`
   FOREIGN KEY (`cashBox`)
