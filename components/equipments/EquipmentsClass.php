@@ -356,7 +356,8 @@ class EquipmentsClass
                 'profit' => $value->profit,
                 'degree_wear' => $value->degree_wear,
                 'payback_ratio' => $value->payback_ratio,
-                'date_create' => $value->date_create
+                'date_create' => $value->date_create,
+                'comment' => $value->equipmentsInfos[0]->comment
             ];
         }
 
@@ -615,6 +616,7 @@ class EquipmentsClass
             'network_cord' => $equipment->equipmentsInfos[0]->network_cord,
             'power' => $equipment->equipmentsInfos[0]->power,
             'frequency_hits' => $equipment->equipmentsInfos[0]->frequency_hits,
+            'comment' => $equipment->equipmentsInfos[0]->comment,
         ];
 
         Yii::info('Информация об оборудовании получено', __METHOD__);
