@@ -6,6 +6,8 @@
 namespace app\components\Clients;
 
 use app\components\Session\Sessions;
+use app\models\ApplicationPay;
+use app\models\Applications;
 use app\models\Branch;
 use app\models\ClientField;
 use app\models\ClientFiz;
@@ -20,6 +22,7 @@ use app\models\ClientUrInfo;
 use app\models\Discount;
 use app\models\ShowFieldClient;
 use app\models\Source;
+use Codeception\Application;
 use Yii;
 
 class ClientsClass
@@ -831,6 +834,40 @@ class ClientsClass
         $discount = $client->clientsInfos[0]->sale0;
         $branch = $client->branch;
         $status = $client->status0;
+        $all_total_paid = 0;
+        $pay_list = [];
+        $application_list = [];
+
+        $application_listArr = Applications::find()->where('client_id=:user_id', [':user_id' => $client->id])->all();
+
+        if (!empty($application_listArr)) {
+            /**
+             * @var Applications $value
+             */
+            foreach ($application_listArr as $value) {
+                foreach ($value->applicationEquipments as $value_2) {
+                    $application_list[] = [
+                        'rent_start' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
+                        'rent_end' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
+                        'sum' => $value_2->sum,
+                        'total_paid' => $value_2->total_paid,
+                        'equipments' => $value_2->equipments->type0->name . ' ' . $value_2->equipments->mark0->name . ' ' . $value_2->equipments->model
+                    ];
+
+                    foreach ($value_2->applicationPays as $value3) {
+                        $pay_list[] = [
+                            'sum' => $value3->sum,
+                            'date' => date('d.m.Y H:i:s', strtotime($value3->date_create)),
+                            'equipments' => $value_2->equipments->type0->name . ' ' . $value_2->equipments->mark0->name . ' ' . $value_2->equipments->model,
+                            'cashBox' => $value3->cashBox0->name
+                        ];
+                    }
+
+
+                    $all_total_paid += (float)$value_2->total_paid;
+                }
+            }
+        }
 
         $result = [
             'id' => $client->id,
@@ -848,6 +885,10 @@ class ClientsClass
             'phone_3' => $client->clientsInfos[0]->phone_chief,
             'phone_2' => $client->clientsInfos[0]->phone_second,
             'phone' => $client->phone,
+            'count_application' => count($application_list),
+            'all_total_paid' => $all_total_paid,
+            'application_list' => $application_list,
+            'pay_list' => $pay_list,
         ];
 
         Yii::info('Информация по клиенту успешно получена', __METHOD__);

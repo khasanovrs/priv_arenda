@@ -406,12 +406,12 @@ class HireClass
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = strtolower($like);
             $like = '%' . $like . '%';
-            $listFilter[] = 'lower(equipments.model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
+            $listFilter[] = ' lower(clients.name) like :like or lower(equipments.model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
             $params[':like'] = $like;
         }
 
         if (!empty($listFilter)) {
-            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->orderBy('id desc')->all();
         }
