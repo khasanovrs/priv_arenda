@@ -834,14 +834,13 @@ class ClientsClass
         $discount = $client->clientsInfos[0]->sale0;
         $branch = $client->branch;
         $status = $client->status0;
-
+        $all_total_paid = 0;
         $pay_list = [];
         $application_list = [];
 
         $application_listArr = Applications::find()->where('client_id=:user_id', [':user_id' => $client->id])->all();
 
         if (!empty($application_listArr)) {
-
             /**
              * @var Applications $value
              */
@@ -856,6 +855,18 @@ class ClientsClass
                         'total_paid' => $value_2->total_paid,
                         'equipments' => $equipments->type0->name . ' ' . $equipments->mark0->name . ' ' . $equipments->model
                     ];
+
+                    foreach ($value_2->applicationPays as $value3) {
+                        $pay_list[] = [
+                            'sum' => $value3->sum,
+                            'date' => date('d.m.Y H:i:s', strtotime($value3->date_create)),
+                            'equipments' => $equipments->type0->name . ' ' . $equipments->mark0->name . ' ' . $equipments->model,
+                            'cashBox' => $value3->cashBox0->name
+                        ];
+                    }
+
+
+                    $all_total_paid += (float)$value_2->total_paid;
                 }
             }
         }
@@ -876,7 +887,10 @@ class ClientsClass
             'phone_3' => $client->clientsInfos[0]->phone_chief,
             'phone_2' => $client->clientsInfos[0]->phone_second,
             'phone' => $client->phone,
-            'application_list' => $application_list
+            'count_application' => count($application_list),
+            'all_total_paid' => $all_total_paid,
+            'application_list' => $application_list,
+            'pay_list' => $pay_list,
         ];
 
         Yii::info('Информация по клиенту успешно получена', __METHOD__);
