@@ -183,15 +183,6 @@ class EquipmentsClass
             $params[':status'] = $status;
         }
 
-        if ($like !== '' and $like !== null) {
-            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
-            $like = mb_strtolower($like);
-            $like = '%' . $like . '%';
-            $listFilter[] = 'lower(model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
-            $params[':like'] = strtolower($like);
-        }
-
-
         if ($stock !== '' and $stock !== null) {
             Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
             $listFilter[] = 'stock_id=:stock';
@@ -318,8 +309,16 @@ class EquipmentsClass
             $params[':degree_wear_end'] = $degree_wear_end;
         }
 
+        if ($like !== '' and $like !== null) {
+            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $like = mb_strtolower($like);
+            $like = '%' . $like . '%';
+            $listFilter[] = 'lower(model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like or lower(equipments_category.name) like :like';
+            $params[':like'] = strtolower($like);
+        }
+
         if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0','category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $equipmentsTypeList = Equipments::find()->orderBy('id desc')->all();
         }
