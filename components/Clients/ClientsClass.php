@@ -6,6 +6,7 @@
 namespace app\components\Clients;
 
 use app\components\Session\Sessions;
+use app\models\ApplicationPay;
 use app\models\Branch;
 use app\models\ClientField;
 use app\models\ClientFiz;
@@ -832,6 +833,27 @@ class ClientsClass
         $branch = $client->branch;
         $status = $client->status0;
 
+        $pay_list = [];
+        $pay_list_arr = ApplicationPay::find()->where('user_id=:user_id', [':user_id' => $client->id])->all();
+
+        if (!empty($pay_list_arr)) {
+
+            /**
+             * @var ApplicationPay $value
+             */
+            foreach ($pay_list_arr as $value) {
+                $equipments = $value->applicationEquipment->equipments;
+
+                $pay_list[] = [
+                    'date' => date('d.m.Y H:i:s', strtotime($value->date_create)),
+                    'sum' => $value->sum,
+                    'cashBox' => $value->cashBox0->name,
+                    'equipment' => $equipments->type0->name . ' ' . $equipments->mark0->name . ' ' . $equipments->model,
+                    'app_id' => $value->applicationEquipment->application_id
+                ];
+            }
+        }
+
         $result = [
             'id' => $client->id,
             'sale' => $discount->id,
@@ -848,6 +870,7 @@ class ClientsClass
             'phone_3' => $client->clientsInfos[0]->phone_chief,
             'phone_2' => $client->clientsInfos[0]->phone_second,
             'phone' => $client->phone,
+            'pay_list' => $pay_list
         ];
 
         Yii::info('Информация по клиенту успешно получена', __METHOD__);
