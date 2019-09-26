@@ -845,22 +845,20 @@ class ClientsClass
              * @var Applications $value
              */
             foreach ($application_listArr as $value) {
-                $equipments = $value->applicationEquipments[0]->equipments;
-
                 foreach ($value->applicationEquipments as $value_2) {
                     $application_list[] = [
                         'rent_start' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
                         'rent_end' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
                         'sum' => $value_2->sum,
                         'total_paid' => $value_2->total_paid,
-                        'equipments' => $equipments->type0->name . ' ' . $equipments->mark0->name . ' ' . $equipments->model
+                        'equipments' => $value_2->equipments->type0->name . ' ' . $value_2->equipments->mark0->name . ' ' . $value_2->equipments->model
                     ];
 
                     foreach ($value_2->applicationPays as $value3) {
                         $pay_list[] = [
                             'sum' => $value3->sum,
                             'date' => date('d.m.Y H:i:s', strtotime($value3->date_create)),
-                            'equipments' => $equipments->type0->name . ' ' . $equipments->mark0->name . ' ' . $equipments->model,
+                            'equipments' => $value_2->equipments->type0->name . ' ' . $value_2->equipments->mark0->name . ' ' . $value_2->equipments->model,
                             'cashBox' => $value3->cashBox0->name
                         ];
                     }
