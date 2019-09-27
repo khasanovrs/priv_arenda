@@ -17,6 +17,7 @@ use app\models\ClientShowField;
 use app\models\ClientsInfo;
 use app\models\ClientSource;
 use app\models\ClientStatus;
+use app\models\ClientStatusChange;
 use app\models\ClientUr;
 use app\models\ClientUrInfo;
 use app\models\Discount;
@@ -30,23 +31,26 @@ class ClientsClass
     /**
      * Добавление нового клиента
      * @param $clientId
-     * @param $sale ,
-     * @param $name ,
-     * @param $branch ,
-     * @param $status ,
-     * @param $source ,
-     * @param $inn ,
-     * @param $kpp ,
-     * @param $name_chief ,
-     * @param $fio ,
-     * @param $phone_1 ,
-     * @param $phone_2 ,
-     * @param $phone_3 ,
-     * @param $email ,
+     * @param $name
+     * @param $sale
+     * @param $branch
+     * @param $new_status
+     * @param $old_status
+     * @param $reason_change_status
+     * @param $source
+     * @param $inn
+     * @param $kpp
+     * @param $name_chief
+     * @param $fio
+     * @param $phone_1
+     * @param $phone_2
+     * @param $phone_3
+     * @param $email
      * @param $number_passport
-     * @return bool|array
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
-    public static function AddClient($clientId, $name, $sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
+    public static function AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -65,15 +69,6 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор филиала'
-            ];
-        }
-
-        if ($status === '') {
-            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор статуса',
             ];
         }
 
@@ -133,17 +128,6 @@ class ClientsClass
             ];
         }
 
-        $check_status = ClientStatus::find()->where('id=:id', [':id' => $status])->one();
-
-        if (!is_object($check_status)) {
-            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
-            ];
-        }
-
         $check_source = Source::find()->where('id=:id', [':id' => $source])->one();
 
         if (!is_object($check_source)) {
@@ -174,7 +158,30 @@ class ClientsClass
         if ($clientId === '') {
             Yii::info('Создание нового клиента', __METHOD__);
 
+            if ($new_status === '') {
+                Yii::error('Не передан идентификатор статуса, status: ' . serialize($new_status), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Не передан идентификатор статуса',
+                ];
+            }
+
+
+            $check_status = ClientStatus::find()->where('id=:id', [':id' => $new_status])->one();
+
+            if (!is_object($check_status)) {
+                Yii::error('Передан некорректный статус, status:' . serialize($new_status), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный статус',
+                ];
+            }
+
             $newClient = new Clients();
+
+            $newClient->status = $new_status;
         } else {
             Yii::info('Обновление информациии о клиенте', __METHOD__);
 
@@ -191,12 +198,26 @@ class ClientsClass
                     'msg' => 'Клиент не найден',
                 ];
             }
+
+            $resultChange = self::UpdateStatusClientUr($clientId, $old_status, $new_status, $reason_change_status);
+
+            if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменения статуса юр.клиента', __METHOD__);
+
+                if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
+                    return $resultChange;
+                }
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменения статуса клиента',
+                ];
+            }
         }
 
         $newClient->name = $fio === '' ? $name : $fio;
         $newClient->type = $fio === '' ? 2 : 1;
         $newClient->phone = $phone_1;
-        $newClient->status = $status;
         $newClient->branch_id = $branch;
         $newClient->last_contact = date('Y-m-d H:i:s');
         $newClient->date_create = date('Y-m-d H:i:s');
@@ -268,23 +289,27 @@ class ClientsClass
 
     /**
      * Добавление нового клиента
-     * @param $clientId ,
-     * @param $sale ,
-     * @param $branch ,
-     * @param $status ,
-     * @param $source ,
-     * @param $inn ,
-     * @param $kpp ,
-     * @param $name_chief ,
-     * @param $fio ,
-     * @param $phone_1 ,
-     * @param $phone_2 ,
-     * @param $phone_3 ,
-     * @param $email ,
+     * @param $clientId
+     * @param $sale
+     * @param $branch
+     * @param $new_status
+     * @param $old_status
+     * @param $reason_change_status
+     * @param $source
+     * @param $inn
+     * @param $kpp
+     * @param $name_chief
+     * @param $fio
+     * @param $phone_1
+     * @param $phone_2
+     * @param $phone_3
+     * @param $email
      * @param $number_passport
-     * @return bool|array
+     * @param $name
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
-    public static function UpdateClientInfo($clientId, $sale, $branch, $status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
+    public static function UpdateClientInfo($clientId, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport, $name)
     {
         Yii::info('Запуск функции изменений детальной информации клиента', __METHOD__);
 
@@ -312,15 +337,6 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор филиала'
-            ];
-        }
-
-        if ($status === '') {
-            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор статуса',
             ];
         }
 
@@ -380,17 +396,6 @@ class ClientsClass
             ];
         }
 
-        $check_status = ClientStatus::find()->where('id=:id', [':id' => $status])->one();
-
-        if (!is_object($check_status)) {
-            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
-            ];
-        }
-
         $check_source = Source::find()->where('id=:id', [':id' => $source])->one();
 
         if (!is_object($check_source)) {
@@ -420,7 +425,6 @@ class ClientsClass
 
         $clients->name = $name === '' ? $fio : $name;
         $clients->phone = $phone_1;
-        $clients->status = $status;
         $clients->branch_id = $branch;
 
         try {
@@ -468,6 +472,25 @@ class ClientsClass
             return false;
         }
 
+        if ($old_status !== $new_status) {
+            Yii::info('Надо обновить статус', __METHOD__);
+
+            $resultChange = self::UpdateStatusClientUr($clientId, $old_status, $new_status, $reason_change_status);
+
+            if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменения статуса юр.клиента', __METHOD__);
+
+                if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
+                    return $resultChange;
+                }
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменения статуса клиента',
+                ];
+            }
+        }
+
         Yii::info('Клиент успешно обновлен', __METHOD__);
 
         return [
@@ -477,37 +500,48 @@ class ClientsClass
     }
 
     /**
-     * Изменение статуса юр. клиента
      * @param $id
-     * @param $status
-     * @return bool|array
+     * @param $old_status
+     * @param $new_status
+     * @param $text
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
-    public static function UpdateStatusClientUr($id, $status)
+    public static function UpdateStatusClientUr($id, $old_status, $new_status, $text)
     {
         Yii::info('Запуск функции UpdateStatusClientUr', __METHOD__);
 
-        if ($id === '' || !is_int($status)) {
-            Yii::error('Не передан идентификтор организации, id: ' . serialize($id), __METHOD__);
+        if ($id === '') {
+            Yii::error('Не передан идентификтор клиента, id: ' . serialize($id), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Не передан идентификтор организации',
+                'msg' => 'Не передан идентификтор клиента',
             ];
         }
 
-        if ($status === '' || !is_int($status)) {
-            Yii::error('Передан некорректный статус, status: ' . serialize($status), __METHOD__);
+        if ($old_status === '' || $new_status === '') {
+            Yii::error('Ошибка при определении статуса, old_status: ' . serialize($old_status) . ', new_status: ' . serialize($new_status), __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
+                'msg' => 'Ошибка при определении статуса',
             ];
         }
 
-        $check_status = ClientStatus::find()->where('id=:id', [':id' => $status])->one();
+        if ($text === '') {
+            Yii::error('Ошибка при определении причины смены статуса, text: ' . serialize($text), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при определении причины смены статуса',
+            ];
+        }
+
+        $check_status = ClientStatus::find()->where('id=:id', [':id' => $new_status])->one();
 
         if (!is_object($check_status)) {
-            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
+            Yii::error('Передан некорректный статус, status:' . serialize($new_status), __METHOD__);
 
             return [
                 'status' => 'ERROR',
@@ -529,7 +563,7 @@ class ClientsClass
             ];
         }
 
-        $client->status = $status;
+        $client->status = $new_status;
 
         try {
             if (!$client->save(false)) {
@@ -538,6 +572,39 @@ class ClientsClass
             }
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при обновлении статуса клиента: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        $new_record = new ClientStatusChange();
+        $new_record->client_id = $id;
+        $new_record->old_status = $old_status;
+        $new_record->new_status = $new_status;
+        $new_record->text = $text;
+        $new_record->user_id = $session->user_id;
+        $new_record->date = date('Y-m-d H:i:s');
+
+        try {
+            if (!$new_record->save(false)) {
+                Yii::error('Ошибка при добавлении записи о смене статуса клиента: ' . serialize($client->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении записи о смене статуса клиента: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
 
@@ -652,7 +719,8 @@ class ClientsClass
                     'org' => $value->type === 2 ? $value->name : '',
                     'type' => $value->type,
                     'phone' => $value->phone,
-                    'status' => $value->status,
+                    'old_status' => $value->status,
+                    'new_status' => $value->status,
                     'color' => $value->status0->color,
                     'date_create' => date('d.m.Y', strtotime($value->date_create)),
                     'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
@@ -837,6 +905,7 @@ class ClientsClass
         $all_total_paid = 0;
         $pay_list = [];
         $application_list = [];
+        $change_status_list = [];
 
         $application_listArr = Applications::find()->where('client_id=:user_id', [':user_id' => $client->id])->all();
 
@@ -869,11 +938,29 @@ class ClientsClass
             }
         }
 
+        $change_status_list_arr = $client->clientStatusChanges;
+
+        if (!empty($change_status_list_arr)) {
+            /**
+             * @var ClientStatusChange $value
+             */
+            foreach ($change_status_list_arr as $value) {
+                $change_status_list[] = [
+                    'date' => date('d.m.Y H:i:s', strtotime($value->date)),
+                    'old_status' => $value->oldStatus->name,
+                    'new_status' => $value->newStatus->name,
+                    'text' => $value->text,
+                    'user' => $value->user->fio,
+                ];
+            }
+        }
+
         $result = [
             'id' => $client->id,
             'sale' => $discount->id,
             'branch' => $branch->id,
-            'status' => $status->id,
+            'old_status' => $status->id,
+            'new_status' => $status->id,
             'source' => $sourceBD->id,
             'phone_1' => $client->phone,
             'fio' => $client->type === 1 ? $client->name : '',
@@ -889,6 +976,7 @@ class ClientsClass
             'all_total_paid' => $all_total_paid,
             'application_list' => $application_list,
             'pay_list' => $pay_list,
+            'change_status_list' => $change_status_list
         ];
 
         Yii::info('Информация по клиенту успешно получена', __METHOD__);

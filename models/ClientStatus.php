@@ -11,6 +11,8 @@ use Yii;
  * @property string $name
  * @property string $color
  *
+ * @property ClientStatusChange[] $clientStatusChanges
+ * @property ClientStatusChange[] $clientStatusChanges0
  * @property Clients[] $clients
  */
 class ClientStatus extends \yii\db\ActiveRecord
@@ -45,6 +47,22 @@ class ClientStatus extends \yii\db\ActiveRecord
             'name' => 'Name',
             'color' => 'Color',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientStatusChanges()
+    {
+        return $this->hasMany(ClientStatusChange::className(), ['old_status' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientStatusChanges0()
+    {
+        return $this->hasMany(ClientStatusChange::className(), ['new_status' => 'id']);
     }
 
     /**
