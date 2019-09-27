@@ -770,7 +770,8 @@ class ApplicationsClass
             'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
-            'pay_list' => $arrPay
+            'pay_list' => $arrPay,
+            'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
         ];
 
         $mark = $applicationEq->equipments->mark0->name;
@@ -905,6 +906,7 @@ class ApplicationsClass
                     'source' => $application->source->name,
                     'comment' => $application->comment,
                     'user' => $application->user->fio,
+                    'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 ];
             }
         }
