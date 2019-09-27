@@ -23,6 +23,7 @@ use Yii;
  * @property ApplicationsShowField[] $applicationsShowFields
  * @property BunchUserRight[] $bunchUserRights
  * @property ClientShowField[] $clientShowFields
+ * @property ClientStatusChange[] $clientStatusChanges
  * @property EquipmentsShowField[] $equipmentsShowFields
  * @property Extension[] $extensions
  * @property FinanceShowField[] $financeShowFields
@@ -116,6 +117,14 @@ class Users extends \yii\db\ActiveRecord
     public function getClientShowFields()
     {
         return $this->hasMany(ClientShowField::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientStatusChanges()
+    {
+        return $this->hasMany(ClientStatusChange::className(), ['user_id' => 'id']);
     }
 
     /**
