@@ -18,10 +18,11 @@ class EquipmentUpdateAction extends Action
         $request = Yii::$app->request;
 
         $id = $request->getBodyParam('id');
-        $status = $request->getBodyParam('status');
         $model = $request->getBodyParam('model');
         $mark = $request->getBodyParam('mark');
-        $stock = $request->getBodyParam('stock');
+        $new_stock = $request->getBodyParam('new_stock');
+        $old_stock = $request->getBodyParam('old_stock');
+        $reason_change_stock = $request->getBodyParam('reason_change_stock');
         $equipmentsType = $request->getBodyParam('equipmentsType');
         $equipmentsCategory = $request->getBodyParam('equipmentsCategory');
         $count = $request->getBodyParam('count');
@@ -43,7 +44,7 @@ class EquipmentUpdateAction extends Action
         $frequency_hits = $request->getBodyParam('frequency_hits');
         $photo_alias = $request->getBodyParam('photo_alias');
 
-        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias);
+        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении оборудования', __METHOD__);
