@@ -199,19 +199,21 @@ class ClientsClass
                 ];
             }
 
-            $resultChange = self::UpdateStatusClientUr($clientId, $old_status, $new_status, $reason_change_status);
+            if ($new_status!==$old_status) {
+                $resultChange = self::UpdateStatusClientUr($clientId, $old_status, $new_status, $reason_change_status);
 
-            if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
-                Yii::error('Ошибка при изменения статуса юр.клиента', __METHOD__);
+                if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при изменения статуса юр.клиента', __METHOD__);
 
-                if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
-                    return $resultChange;
+                    if (is_array($resultChange) && isset($resultChange['status']) && $resultChange['status'] === 'ERROR') {
+                        return $resultChange;
+                    }
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при изменения статуса клиента',
+                    ];
                 }
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при изменения статуса клиента',
-                ];
             }
         }
 

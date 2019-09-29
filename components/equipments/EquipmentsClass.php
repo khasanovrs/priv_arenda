@@ -7,12 +7,10 @@ namespace app\components\equipments;
 
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
-use app\models\Clients;
-use app\models\ClientStatus;
 use app\models\Equipments;
-use app\models\EquipmentsAvailability;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
+use app\models\EquipmentsHistory;
 use app\models\EquipmentsInfo;
 use app\models\EquipmentsMark;
 use app\models\EquipmentsShowField;
@@ -20,7 +18,6 @@ use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
 use app\models\Stock;
 use Yii;
-use yii\base\Application;
 
 class EquipmentsClass
 {
@@ -87,9 +84,26 @@ class EquipmentsClass
          * @var EquipmentsCategory $value
          */
         foreach ($equipmentsTypeList as $value) {
+
+            $type_arr = $value->equipmentsTypes;
+            $type_list = [];
+
+            if (!empty($type_arr)) {
+                /**
+                 * @var EquipmentsType $value
+                 */
+                foreach ($type_arr as $value2) {
+                    $type_list[] = [
+                        'val' => $value2->id,
+                        'name' => $value2->name
+                    ];
+                }
+            }
+
             $result[] = [
                 'val' => $value->id,
-                'name' => $value->name
+                'name' => $value->name,
+                'type' => $type_list
             ];
         }
 
@@ -318,7 +332,7 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0','category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $equipmentsTypeList = Equipments::find()->orderBy('id desc')->all();
         }
@@ -574,6 +588,9 @@ class EquipmentsClass
     {
         Yii::info('Запуск функции GetEquipmentInfo', __METHOD__);
 
+        /**
+         * @var Equipments $equipment
+         */
         $equipment = Equipments::find()->where('id=:id', [':id' => $equipmentId])->one();
 
         if (!is_object($equipment)) {
@@ -585,16 +602,30 @@ class EquipmentsClass
             ];
         }
 
-        /**
-         * @var Equipments $equipment
-         */
+        $change_history = [];
+
+        $change_history_arr = $equipment->equipmentsHistories;
+
+        if (!empty($change_history_arr)) {
+            foreach ($change_history_arr as $value) {
+                $change_history[] = [
+                    'date' => date('d.m.Y H:i:s', strtotime($value->date_create)),
+                    'new_params' => $value->new_params,
+                    'old_params' => $value->old_params,
+                    'type' => $value->typeChange->name,
+                    'reason' => $value->reason,
+                    'user' => $value->user->fio
+                ];
+            }
+        }
 
         $result = [
             'id' => $equipment->id,
             'mark' => $equipment->mark,
             'model' => $equipment->model,
             'category' => $equipment->category_id,
-            'stock' => $equipment->stock_id,
+            'new_stock' => $equipment->stock_id,
+            'old_stock' => $equipment->stock_id,
             'type' => $equipment->type,
             'discount' => $equipment->discount,
             'status' => $equipment->status0->name,
@@ -616,6 +647,7 @@ class EquipmentsClass
             'power' => $equipment->equipmentsInfos[0]->power,
             'frequency_hits' => $equipment->equipmentsInfos[0]->frequency_hits,
             'comment' => $equipment->equipmentsInfos[0]->comment,
+            'change_history' => $change_history
         ];
 
         Yii::info('Информация об оборудовании получено', __METHOD__);
@@ -1052,8 +1084,9 @@ class EquipmentsClass
      * @param $id
      * @param $model
      * @param $mark
-     * @param $status
-     * @param $stock
+     * @param $new_stock
+     * @param $old_stock
+     * @param $reason_change_stock
      * @param $equipmentsType
      * @param $equipmentsCategory
      * @param $count
@@ -1075,8 +1108,9 @@ class EquipmentsClass
      * @param $frequency_hits
      * @param $photo_alias
      * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
-    public static function changeEquipment($id, $model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias)
+    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1094,14 +1128,6 @@ class EquipmentsClass
             ];
         }
 
-        if ($status === '') {
-            Yii::error('Не передан идентификатор статуса, status: ' . serialize($status), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор статуса',
-            ];
-        }
-
         if ($discount === '') {
             Yii::error('Не передан идентификатор скидки, discount: ' . serialize($discount), __METHOD__);
             return [
@@ -1110,8 +1136,8 @@ class EquipmentsClass
             ];
         }
 
-        if ($stock === '') {
-            Yii::error('Не передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
+        if ($new_stock === '') {
+            Yii::error('Не передан идентификатор склада, stock: ' . serialize($new_stock), __METHOD__);
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор склада',
@@ -1158,6 +1184,14 @@ class EquipmentsClass
             ];
         }
 
+        if ($new_stock !== $old_stock && $reason_change_stock === '') {
+            Yii::error('Необходимо указать причину изменения склада, reason_change_stock: ' . serialize($reason_change_stock), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Необходимо указать причину изменения склада',
+            ];
+        }
+
         /**
          * @var Equipments $equipment
          */
@@ -1171,10 +1205,9 @@ class EquipmentsClass
             ];
         }
 
-        $equipment->status = $status;
         $equipment->mark = $mark;
         $equipment->model = $model;
-        $equipment->stock_id = $stock;
+        $equipment->stock_id = $new_stock;
         $equipment->type = $equipmentsType;
         $equipment->category_id = $equipmentsCategory;
         $equipment->count = $count;
@@ -1230,11 +1263,111 @@ class EquipmentsClass
             return false;
         }
 
+        if ($new_stock !== $old_stock) {
+
+            /**
+             * @var Stock $new_stock_name
+             */
+            $new_stock_name = Stock::find()->where('id=:id', [':id' => $new_stock])->one();
+
+            if (!is_object($new_stock_name)) {
+                Yii::error('Склад не найден, new_stock: ' . serialize($new_stock), __METHOD__);
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Склад не найден',
+                ];
+            }
+
+            /**
+             * @var Stock $old_stock_name
+             */
+            $old_stock_name = Stock::find()->where('id=:id', [':id' => $old_stock])->one();
+
+            if (!is_object($old_stock_name)) {
+                Yii::error('Склад не найден, old_stock: ' . serialize($old_stock), __METHOD__);
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Склад не найден',
+                ];
+            }
+
+            $check = self::addHistory($id, 1, $old_stock_name->name, $new_stock_name->name, $reason_change_stock);
+
+            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменении оборудования', __METHOD__);
+
+                if (is_array($check) && isset($check['status']) && $check['status'] === 'ERROR') {
+                    return $check;
+                }
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении оборудования',
+                ];
+            }
+        }
+
         return [
             'status' => 'SUCCESS',
             'msg' => 'Оборудование успешно изменено'
         ];
 
+    }
+
+    /**
+     * Добавление записи в историю изменений
+     * @param $eq_id
+     * @param $type_changes
+     * @param $old_params
+     * @param $new_params
+     * @param $reason
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function addHistory($eq_id, $type_changes, $old_params, $new_params, $reason)
+    {
+        Yii::info('Запуск функции добавления записи в историю изменений оборудования', __METHOD__);
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        $new_records = new EquipmentsHistory();
+        $new_records->equipments_id = $eq_id;
+        $new_records->type_change = $type_changes;
+        $new_records->old_params = $old_params;
+        $new_records->new_params = $new_params;
+        $new_records->reason = $reason;
+        $new_records->user_id = $session->user_id;
+        $new_records->date_create = date('Y-m-d H:i:s');
+
+        try {
+            if (!$new_records->save(false)) {
+                Yii::error('Ошибка при добавления записи в историю изменений оборудования: ' . serialize($new_records->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавления записи в историю изменений оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Запись успешно добавлена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Запись успешно добавлена'
+        ];
     }
 
     /**

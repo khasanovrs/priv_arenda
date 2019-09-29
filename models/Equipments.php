@@ -38,6 +38,7 @@ use Yii;
  * @property EquipmentsType $type0
  * @property EquipmentsMark $mark0
  * @property Discount $discount0
+ * @property EquipmentsHistory[] $equipmentsHistories
  * @property EquipmentsInfo[] $equipmentsInfos
  */
 class Equipments extends \yii\db\ActiveRecord
@@ -157,6 +158,14 @@ class Equipments extends \yii\db\ActiveRecord
     public function getDiscount0()
     {
         return $this->hasOne(Discount::className(), ['id' => 'discount']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsHistories()
+    {
+        return $this->hasMany(EquipmentsHistory::className(), ['equipments_id' => 'id']);
     }
 
     /**
