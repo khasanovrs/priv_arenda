@@ -143,21 +143,28 @@ class MainClass
             ];
         }
 
-        $check_branch = Branch::find()->where('id=:id', [':id' => $branch])->one();
+        if ($branch!==0) {
+            $check_branch = Branch::find()->where('id=:id', [':id' => $branch])->one();
 
-        if (!is_object($check_branch)) {
-            Yii::error('Передан некорректный идентификатор филиала, branch:' . serialize($branch), __METHOD__);
+            if (!is_object($check_branch)) {
+                Yii::error('Передан некорректный идентификатор филиала, branch:' . serialize($branch), __METHOD__);
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный идентификатор филиала',
-            ];
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор филиала',
+                ];
+            }
+
+            $applicationPayArr = ApplicationPay::find()
+                ->joinWith(['applicationEquipment', 'applicationEquipment.application'])
+                ->where('applications.branch_id=:branch and application_pay.date_create BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+                ->all();
+        } else {
+            $applicationPayArr = ApplicationPay::find()
+                ->joinWith(['applicationEquipment', 'applicationEquipment.application'])
+                ->where('application_pay.date_create BETWEEN :date_start and :date_end', [':date_start' => $date_start, ':date_end' => $date_end])
+                ->all();
         }
-
-        $applicationPayArr = ApplicationPay::find()
-            ->joinWith(['applicationEquipment', 'applicationEquipment.application'])
-            ->where('applications.branch_id=:branch and application_pay.date_create BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
-            ->all();
 
         if (!empty($applicationPayArr)) {
             /**
