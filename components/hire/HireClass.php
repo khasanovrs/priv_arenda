@@ -543,6 +543,40 @@ class HireClass
         $sum_sale = (float)$applicationEq->sum - ((float)$applicationEq->sum * (float)$application->discount->name / 100);
         $client = ClientsClass::GetClientInfo($application->client_id);
 
+        $mark = $applicationEq->equipments->mark0->name;
+        $model = $applicationEq->equipments->model;
+        $category = $applicationEq->equipments->category->name;
+
+        $pay_list = PayClass::getPayList($applicationEq->id);
+
+        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении платежей', __METHOD__);
+
+            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
+                return $pay_list;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении платежей',
+            ];
+        }
+
+        $extensions_list = PayClass::getExtensions($applicationEq->id);
+
+        if (!is_array($extensions_list) || !isset($extensions_list['status']) || $extensions_list['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении продлений', __METHOD__);
+
+            if (is_array($extensions_list) && isset($result['status']) && $extensions_list['status'] === 'ERROR') {
+                return $extensions_list;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении продлений',
+            ];
+        }
+
         $result = [
             'id' => $applicationEq->id,
             'branch' => $application->branch->name,
@@ -563,52 +597,18 @@ class HireClass
             'total_paid' => $applicationEq->total_paid,
             'remainder' => $sum_sale - $applicationEq->total_paid,
             'count' => $applicationEq->equipments_count,
-
+            'equipments' =>
+                [
+                    'equipments_id' => $applicationEq->equipments_id,
+                    'name' => $category . ' ' . $mark . ' ' . $model,
+                    'state' => $applicationEq->hireState->name,
+                    'photo' => $applicationEq->equipments->photo,
+                    'photo_alias' => $applicationEq->equipments->photo_alias
+                ],
+            'extensions' => $extensions_list['data'],
+            'pay_list' => $pay_list['data']
         ];
 
-        $mark = $applicationEq->equipments->mark0->name;
-        $model = $applicationEq->equipments->model;
-        $category = $applicationEq->equipments->category->name;
-
-        $result['equipments'] = [
-            'equipments_id' => $applicationEq->equipments_id,
-            'name' => $category . ' ' . $mark . ' ' . $model,
-            'state' => $applicationEq->hireState->name,
-            'photo' => $applicationEq->equipments->photo,
-            'photo_alias' => $applicationEq->equipments->photo_alias
-        ];
-
-        $pay_list = PayClass::getPayList($applicationEq->id);
-
-        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при получении платежей', __METHOD__);
-
-            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
-                return $pay_list;
-            }
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при получении платежей',
-            ];
-        }
-
-        $pay_list = PayClass::getExtensions($applicationEq->id);
-
-        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при получении продлений', __METHOD__);
-
-            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
-                return $pay_list;
-            }
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при получении продлений',
-            ];
-        }
-
-        $result['extensions'] = $pay_list['data'];
 
         Yii::info('Заявка успешно получена', __METHOD__);
 

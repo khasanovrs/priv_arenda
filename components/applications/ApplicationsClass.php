@@ -667,7 +667,7 @@ class ApplicationsClass
             }
 
             if ($sum_pay !== '') {
-                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay, $cashBox);
+                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay, $cashBox, false);
 
                 if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при добавлении платежа', __METHOD__);
