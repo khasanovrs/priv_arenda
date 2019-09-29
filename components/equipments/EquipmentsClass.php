@@ -84,9 +84,26 @@ class EquipmentsClass
          * @var EquipmentsCategory $value
          */
         foreach ($equipmentsTypeList as $value) {
+
+            $type_arr = $value->equipmentsTypes;
+            $type_list = [];
+
+            if (!empty($type_arr)) {
+                /**
+                 * @var EquipmentsType $value
+                 */
+                foreach ($type_arr as $value2) {
+                    $type_list[] = [
+                        'val' => $value2->id,
+                        'name' => $value2->name
+                    ];
+                }
+            }
+
             $result[] = [
                 'val' => $value->id,
-                'name' => $value->name
+                'name' => $value->name,
+                'type' => $type_list
             ];
         }
 
@@ -1274,7 +1291,7 @@ class EquipmentsClass
                 ];
             }
 
-            $check = self::addHistory($id, 1, $old_stock_name->name, $new_stock_name->name,$reason_change_stock);
+            $check = self::addHistory($id, 1, $old_stock_name->name, $new_stock_name->name, $reason_change_stock);
 
             if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при изменении оборудования', __METHOD__);
