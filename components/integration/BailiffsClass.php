@@ -7,6 +7,7 @@ namespace app\components\integration;
 
 use app\models\Clients;
 use Yii;
+use linslin\yii2\curl;
 
 class BailiffsClass
 {
@@ -60,26 +61,27 @@ class BailiffsClass
             ];
         }
 
-
-        foreach ($clientParam as $key => $value) {
-            $params .= $key . '=' . $value . '&';
+        try {
+            $curl = new curl\Curl();
+            $response = $curl->setGetParams($clientParam)->get('https://api-ip.fssprus.ru/api/v1.0/search/physical');
+            $ll = json_decode($response);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при проверке клиента у приставов: ' . serialize($e->getMessage()), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => ' Ошибка при проверке клиента у приставов',
+                'data' => $result
+            ];
         }
 
-        $params = trim($params, '&');
+        Yii::info('Получили данные:' . serialize($ll), __METHOD__);
 
-        $c = curl_init();
-        curl_setopt($c, CURLOPT_URL, "https://api-ip.fssprus.ru/api/v1.0/search/physical?" . $params);
-        curl_setopt($c, CURLOPT_PROXY, 'http://192.168.5.12:3140');
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-        $src = curl_exec($c);
-        curl_close($c);
-
-        Yii::info('Получили данные:' . serialize($src), __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Клоиент успешно проверен',
-            'data' => $result
-        ];
+        if (is_object($ll) && isset($ll->status) && $ll->status === 'success') {
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Клиент успешно проверен',
+                'data' => $result
+            ];
+        }
     }
 }
