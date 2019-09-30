@@ -42,6 +42,7 @@ class BranchClass
             $result[] = [
                 'val' => $value->id,
                 'name' => $value->name,
+                'region' => $value->region,
             ];
         }
 
@@ -58,9 +59,10 @@ class BranchClass
      * Функци добавления филиала
      * @param $branch
      * @param $val
+     * @param $region
      * @return array|bool
      */
-    public static function AddBranch($branch, $val)
+    public static function AddBranch($branch, $val, $region)
     {
         Yii::info('Запуск функции AddBranch', __METHOD__);
 
@@ -80,6 +82,7 @@ class BranchClass
         }
 
         $newBranch->name = $branch;
+        $newBranch->region = $region;
 
         try {
             if (!$newBranch->save(false)) {
