@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ * @property string $region
  *
  * @property Applications[] $applications
  * @property Clients[] $clients
@@ -32,8 +33,9 @@ class Branch extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name', 'region'], 'required'],
             [['name'], 'string', 'max' => 150],
+            [['region'], 'string', 'max' => 45],
         ];
     }
 
@@ -45,6 +47,7 @@ class Branch extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'region' => 'Region',
         ];
     }
 

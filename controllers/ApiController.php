@@ -374,7 +374,13 @@ class ApiController extends Controller
              */
             'add-pay' => [
                 'class' => 'app\components\actions\pay\AddPayAction',
-            ]
+            ],
+            /**
+             * Управление приставами
+             */
+            'get-bailiffs' => [
+                'class' => 'app\components\actions\bailiffs\GetBailiffsAction',
+            ],
         ];
     }
 

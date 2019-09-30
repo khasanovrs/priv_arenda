@@ -7,6 +7,7 @@
 
 namespace app\commands;
 
+use app\components\integration\BailiffsClass;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -30,5 +31,10 @@ class HelloController extends Controller
         echo $message . "\n";
 
         return ExitCode::OK;
+    }
+
+    public function actionTest()
+    {
+        BailiffsClass::getData(1);
     }
 }
