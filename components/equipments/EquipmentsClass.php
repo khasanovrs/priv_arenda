@@ -47,7 +47,8 @@ class EquipmentsClass
         foreach ($equipmentsTypeList as $value) {
             $result[] = [
                 'val' => $value->id,
-                'name' => $value->name
+                'name' => $value->name,
+                'category_id' => $value->category_id,
             ];
         }
 
@@ -1484,9 +1485,10 @@ class EquipmentsClass
      * Добавление нового типа для оборудования
      * @param $name
      * @param $val
+     * @param $category_id
      * @return bool|array
      */
-    public static function AddType($name, $val)
+    public static function AddType($name, $val, $category_id)
     {
         Yii::info('Запуск функции добавления нового типа для оборудования', __METHOD__);
 
@@ -1496,6 +1498,15 @@ class EquipmentsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Ни передано наименование типа',
+            ];
+        }
+
+        if ($category_id === '') {
+            Yii::error('Ни передан идентификатор категории, category_id:' . serialize($category_id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор категории',
             ];
         }
 
@@ -1515,6 +1526,7 @@ class EquipmentsClass
         }
 
         $new->name = $name;
+        $new->category_id = $category_id;
 
         try {
             if (!$new->save(false)) {
