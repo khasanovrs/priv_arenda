@@ -19,8 +19,9 @@ class AddEquipmentTypeAction extends Action
 
         $name = $request->getBodyParam('name');
         $val = $request->getBodyParam('val');
+        $category_id = $request->getBodyParam('category_id');
 
-        $resultChange = EquipmentsClass::AddType($name, $val);
+        $resultChange = EquipmentsClass::AddType($name, $val, $category_id);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового типа для оборудования', __METHOD__);
