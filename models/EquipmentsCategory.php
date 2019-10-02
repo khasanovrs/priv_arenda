@@ -11,6 +11,7 @@ use Yii;
  * @property string $name Наименование категории
  *
  * @property Equipments[] $equipments
+ * @property EquipmentsType[] $equipmentsTypes
  */
 class EquipmentsCategory extends \yii\db\ActiveRecord
 {
@@ -50,5 +51,13 @@ class EquipmentsCategory extends \yii\db\ActiveRecord
     public function getEquipments()
     {
         return $this->hasMany(Equipments::className(), ['category_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsTypes()
+    {
+        return $this->hasMany(EquipmentsType::className(), ['category_id' => 'id']);
     }
 }
