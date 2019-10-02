@@ -1027,8 +1027,6 @@ class ClientsClass
          * @var Clients $value
          */
         foreach ($clients as $value) {
-
-
             $result[] = [
                 'client_id' => $value->id,
                 'client_fio' => $value->name,
@@ -1038,7 +1036,6 @@ class ClientsClass
                 'client_number_passport' => $value->clientsInfos[0]->number_passport,
             ];
         }
-
 
         Yii::info('Клиенты успешно получены', __METHOD__);
 
