@@ -1034,6 +1034,7 @@ class ClientsClass
                 'client_fio' => $value->name,
                 'client_email' => $value->clientsInfos[0]->inn,
                 'client_phone' => $value->phone,
+                'client_type' => $value->type,
                 'client_number_passport' => $value->clientsInfos[0]->number_passport,
             ];
         }
