@@ -623,7 +623,7 @@ class EquipmentsClass
             }
         }
 
-        $change_history_status_arr = $equipment->equipmentsHistoryChangeStatuses0;
+        $change_history_status_arr = $equipment->equipmentsHistoryChangeStatuses;
 
         Yii::info('ololo:'.serialize($change_history_status_arr), __METHOD__);
 
