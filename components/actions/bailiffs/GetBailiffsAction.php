@@ -18,9 +18,11 @@ class GetBailiffsAction extends Action
         Yii::info('Запуск функции получения данных от приставов', __METHOD__);
 
         $request = Yii::$app->request;
-        $id = $request->getBodyParam('clientId');
-        
-        $result = BailiffsClass::getData($id);
+        $fio = $request->getBodyParam('fio');
+        $region = $request->getBodyParam('region');
+        $type = $request->getBodyParam('type');
+
+        $result = BailiffsClass::getData($fio, $region, $type);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении данных от приставов', __METHOD__);
