@@ -47,9 +47,9 @@ class EquipmentUpdateAction extends Action
         $old_status = $request->getBodyParam('old_status');
         $reason_change_status = $request->getBodyParam('reason_change_status');
         $amount_repair = $request->getBodyParam('amount_repair');
-        $cashbox = $request->getBodyParam('cashbox');
+        $amount_repair_cash_box = $request->getBodyParam('amount_repair_cash_box');
 
-        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cashbox);
+        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $amount_repair_cash_box);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении оборудования', __METHOD__);
