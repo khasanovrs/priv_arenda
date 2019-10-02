@@ -625,7 +625,7 @@ class EquipmentsClass
 
         $change_history_status_arr = $equipment->equipmentsHistoryChangeStatuses;
 
-        Yii::info('ololo:'.serialize($change_history_status_arr), __METHOD__);
+        Yii::info('ololo:' . serialize($change_history_status_arr), __METHOD__);
 
         if (!empty($change_history_status_arr)) {
             foreach ($change_history_status_arr as $value) {
@@ -1485,6 +1485,36 @@ class EquipmentsClass
             Yii::error('Поймали Exception при добавления записи в историю изменений статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
+
+
+        if ($amount_repair !== '') {
+            /**
+             * @var FinanceCashbox $cash_box
+             */
+            $cash_box = FinanceCashbox::find()->where('id=:id', [':id' => $cashBox])->one();
+
+            if (!is_object($cash_box)) {
+                Yii::error('Ошибка при опредении кассы', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при опредении кассы'
+                ];
+            }
+
+            $cash_box->sum -= $amount_repair;
+
+            try {
+                if (!$cash_box->save(false)) {
+                    Yii::error('Ошибка при изменении суммы кассы: ' . serialize($cash_box->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при изменении суммы кассы: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+        }
+
 
         Yii::info('Запись успешно добавлена', __METHOD__);
 
