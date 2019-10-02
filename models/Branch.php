@@ -13,7 +13,6 @@ use Yii;
  *
  * @property Applications[] $applications
  * @property Clients[] $clients
- * @property Finance[] $finances
  * @property Stock[] $stocks
  * @property Users[] $users
  */
@@ -65,14 +64,6 @@ class Branch extends \yii\db\ActiveRecord
     public function getClients()
     {
         return $this->hasMany(Clients::className(), ['branch_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getFinances()
-    {
-        return $this->hasMany(Finance::className(), ['branch_id' => 'id']);
     }
 
     /**

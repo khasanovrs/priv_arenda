@@ -40,7 +40,6 @@ use Yii;
  * @property Discount $discount0
  * @property EquipmentsHistory[] $equipmentsHistories
  * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses
- * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses0
  * @property EquipmentsInfo[] $equipmentsInfos
  */
 class Equipments extends \yii\db\ActiveRecord
@@ -59,7 +58,7 @@ class Equipments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount'], 'required'],
+            [['mark', 'model', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'required'],
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],
@@ -176,14 +175,6 @@ class Equipments extends \yii\db\ActiveRecord
     public function getEquipmentsHistoryChangeStatuses()
     {
         return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['equipments_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEquipmentsHistoryChangeStatuses0()
-    {
-        return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['new_status' => 'id']);
     }
 
     /**
