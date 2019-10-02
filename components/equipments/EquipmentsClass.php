@@ -11,11 +11,13 @@ use app\models\Equipments;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsField;
 use app\models\EquipmentsHistory;
+use app\models\EquipmentsHistoryChangeStatus;
 use app\models\EquipmentsInfo;
 use app\models\EquipmentsMark;
 use app\models\EquipmentsShowField;
 use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
+use app\models\FinanceCashbox;
 use app\models\Stock;
 use Yii;
 
@@ -604,6 +606,7 @@ class EquipmentsClass
         }
 
         $change_history = [];
+        $change_history_status = [];
 
         $change_history_arr = $equipment->equipmentsHistories;
 
@@ -620,6 +623,29 @@ class EquipmentsClass
             }
         }
 
+        $change_history_status_arr = $equipment->equipmentsHistoryChangeStatuses0;
+
+        if (!empty($change_history_status_arr)) {
+            foreach ($change_history_status_arr as $value) {
+
+                /**
+                 * @var FinanceCashbox $cashBox
+                 */
+                $cashBox = FinanceCashbox::find()->where('id=:id', [':id' => $value->cashBox_id])->one();
+                $cashBox_name = is_object($cashBox) ? $cashBox->name : '';
+
+                $change_history_status[] = [
+                    'date' => date('d.m.Y H:i:s', strtotime($value->date_create)),
+                    'new_params' => $value->new_status,
+                    'old_params' => $value->old_status,
+                    'cashBox' => $cashBox_name,
+                    'sum' => $value->sum,
+                    'reason' => $value->reason,
+                    'user' => $value->user->fio
+                ];
+            }
+        }
+
         $result = [
             'id' => $equipment->id,
             'mark' => $equipment->mark,
@@ -629,7 +655,8 @@ class EquipmentsClass
             'old_stock' => $equipment->stock_id,
             'type' => $equipment->type,
             'discount' => $equipment->discount,
-            'status' => $equipment->status0->name,
+            'new_status' => $equipment->status,
+            'old_status' => $equipment->status,
             'count' => $equipment->count,
             'selling_price' => $equipment->selling_price,
             'price_per_day' => $equipment->price_per_day,
@@ -648,7 +675,8 @@ class EquipmentsClass
             'power' => $equipment->equipmentsInfos[0]->power,
             'frequency_hits' => $equipment->equipmentsInfos[0]->frequency_hits,
             'comment' => $equipment->equipmentsInfos[0]->comment,
-            'change_history' => $change_history
+            'change_history' => $change_history,
+            'change_history_status' => $change_history_status
         ];
 
         Yii::info('Информация об оборудовании получено', __METHOD__);
@@ -1108,10 +1136,15 @@ class EquipmentsClass
      * @param $power
      * @param $frequency_hits
      * @param $photo_alias
+     * @param $new_status ,
+     * @param $old_status ,
+     * @param $reason_change_status
+     * @param $amount_repair
+     * @param $cashbox
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias)
+    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cashbox)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1169,19 +1202,11 @@ class EquipmentsClass
             ];
         }
 
-        if ($count === '') {
-            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передано количество оборудования',
-            ];
-        }
-
         if ($tool_number === '') {
             Yii::error('Не передан номер оборудования, tool_number: ' . serialize($tool_number), __METHOD__);
             return [
                 'status' => 'ERROR',
-                'msg' => 'Не передано количество оборудования',
+                'msg' => 'Не передан номер оборудования',
             ];
         }
 
@@ -1190,6 +1215,22 @@ class EquipmentsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Необходимо указать причину изменения склада',
+            ];
+        }
+
+        if ($new_status === '') {
+            Yii::error('Не передан статус, new_status: ' . serialize($new_status), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан статус',
+            ];
+        }
+
+        if ($new_status !== $old_status && $reason_change_status === '') {
+            Yii::error('Необходимо указать причину изменения статуса, reason_change_status: ' . serialize($reason_change_status), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Необходимо указать причину изменения статуса',
             ];
         }
 
@@ -1212,6 +1253,7 @@ class EquipmentsClass
         $equipment->type = $equipmentsType;
         $equipment->category_id = $equipmentsCategory;
         $equipment->count = $count;
+        $equipment->status = $new_status;
         $equipment->tool_number = $tool_number;
         $equipment->selling_price = $selling_price;
         $equipment->price_per_day = $price_per_day;
@@ -1265,6 +1307,7 @@ class EquipmentsClass
         }
 
         if ($new_stock !== $old_stock) {
+            Yii::info('Запись  информации об изменении склада');
 
             /**
              * @var Stock $new_stock_name
@@ -1304,6 +1347,26 @@ class EquipmentsClass
                 return [
                     'status' => 'ERROR',
                     'msg' => 'Ошибка при изменении оборудования',
+                ];
+            }
+        }
+
+
+        if ($new_status !== $old_status) {
+            Yii::info('Запись информации об изменении статуса');
+
+            $check = self::addHistoryChangeStatus($id, $new_status, $old_status, $reason_change_status, $amount_repair, $cashbox);
+
+            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменении статуса', __METHOD__);
+
+                if (is_array($check) && isset($check['status']) && $check['status'] === 'ERROR') {
+                    return $check;
+                }
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении статуса',
                 ];
             }
         }
@@ -1360,6 +1423,64 @@ class EquipmentsClass
             }
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при добавления записи в историю изменений оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Запись успешно добавлена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Запись успешно добавлена'
+        ];
+    }
+
+    /**
+     * Добавление записи в историю изменений статуса
+     * @param $id
+     * @param $new_status
+     * @param $old_status
+     * @param $reason_change_status
+     * @param $amount_repair
+     * @param $cashBox
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function addHistoryChangeStatus($id, $new_status, $old_status, $reason_change_status, $amount_repair, $cashBox)
+    {
+        Yii::info('Запуск функции добавления записи в историю изменений статуса оборудования', __METHOD__);
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        $new_records = new EquipmentsHistoryChangeStatus();
+        $new_records->equipments_id = $id;
+        $new_records->old_status = $old_status;
+        $new_records->new_status = $new_status;
+        $new_records->reason = $reason_change_status;
+        $new_records->user_id = $session->user_id;
+        $new_records->sum = $amount_repair;
+        $new_records->cashBox_id = $cashBox;
+        $new_records->date_create = date('Y-m-d H:i:s');
+
+        try {
+            if (!$new_records->save(false)) {
+                Yii::error('Ошибка при добавления записи в историю изменений статуса оборудования: ' . serialize($new_records->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавления записи в историю изменений статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
 
@@ -1433,7 +1554,8 @@ class EquipmentsClass
      * @param $val
      * @return bool|array
      */
-    public static function AddCategory($name, $val)
+    public
+    static function AddCategory($name, $val)
     {
         Yii::info('Запуск функции добавления новой категории для оборудования', __METHOD__);
 
@@ -1488,7 +1610,8 @@ class EquipmentsClass
      * @param $category_id
      * @return bool|array
      */
-    public static function AddType($name, $val, $category_id)
+    public
+    static function AddType($name, $val, $category_id)
     {
         Yii::info('Запуск функции добавления нового типа для оборудования', __METHOD__);
 
@@ -1552,7 +1675,8 @@ class EquipmentsClass
      * @param $val
      * @return bool|array
      */
-    public static function AddMark($name, $val)
+    public
+    static function AddMark($name, $val)
     {
         Yii::info('Запуск функции добавления новой марки для оборудования', __METHOD__);
 
@@ -1605,7 +1729,8 @@ class EquipmentsClass
      * @param $id ,
      * @return bool|array
      */
-    public static function DeleteStatus($id)
+    public
+    static function DeleteStatus($id)
     {
         Yii::info('Запуск функции удаления статуса оборудования', __METHOD__);
 
@@ -1649,7 +1774,8 @@ class EquipmentsClass
      * @param $id ,
      * @return bool|array
      */
-    public static function DeleteCategory($id)
+    public
+    static function DeleteCategory($id)
     {
         Yii::info('Запуск функции удаления категории оборудования', __METHOD__);
 
@@ -1693,7 +1819,8 @@ class EquipmentsClass
      * @param $id ,
      * @return bool|array
      */
-    public static function DeleteType($id)
+    public
+    static function DeleteType($id)
     {
         Yii::info('Запуск функции удаления типа оборудования', __METHOD__);
 
@@ -1737,7 +1864,8 @@ class EquipmentsClass
      * @param $id ,
      * @return bool|array
      */
-    public static function DeleteMark($id)
+    public
+    static function DeleteMark($id)
     {
         Yii::info('Запуск функции удаления марки оборудования', __METHOD__);
 

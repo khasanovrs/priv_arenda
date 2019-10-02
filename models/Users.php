@@ -25,6 +25,7 @@ use Yii;
  * @property ClientShowField[] $clientShowFields
  * @property ClientStatusChange[] $clientStatusChanges
  * @property EquipmentsHistory[] $equipmentsHistories
+ * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses
  * @property EquipmentsShowField[] $equipmentsShowFields
  * @property Extension[] $extensions
  * @property FinanceShowField[] $financeShowFields
@@ -134,6 +135,14 @@ class Users extends \yii\db\ActiveRecord
     public function getEquipmentsHistories()
     {
         return $this->hasMany(EquipmentsHistory::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsHistoryChangeStatuses()
+    {
+        return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['user_id' => 'id']);
     }
 
     /**

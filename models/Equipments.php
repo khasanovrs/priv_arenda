@@ -39,6 +39,8 @@ use Yii;
  * @property EquipmentsMark $mark0
  * @property Discount $discount0
  * @property EquipmentsHistory[] $equipmentsHistories
+ * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses
+ * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses0
  * @property EquipmentsInfo[] $equipmentsInfos
  */
 class Equipments extends \yii\db\ActiveRecord
@@ -166,6 +168,22 @@ class Equipments extends \yii\db\ActiveRecord
     public function getEquipmentsHistories()
     {
         return $this->hasMany(EquipmentsHistory::className(), ['equipments_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsHistoryChangeStatuses()
+    {
+        return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['equipments_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsHistoryChangeStatuses0()
+    {
+        return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['new_status' => 'id']);
     }
 
     /**
