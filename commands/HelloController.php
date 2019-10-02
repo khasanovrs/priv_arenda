@@ -32,9 +32,4 @@ class HelloController extends Controller
 
         return ExitCode::OK;
     }
-
-    public function actionTest()
-    {
-        BailiffsClass::getData(1);
-    }
 }

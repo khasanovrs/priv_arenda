@@ -5,6 +5,7 @@
 
 namespace app\components\integration;
 
+use app\models\Branch;
 use app\models\Clients;
 use Yii;
 use linslin\yii2\curl;
@@ -13,51 +14,70 @@ class BailiffsClass
 {
     /**
      * Функция получения информации по клиенту через сервис приставов
-     * @param $id_client
+     * @param $fio
+     * @param $branch
+     * @param $type
      * @return array
      */
-    public static function getData($id_client)
+    public static function getData($fio, $branch, $type)
     {
         Yii::info('Запуск функции getData', __METHOD__);
         $result = [];
-        $params = '';
 
-        if ($id_client === '') {
-            Yii::error('Не передан идентификатор клиента', __METHOD__);
+        if ($fio === '') {
+            Yii::error('Не передан фио клиента', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор клиента'
+                'msg' => 'Не передан фио клиента'
+            ];
+        }
+
+        if ($branch === '') {
+            Yii::error('Не передан регион клиента', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан регион клиента'
+            ];
+        }
+
+        if ($type === '') {
+            Yii::error('Не передан тип клиента', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан тип клиента'
             ];
         }
 
         /**
-         * @var Clients $client
+         * @var Branch $current_branch
          */
-        $client = Clients::find()->where('id=:id', [':id' => $id_client])->one();
+        $current_branch = Branch::find()->where('id=:id', [':id' => $branch])->one();
 
-        if (!is_object($client)) {
-            Yii::error('Ошибка при поиске клиента', __METHOD__);
+        if (!is_object($current_branch)) {
+            Yii::error('Ошибка при поиске филиала', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при поиске клиента'
+                'msg' => 'Ошибка при поиске филиала'
             ];
         }
 
-        if ($client->type === 1) {
-            $fio = explode(" ", $client->name);
+        if ($type === 1) {
+            $fio = explode(" ", $fio);
             $clientParam = [
                 'token' => 'zC9MhiUcVmiA',
-                'region' => $client->branch->region,
+                'region' => $current_branch->region,
                 'firstname' => $fio[1],
                 'lastname' => $fio[0],
             ];
         } else {
             $clientParam = [
                 'token' => 'zC9MhiUcVmiA',
-                'region' => $client->branch->region,
-                'name' => $client->name,
+                'region' => $current_branch->region,
+                'name' => $fio,
             ];
         }
 

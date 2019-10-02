@@ -48,7 +48,7 @@ class EquipmentsClass
             $result[] = [
                 'val' => $value->id,
                 'name' => $value->name,
-                'category_id' => $value->category_id
+                'category_id' => $value->category_id,
             ];
         }
 
