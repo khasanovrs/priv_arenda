@@ -47,10 +47,11 @@ class ClientsClass
      * @param $phone_3
      * @param $email
      * @param $number_passport
+     * @param $date_birth
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport)
+    public static function AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport, $date_birth)
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -78,6 +79,15 @@ class ClientsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор источника',
+            ];
+        }
+
+        if ($date_birth === '') {
+            Yii::error('Не передана дта рождения, source: ' . serialize($date_birth), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передана дта рождения',
             ];
         }
 
@@ -182,11 +192,13 @@ class ClientsClass
             $newClient = new Clients();
 
             $newClient->status = $new_status;
+
+            $newClientInfo = new ClientsInfo();
         } else {
             Yii::info('Обновление информациии о клиенте', __METHOD__);
 
             /**
-             * @var Clients $clients
+             * @var Clients $newClient
              */
             $newClient = Clients::find()->where('id=:id', [':id' => $clientId])->one();
 
@@ -199,7 +211,7 @@ class ClientsClass
                 ];
             }
 
-            if ($new_status!==$old_status) {
+            if ($new_status !== $old_status) {
                 $resultChange = self::UpdateStatusClientUr($clientId, $old_status, $new_status, $reason_change_status);
 
                 if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
@@ -215,6 +227,8 @@ class ClientsClass
                     ];
                 }
             }
+
+            $newClientInfo = $newClient->clientsInfos[0];
         }
 
         $newClient->name = $fio === '' ? $name : $fio;
@@ -248,7 +262,7 @@ class ClientsClass
             ];
         }
 
-        $newClientInfo = new ClientsInfo();
+
         $newClientInfo->client_id = $client->id;
         $newClientInfo->email = $email;
         $newClientInfo->source = $source;
@@ -261,6 +275,7 @@ class ClientsClass
         $newClientInfo->phone_chief = $phone_3;
         $newClientInfo->phone_second = $phone_2;
         $newClientInfo->number_passport = $number_passport;
+        $newClientInfo->date_birth = $date_birth;
         $newClientInfo->date_create = date('Y-m-d H:i:s');
         $newClientInfo->date_update = date('Y-m-d H:i:s');
 
@@ -973,6 +988,7 @@ class ClientsClass
             'name_chief' => $client->clientsInfos[0]->name_chief,
             'phone_3' => $client->clientsInfos[0]->phone_chief,
             'phone_2' => $client->clientsInfos[0]->phone_second,
+            'date_birth' => $client->clientsInfos[0]->date_birth,
             'phone' => $client->phone,
             'count_application' => count($application_list),
             'all_total_paid' => $all_total_paid,

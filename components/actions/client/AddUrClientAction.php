@@ -34,8 +34,9 @@ class AddUrClientAction extends Action
         $phone_3 = $request->getBodyParam('phone_3');
         $email = $request->getBodyParam('email');
         $number_passport = $request->getBodyParam('number_passport');
+        $date_birth = $request->getBodyParam('date_birth');
 
-        $resultChange = ClientsClass::AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport);
+        $resultChange = ClientsClass::AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport, $date_birth);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении нового клиента', __METHOD__);

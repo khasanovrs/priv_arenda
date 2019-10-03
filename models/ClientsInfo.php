@@ -18,6 +18,7 @@ use Yii;
  * @property string $name_chief
  * @property string $phone_chief
  * @property string $phone_second
+ * @property string $date_birth
  * @property string $email
  * @property string $number_passport
  * @property string $date_create дата создания записи
@@ -48,7 +49,7 @@ class ClientsInfo extends \yii\db\ActiveRecord
             [['date_create', 'date_update'], 'safe'],
             [['inn'], 'string', 'max' => 20],
             [['kpp', 'phone_second'], 'string', 'max' => 45],
-            [['name_chief', 'phone_chief', 'email', 'number_passport'], 'string', 'max' => 150],
+            [['name_chief', 'phone_chief', 'date_birth', 'email', 'number_passport'], 'string', 'max' => 150],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source' => 'id']],
             [['sale'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['sale' => 'id']],
@@ -72,6 +73,7 @@ class ClientsInfo extends \yii\db\ActiveRecord
             'name_chief' => 'Name Chief',
             'phone_chief' => 'Phone Chief',
             'phone_second' => 'Phone Second',
+            'date_birth' => 'Date Birth',
             'email' => 'Email',
             'number_passport' => 'Number Passport',
             'date_create' => 'Date Create',
