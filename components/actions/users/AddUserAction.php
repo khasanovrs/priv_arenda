@@ -19,7 +19,7 @@ class AddUserAction extends Action
 
         $fio = $request->getBodyParam('fio');
         $id = $request->getBodyParam('id');
-        $password = $request->getBodyParam('password');
+        $password = $request->getBodyParam('pass');
         $user_type = $request->getBodyParam('user_type');
         $branch_id = $request->getBodyParam('branch_id');
         $email = $request->getBodyParam('email');
