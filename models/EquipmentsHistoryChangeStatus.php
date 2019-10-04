@@ -19,6 +19,7 @@ use Yii;
  *
  * @property Equipments $equipments
  * @property EquipmentsStatus $oldStatus
+ * @property EquipmentsStatus $newStatus
  * @property Users $user
  */
 class EquipmentsHistoryChangeStatus extends \yii\db\ActiveRecord
@@ -44,6 +45,7 @@ class EquipmentsHistoryChangeStatus extends \yii\db\ActiveRecord
             [['sum'], 'string', 'max' => 45],
             [['equipments_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['equipments_id' => 'id']],
             [['old_status'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsStatus::className(), 'targetAttribute' => ['old_status' => 'id']],
+            [['new_status'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsStatus::className(), 'targetAttribute' => ['new_status' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -80,6 +82,14 @@ class EquipmentsHistoryChangeStatus extends \yii\db\ActiveRecord
     public function getOldStatus()
     {
         return $this->hasOne(EquipmentsStatus::className(), ['id' => 'old_status']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNewStatus()
+    {
+        return $this->hasOne(EquipmentsStatus::className(), ['id' => 'new_status']);
     }
 
     /**

@@ -625,8 +625,6 @@ class EquipmentsClass
 
         $change_history_status_arr = $equipment->equipmentsHistoryChangeStatuses;
 
-        Yii::info('ololo:' . serialize($change_history_status_arr), __METHOD__);
-
         if (!empty($change_history_status_arr)) {
             foreach ($change_history_status_arr as $value) {
 
@@ -638,8 +636,8 @@ class EquipmentsClass
 
                 $change_history_status[] = [
                     'date' => date('d.m.Y H:i:s', strtotime($value->date_create)),
-                    'new_params' => $value->new_status,
-                    'old_params' => $value->old_status,
+                    'new_params' => $value->newStatus->name,
+                    'old_params' => $value->oldStatus->name,
                     'cashBox' => $cashBox_name,
                     'sum' => $value->sum,
                     'reason' => $value->reason,
@@ -1142,11 +1140,12 @@ class EquipmentsClass
      * @param $old_status ,
      * @param $reason_change_status
      * @param $amount_repair
-     * @param $cashbox
+     * @param $cash_box
+     * @param $sale_amount
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cashbox)
+    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1229,11 +1228,49 @@ class EquipmentsClass
         }
 
         if ($new_status !== $old_status && $reason_change_status === '') {
-            Yii::error('Необходимо указать причину изменения статуса, reason_change_status: ' . serialize($reason_change_status), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Необходимо указать причину изменения статуса',
-            ];
+            if ($new_status === 4 && $old_status === 2) {
+                if ($amount_repair === '') {
+                    Yii::error('Необходимо указать сумму ремонта, amount_repair: ' . serialize($amount_repair), __METHOD__);
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Необходимо указать сумму ремонта',
+                    ];
+                }
+
+                if ($cash_box === null) {
+                    Yii::error('Необходимо указать кассу, sale_amount: ' . serialize($cash_box), __METHOD__);
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Необходимо указать кассу',
+                    ];
+                }
+            }
+
+            if ($new_status !== 6) {
+                if ($reason_change_status === '') {
+                    Yii::error('Необходимо указать причину изменения статуса, reason_change_status: ' . serialize($reason_change_status), __METHOD__);
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Необходимо указать причину изменения статуса',
+                    ];
+                }
+            } else {
+                if ($sale_amount === '') {
+                    Yii::error('Необходимо указать сумму продажи, sale_amount: ' . serialize($sale_amount), __METHOD__);
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Необходимо указать сумму продажи',
+                    ];
+                }
+
+                if ($cash_box === null) {
+                    Yii::error('Необходимо указать кассу, cash_box: ' . serialize($cash_box), __METHOD__);
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Необходимо указать кассу',
+                    ];
+                }
+            }
         }
 
         /**
@@ -1357,7 +1394,7 @@ class EquipmentsClass
         if ($new_status !== $old_status) {
             Yii::info('Запись информации об изменении статуса');
 
-            $check = self::addHistoryChangeStatus($id, $new_status, $old_status, $reason_change_status, $amount_repair, $cashbox);
+            $check = self::addHistoryChangeStatus($id, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount);
 
             if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при изменении статуса', __METHOD__);
@@ -1443,11 +1480,12 @@ class EquipmentsClass
      * @param $old_status
      * @param $reason_change_status
      * @param $amount_repair
+     * @param $sale_amount
      * @param $cashBox
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function addHistoryChangeStatus($id, $new_status, $old_status, $reason_change_status, $amount_repair, $cashBox)
+    public static function addHistoryChangeStatus($id, $new_status, $old_status, $reason_change_status, $amount_repair, $cashBox, $sale_amount)
     {
         Yii::info('Запуск функции добавления записи в историю изменений статуса оборудования', __METHOD__);
 
@@ -1487,7 +1525,7 @@ class EquipmentsClass
         }
 
 
-        if ($amount_repair !== '') {
+        if ($amount_repair !== '' || $sale_amount != '') {
             /**
              * @var FinanceCashbox $cash_box
              */
@@ -1502,7 +1540,12 @@ class EquipmentsClass
                 ];
             }
 
-            $cash_box->sum -= $amount_repair;
+            if ($amount_repair !== '') {
+                $cash_box->sum -= (float)$amount_repair;
+            } else {
+                $cash_box->sum += (float)$sale_amount;
+            }
+
 
             try {
                 if (!$cash_box->save(false)) {

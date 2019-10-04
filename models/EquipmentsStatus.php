@@ -13,6 +13,7 @@ use Yii;
  *
  * @property Equipments[] $equipments
  * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses
+ * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses0
  */
 class EquipmentsStatus extends \yii\db\ActiveRecord
 {
@@ -62,5 +63,13 @@ class EquipmentsStatus extends \yii\db\ActiveRecord
     public function getEquipmentsHistoryChangeStatuses()
     {
         return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['old_status' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsHistoryChangeStatuses0()
+    {
+        return $this->hasMany(EquipmentsHistoryChangeStatus::className(), ['new_status' => 'id']);
     }
 }
