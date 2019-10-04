@@ -866,6 +866,16 @@ class HireClass
             return false;
         }
 
+        $check = self::checkHire($app_eq_id);
+
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении состояния',
+            ];
+        }
 
         Yii::info('Заявка успешно изменена', __METHOD__);
 
