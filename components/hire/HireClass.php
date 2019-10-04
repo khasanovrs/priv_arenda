@@ -695,6 +695,17 @@ class HireClass
             return false;
         }
 
+        $check = self::checkHire($id);
+
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении состояния',
+            ];
+        }
+
         Yii::info('Заявка успешно изменена', __METHOD__);
 
         return [
@@ -883,31 +894,93 @@ class HireClass
             ];
         }
 
-        /**
-         * @var ApplicationEquipment $app_eq
-         */
-        $app_eq = ApplicationEquipment::find()->where('id=:id', ['id' => $app_id])->one();
+        $check = self::checkHire($app_id, $checkPrim);
 
-        if (!is_object($app_eq)) {
-            Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при получении заявки с оборудованием'
+                'msg' => 'Ошибка при изменении состояния',
             ];
         }
 
-        if ($app_eq->sum == $app_eq->total_paid) {
-            Yii::info('Сумма совпадает', __METHOD__);
-            $app_eq->hire_state_id = 3;
-        } else {
-            Yii::info('Сумма не совпадает', __METHOD__);
-            $app_eq->hire_state_id = 5;
+        Yii::info('Заявка успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно изменена'
+        ];
+    }
+
+    /**
+     * Проверка и изменение состояния у проката
+     * @param $ap_eq_id
+     * @param $checkPrim
+     * @return array|bool
+     */
+    public static function checkHire($ap_eq_id, $checkPrim = false)
+    {
+        Yii::info('Проверка и изменение состояния проката', __METHOD__);
+
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $ap_eq_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::info('Информация об оборудовании по заявке не найдена', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена'
+            ];
         }
 
-        if ($checkPrim) {
-            $app_eq->hire_state_id = 6;
+        /**
+         * @var Applications $app
+         */
+        $app = $app_eq->application;
+
+        if (!is_object($app)) {
+            Yii::info('Заявка не найдена', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена'
+            ];
         }
+
+        $state = '';
+
+        if (date('Y-m-d H:i:s', strtotime($app->rent_start)) < date('Y-m-d H:i:s') && date('Y-m-d H:i:s', strtotime($app->rent_end)) > date('Y-m-d H:i:s')) {
+            Yii::info('Заявка в статусе: прокат', __METHOD__);
+            $state = '4';
+        }
+
+        if (date('Y-m-d H:i:s', strtotime($app->rent_start)) > date('Y-m-d H:i:s')) {
+            Yii::info('Заявка в статусе: бронь', __METHOD__);
+            $state = '1';
+        }
+
+        if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
+            if ($app_eq->sum == $app_eq->total_paid) {
+                Yii::info('Сумма совпадает', __METHOD__);
+                Yii::info('Заявка в статусе: закрыт', __METHOD__);
+                $state = 3;
+            } else {
+                Yii::info('Сумма не совпадает', __METHOD__);
+                Yii::info('Заявка в статусе: долг', __METHOD__);
+                $state = 5;
+            }
+
+            if ($checkPrim) {
+                Yii::info('Заявка в статусе: замечение', __METHOD__);
+                $state = 6;
+            }
+        }
+
+        $app_eq->hire_state_id = $state;
 
         try {
             if (!$app_eq->save(false)) {
@@ -923,17 +996,18 @@ class HireClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Заявка успешно изменена'
+            'msg' => 'Состояние успешно изменено'
         ];
     }
 
+
     /**
-     * Проверка и изменение состояния
+     * Проверка и изменение состояния у прокатов
      * @return array|bool
      */
-    public static function checkHire()
+    public static function checkHires()
     {
-        Yii::info('Заявка успешно проверена', __METHOD__);
+        Yii::info('Проверка и изменение состояния', __METHOD__);
 
         $arr_eqs = ApplicationEquipment::find()->where('hire_state_id!=3')->all();
 
