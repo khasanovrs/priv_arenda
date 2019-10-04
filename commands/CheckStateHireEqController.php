@@ -8,6 +8,8 @@
 namespace app\commands;
 
 use app\components\hire\HireClass;
+use app\models\ApplicationEquipment;
+use app\models\Applications;
 use Yii;
 use yii\console\Controller;
 
@@ -20,21 +22,30 @@ class CheckStateHireEqController extends Controller
     {
         Yii::info('Запуск функции actionIndex', __METHOD__);
 
-        $result = HireClass::checkHire();
+        $app_eq = ApplicationEquipment::find()->all();
 
-        if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при добавлении нового статуса для заявки', __METHOD__);
+        if (!empty($app_eq)) {
+            Yii::info('Есть заявки обрабатываем', __METHOD__);
+            /**
+             * @var ApplicationEquipment $item
+             */
+            foreach ($app_eq as $item) {
+                $result = HireClass::checkHire($item);
 
-            if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
-                return $result;
+                if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при добавлении нового статуса для заявки', __METHOD__);
+
+                    if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
+                        return $result;
+                    }
+
+                    return false;
+                }
             }
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при проверке статусов заявки',
-            ];
         }
 
         Yii::info('Заявки успешно обработаны', __METHOD__);
+
+        return true;
     }
 }
