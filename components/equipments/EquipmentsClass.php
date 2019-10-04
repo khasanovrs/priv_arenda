@@ -476,7 +476,7 @@ class EquipmentsClass
         $filter = strtolower($filter);
         $filter = '%' . $filter . '%';
 
-        $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->where('lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter', [':filter' => $filter])->orderBy('id desc')->all();
+        $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->where('equipments.status=4 and (lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)', [':filter' => $filter])->orderBy('id desc')->all();
 
         if (empty($equipments)) {
             Yii::error('Список оборудования пуст', __METHOD__);

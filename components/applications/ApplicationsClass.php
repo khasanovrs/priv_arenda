@@ -666,6 +666,22 @@ class ApplicationsClass
                 return false;
             }
 
+            Yii::info('Опраделеяем статус для оборудования', __METHOD__);
+
+            if ($status===1 || $status===2) {
+                $equipments->status = '';
+
+                try {
+                    if (!$equipments->save(false)) {
+                        Yii::error('Ошибка при сохранении статуса оборудования: ' . serialize($equipments->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при сохранении статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+            }
+
             if ($sum_pay !== '') {
                 $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay, $cashBox, false);
 
