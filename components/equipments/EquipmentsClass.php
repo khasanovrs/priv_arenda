@@ -361,7 +361,6 @@ class EquipmentsClass
                 'type' => $value->type0->name,
                 'status' => $value->status0->name,
                 'color' => $value->status0->color,
-                'count' => $value->count,
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,
                 'rentals' => $value->rentals,
@@ -657,7 +656,6 @@ class EquipmentsClass
             'discount' => $equipment->discount,
             'new_status' => $equipment->status,
             'old_status' => $equipment->status,
-            'count' => $equipment->count,
             'selling_price' => $equipment->selling_price,
             'price_per_day' => $equipment->price_per_day,
             'rentals' => $equipment->rentals,
@@ -894,7 +892,6 @@ class EquipmentsClass
      * @param $stock
      * @param $equipmentsType
      * @param $equipmentsCategory
-     * @param $count
      * @param $tool_number
      * @param $selling_price
      * @param $price_per_day
@@ -916,7 +913,7 @@ class EquipmentsClass
      * @param $comment
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -981,7 +978,6 @@ class EquipmentsClass
         $newEquipment->stock_id = $stock;
         $newEquipment->type = $equipmentsType;
         $newEquipment->category_id = $equipmentsCategory;
-        $newEquipment->count = $count;
         $newEquipment->tool_number = $tool_number;
         $newEquipment->selling_price = $selling_price;
         $newEquipment->price_per_day = $price_per_day;

@@ -82,15 +82,6 @@ class ClientsClass
             ];
         }
 
-        if ($date_birth === '') {
-            Yii::error('Не передана дта рождения, source: ' . serialize($date_birth), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передана дта рождения',
-            ];
-        }
-
         if ($phone_1 === '') {
             Yii::error('Не передан номер телефона', __METHOD__);
 
