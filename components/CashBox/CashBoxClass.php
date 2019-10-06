@@ -38,7 +38,8 @@ class CashBoxClass
             $result[] = [
                 'val' => $value->id,
                 'name' => $value->name,
-                'sum' => $value->sum
+                'sum' => $value->sum,
+                'zalog' => $value->check_zalog,
             ];
         }
 
@@ -56,9 +57,10 @@ class CashBoxClass
      * @param $name
      * @param $sum
      * @param $val
+     * @param zalog
      * @return array|bool
      */
-    public static function addCashBox($name, $sum, $val)
+    public static function addCashBox($name, $sum, $val, $zalog)
     {
         Yii::info('Запуск функции addCashBox', __METHOD__);
 
@@ -88,6 +90,7 @@ class CashBoxClass
 
         $newCashBox->name = $name;
         $newCashBox->sum = $sum;
+        $newCashBox->check_zalog = $zalog;
 
         try {
             if (!$newCashBox->save(false)) {

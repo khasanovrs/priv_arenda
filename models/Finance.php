@@ -21,7 +21,6 @@ use Yii;
  * @property FinanceType $type
  * @property Clients $payer
  * @property FinanceCashbox $cashBox
- * @property Branch $branch
  */
 class Finance extends \yii\db\ActiveRecord
 {
@@ -48,7 +47,6 @@ class Finance extends \yii\db\ActiveRecord
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceType::className(), 'targetAttribute' => ['type_id' => 'id']],
             [['payer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['payer_id' => 'id']],
             [['cashBox_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceCashbox::className(), 'targetAttribute' => ['cashBox_id' => 'id']],
-            [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
         ];
     }
 
@@ -100,13 +98,5 @@ class Finance extends \yii\db\ActiveRecord
     public function getCashBox()
     {
         return $this->hasOne(FinanceCashbox::className(), ['id' => 'cashBox_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getBranch()
-    {
-        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
     }
 }
