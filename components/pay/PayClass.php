@@ -147,7 +147,8 @@ class PayClass
                 $arr = [
                     'date' => date('d.m.Y H:i', strtotime($value->date_create)),
                     'user_id' => $value->user->fio,
-                    'sum' => $value->sum
+                    'sum' => $value->sum,
+                    'cash_box' => $value->cashBox0->name
                 ];
 
                 array_push($pay_list, $arr);
