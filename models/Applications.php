@@ -20,6 +20,7 @@ use Yii;
  * @property string $rent_end
  * @property string $date_create
  * @property string $date_end
+ * @property string $is_not_active
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property Source $source
@@ -49,6 +50,7 @@ class Applications extends \yii\db\ActiveRecord
             [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
             [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment'], 'string', 'max' => 500],
+            [['is_not_active'], 'string', 'max' => 45],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
             [['delivery_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsDelivery::className(), 'targetAttribute' => ['delivery_id' => 'id']],
@@ -77,6 +79,7 @@ class Applications extends \yii\db\ActiveRecord
             'rent_end' => 'Rent End',
             'date_create' => 'Date Create',
             'date_end' => 'Date End',
+            'is_not_active' => 'Is Not Active',
         ];
     }
 

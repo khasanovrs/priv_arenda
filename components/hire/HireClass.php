@@ -411,9 +411,10 @@ class HireClass
         }
 
         if (!empty($listFilter)) {
+            $listFilter[]='is_not_active=0';
             $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $list = ApplicationEquipment::find()->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->where('is_not_active=0')->orderBy('id desc')->all();
         }
 
 
@@ -920,6 +921,54 @@ class HireClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Заявка успешно изменена'
+        ];
+    }
+
+
+    public static function deleteHire($app_id)
+    {
+        Yii::info('Запуск функции deleteHire', __METHOD__);
+
+        if ($app_id === '') {
+            Yii::error('Не передан идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор заявки',
+            ];
+        }
+
+        /**
+         * @var Applications $applications
+         */
+        $applications = Applications::find()->where('id=:id', [':id' => $app_id])->one();
+
+        if (!is_object($applications)) {
+            Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении оборудования'
+            ];
+        }
+
+        $applications->is_not_active=1;
+
+        try {
+            if (!$applications->save(false)) {
+                Yii::error('Ошибка при удалении проката: ' . serialize($applications->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении проката: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Прокат успешно удален', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Прокат успешно удален'
         ];
     }
 

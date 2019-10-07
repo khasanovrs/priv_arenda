@@ -363,6 +363,9 @@ class ApiController extends Controller
             'close-hire' => [
                 'class' => 'app\components\actions\hire\CloseHireAction',
             ],
+            'delete-hire' => [
+                'class' => 'app\components\actions\hire\DeleteHireAction',
+            ],
             /**
              * Работа с отчетами
              */
