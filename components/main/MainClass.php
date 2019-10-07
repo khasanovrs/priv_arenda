@@ -143,7 +143,7 @@ class MainClass
             ];
         }
 
-        if ($branch!==0) {
+        if ($branch !== 0) {
             $check_branch = Branch::find()->where('id=:id', [':id' => $branch])->one();
 
             if (!is_object($check_branch)) {
@@ -171,7 +171,9 @@ class MainClass
              * @var ApplicationPay $value
              */
             foreach ($applicationPayArr as $value) {
-                $allSum += (float)$value->sum;
+                if ($value->cashBox0->check_zalog === '0') {
+                    $allSum += (float)$value->sum;
+                }
             }
         }
 
