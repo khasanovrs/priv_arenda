@@ -918,6 +918,7 @@ class ApplicationsClass
                     'status' => $equipments->status_id,
                     'color' => $equipments->status->color,
                     'client' => $client->name,
+                    'branch' => $application->branch->name,
                     'phone' => $client->phone,
                     'typeLease' => $application->typeLease->name,
                     'source' => $application->source->name,
