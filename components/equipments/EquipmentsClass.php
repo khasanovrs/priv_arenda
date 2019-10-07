@@ -335,9 +335,10 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
+            $listFilter[] = 'is_not_active=0';
             $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->where('is_not_active=0')->all();
         }
 
         if (!is_array($equipmentsTypeList)) {
@@ -1891,8 +1892,7 @@ class EquipmentsClass
      * @param $id ,
      * @return bool|array
      */
-    public
-    static function DeleteType($id)
+    public static function DeleteType($id)
     {
         Yii::info('Запуск функции удаления типа оборудования', __METHOD__);
 
@@ -1928,6 +1928,58 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Тип успешно удален'
+        ];
+    }
+
+    /**
+     * Удаление оборудования
+     * @param $id ,
+     * @return bool|array
+     */
+    public static function DeleteEquipment($id)
+    {
+        Yii::info('Запуск функции удаления типа оборудования', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Ни передано идентификатор типа, id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передан идентификатор типа',
+            ];
+        }
+
+        /**
+         * @var Equipments $equipments
+         */
+        $equipments = Equipments::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($equipments)) {
+            Yii::error('Оборудование не найдено. id:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Оборудование не найдено',
+            ];
+        }
+
+        $equipments->is_not_active=1;
+
+        try {
+            if (!$equipments->save(false)) {
+                Yii::error('Ошибка при удалении оборудования: ' . serialize($equipments->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Оборудование успешно удалено', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно удалено'
         ];
     }
 

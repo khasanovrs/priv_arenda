@@ -30,6 +30,7 @@ use Yii;
  * @property string $photo
  * @property string $countHire количество прокатов
  * @property string $photo_alias
+ * @property string $is_not_active
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property EquipmentsCategory $category
@@ -62,7 +63,7 @@ class Equipments extends \yii\db\ActiveRecord
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],
-            [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio', 'countHire'], 'string', 'max' => 45],
+            [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio', 'countHire', 'is_not_active'], 'string', 'max' => 45],
             [['photo_alias'], 'string', 'max' => 250],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
@@ -102,6 +103,7 @@ class Equipments extends \yii\db\ActiveRecord
             'photo' => 'Photo',
             'countHire' => 'Count Hire',
             'photo_alias' => 'Photo Alias',
+            'is_not_active' => 'Is Not Active',
         ];
     }
 
