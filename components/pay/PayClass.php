@@ -67,12 +67,23 @@ class PayClass
             ];
         }
 
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $application_equipment_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::error('Заявка на оборудование не найдено: ' . serialize($app_eq), __METHOD__);
+            return false;
+        }
+
         $newPay = new ApplicationPay();
 
         $newPay->user_id = $session->user_id;
         $newPay->sum = ($revertSum ? '-' : '') . $sum;
         $newPay->cashBox = $cashBox;
         $newPay->application_equipment_id = $application_equipment_id;
+        $newPay->client_id = $app_eq->application->client_id;
         $newPay->date_create = date('Y-m-d H:i:s');
 
         try {
@@ -86,16 +97,6 @@ class PayClass
         }
 
         Yii::info('Обновляем общую сумму', __METHOD__);
-
-        /**
-         * @var ApplicationEquipment $app_eq
-         */
-        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $application_equipment_id])->one();
-
-        if (!is_object($app_eq)) {
-            Yii::error('Заявка на оборудование не найдено: ' . serialize($app_eq), __METHOD__);
-            return false;
-        }
 
         if ($revertSum) {
             $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;

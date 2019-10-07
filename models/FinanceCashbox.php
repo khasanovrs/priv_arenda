@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name Наименование категории
  * @property string $sum
- * @property string $check_zalog
+ * @property string $check_zalog Залог касса. 0-нет,1-да
  *
  * @property ApplicationPay[] $applicationPays
  * @property Finance[] $finances

@@ -722,6 +722,10 @@ class ClientsClass
                     continue;
                 }
 
+                $sum = ApplicationPay::find()->where('client_id=:client_id', [':client_id' => $value->id])->sum('sum');
+
+                $count_app = Applications::find()->where('client_id=:client_id',[':client_id'=>$value->id])->count();
+
                 $result[] = [
                     'id' => $value->id,
                     'fio' => $value->type === 1 ? $value->name : $value->clientsInfos[0]->name_chief,
@@ -737,6 +741,8 @@ class ClientsClass
                     'rentals' => $rentalsBD,
                     'dohod' => $dohodBD,
                     'sale' => ['code' => $discount->code, 'name' => $discount->name],
+                    'sum_pay' => $sum,
+                    'count_app' => $count_app
                 ];
             }
         }
