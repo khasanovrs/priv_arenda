@@ -668,7 +668,7 @@ class ApplicationsClass
 
             Yii::info('Опраделеяем статус для оборудования', __METHOD__);
 
-            if ($status===1 || $status===2) {
+            if ($status === 1 || $status === 2) {
                 $equipments->status = '';
 
                 try {
@@ -880,9 +880,10 @@ class ApplicationsClass
         }
 
         if (!empty($listFilter)) {
+            $listFilter[] = 'is_not_active=0';
             $applications = Applications::find()->joinWith('applicationEquipments')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $applications = Applications::find()->joinWith('applicationEquipments')->orderBy('id desc')->all();
+            $applications = Applications::find()->joinWith('applicationEquipments')->where('is_not_active=0')->orderBy('id desc')->all();
         }
 
         if (!is_array($applications)) {
