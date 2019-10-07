@@ -665,6 +665,7 @@ class EquipmentsClass
             'revenue' => $equipment->revenue,
             'profit' => $equipment->profit,
             'photo' => $equipment->photo,
+            'photo_alias' => $equipment->photo_alias,
             'degree_wear' => $equipment->degree_wear,
             'payback_ratio' => $equipment->payback_ratio,
             'power_energy' => $equipment->equipmentsInfos[0]->power_energy,
