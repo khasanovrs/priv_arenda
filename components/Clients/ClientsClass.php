@@ -686,9 +686,10 @@ class ClientsClass
         }
 
         if (!empty($listFilter)) {
+            $listFilter[] = 'is_not_active=0';
             $clients = Clients::find()->with('clientsInfos')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
         } else {
-            $clients = Clients::find()->with('clientsInfos')->orderBy('last_contact desc')->all();
+            $clients = Clients::find()->with('clientsInfos')->where('is_not_active=0')->orderBy('last_contact desc')->all();
         }
 
         if (is_array($clients)) {
@@ -1019,7 +1020,7 @@ class ClientsClass
 
         $like = '%' . $like . '%';
 
-        $clients = Clients::find()->where('name like :like', [':like' => $like])->limit(10)->all();
+        $clients = Clients::find()->where('is_not_active=0 and name like :like', [':like' => $like])->limit(10)->all();
 
         if (!is_array($clients)) {
             Yii::error('Клиенты не найдены, like: ' . serialize($like), __METHOD__);
@@ -1126,5 +1127,51 @@ class ClientsClass
         }
 
         return $client;
+    }
+
+    /**
+     * Удаление клиента
+     * @param $id
+     * @return bool|array
+     */
+    public static function DeleteClient($id)
+    {
+        Yii::info('Запуск функции GetAllClient', __METHOD__);
+
+        $result = [];
+
+        /**
+         * @var Clients $client
+         */
+        $client = Clients::find()->where('id = :id', [':id' => $id])->one();
+
+        if (!is_object($client)) {
+            Yii::error('Клиент не найден, id: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Клиент не найден'
+            ];
+        }
+
+        $client->is_not_active = 1;
+
+        try {
+            if (!$client->save(false)) {
+                Yii::error('Ошибка при удалении клиента: ' . serialize($client->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении клиента: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+
+        Yii::info('Клиенты успешно удален', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Клиенты успешно удален'
+        ];
     }
 }

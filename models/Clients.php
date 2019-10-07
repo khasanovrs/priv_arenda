@@ -15,6 +15,7 @@ use Yii;
  * @property int $branch_id
  * @property string $last_contact последний контакт
  * @property string $date_create дата создания записи
+ * @property string $is_not_active 0-активный,1-не активный
  *
  * @property ClientStatusChange[] $clientStatusChanges
  * @property Branch $branch
@@ -43,6 +44,7 @@ class Clients extends \yii\db\ActiveRecord
             [['last_contact', 'date_create'], 'safe'],
             [['name'], 'string', 'max' => 150],
             [['phone'], 'string', 'max' => 11],
+            [['is_not_active'], 'string', 'max' => 45],
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => ClientStatus::className(), 'targetAttribute' => ['status' => 'id']],
         ];
@@ -62,6 +64,7 @@ class Clients extends \yii\db\ActiveRecord
             'branch_id' => 'Branch ID',
             'last_contact' => 'Last Contact',
             'date_create' => 'Date Create',
+            'is_not_active' => 'Is Not Active',
         ];
     }
 

@@ -90,6 +90,9 @@ class ApiController extends Controller
             'update-status-client' => [
                 'class' => 'app\components\actions\client\UpdateStatusUrClientAction',
             ],
+            'delete-client' => [
+                'class' => 'app\components\actions\client\DeleteClientAction',
+            ],
             /**
              * Управление статусами для клиентов
              */

@@ -13,6 +13,7 @@ use Yii;
  *
  * @property Equipments[] $equipments
  * @property EquipmentsCategory $category
+ * @property EquipmentsCategory $category0
  */
 class EquipmentsType extends \yii\db\ActiveRecord
 {
@@ -33,6 +34,7 @@ class EquipmentsType extends \yii\db\ActiveRecord
             [['category_id'], 'required'],
             [['category_id'], 'integer'],
             [['name'], 'string', 'max' => 150],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
@@ -61,6 +63,14 @@ class EquipmentsType extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getCategory()
+    {
+        return $this->hasOne(EquipmentsCategory::className(), ['id' => 'category_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategory0()
     {
         return $this->hasOne(EquipmentsCategory::className(), ['id' => 'category_id']);
     }
