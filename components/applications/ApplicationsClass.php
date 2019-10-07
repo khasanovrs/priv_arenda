@@ -907,13 +907,13 @@ class ApplicationsClass
 
                 $mark = $equipments->equipments->mark0->name;
                 $model = $equipments->equipments->model;
-                $category = $equipments->equipments->category->name;
+                $type = $equipments->equipments->type0->name;
                 $client = ClientsClass::GetClientInfo($application->client_id);
 
                 $result[] = [
                     'id' => $application->id,
                     'equipments_id' => $equipments->id,
-                    'equipments_name' => $category . ' ' . $mark . ' ' . $model,
+                    'equipments_name' => $type . ' ' . $mark . ' ' . $model,
                     'equipments_count' => $equipments->equipments_count,
                     'status' => $equipments->status_id,
                     'color' => $equipments->status->color,
