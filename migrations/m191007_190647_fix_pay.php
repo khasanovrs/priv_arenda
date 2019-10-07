@@ -14,7 +14,7 @@ class m191007_190647_fix_pay extends Migration
     {
         $this->execute("ALTER TABLE `application_pay` 
 ADD COLUMN `client_id` INT(11) NOT NULL AFTER `sum`,
-ADD INDEX `fk_application_pay_3_idx1` (`client_id` ASC) VISIBLE;
+ADD INDEX `fk_application_pay_3_idx1` (`client_id` ASC);
 ;
 ");
     }
