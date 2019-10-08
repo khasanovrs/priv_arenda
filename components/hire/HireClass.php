@@ -411,10 +411,10 @@ class HireClass
         }
 
         if (!empty($listFilter)) {
-            $listFilter[]='applications.is_not_active=0';
+            $listFilter[]='applications.is_not_active=0 and status_id in (1,2)';
             $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $list = ApplicationEquipment::find()->joinWith(['application'])->where('applications.is_not_active=0')->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application'])->where('applications.is_not_active=0 and status_id in (1,2)')->orderBy('id desc')->all();
         }
 
 

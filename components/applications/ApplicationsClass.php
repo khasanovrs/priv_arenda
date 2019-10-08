@@ -651,7 +651,7 @@ class ApplicationsClass
             $newApplicationEquipment->application_id = $newApplications->id;
             $newApplicationEquipment->equipments_id = $value->id;
             $newApplicationEquipment->status_id = $status;
-            $newApplicationEquipment->hire_state_id = 1;
+            $newApplicationEquipment->hire_state_id = $status === 1 ? 4 : 1;
             $newApplicationEquipment->equipments_count = $value->count;
             $newApplicationEquipment->sum = round($price);
             $newApplicationEquipment->delivery_sum = $delivery_sum;
