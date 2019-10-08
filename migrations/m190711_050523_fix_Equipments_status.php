@@ -12,7 +12,7 @@ class m190711_050523_fix_Equipments_status extends Migration
      */
     public function safeUp()
     {
-        $this->execute("ALTER TABLE `equipments_status` ADD COLUMN `color` VARCHAR(45) NOT NULL DEFAULT '#000000' AFTER `name`;");
+        $this->execute("ALTER TABLE `equipments_status` ADD COLUMN `color` VARCHAR(45) NOT NULL DEFAULT '#ffffff' AFTER `name`;");
     }
 
     /**

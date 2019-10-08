@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Class m190711_044942_fix_client_status
+ * Class m191008_061746_fix_client_status
  */
-class m190711_044942_fix_client_status extends Migration
+class m191008_061746_fix_client_status extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->execute("ALTER TABLE `client_status` ADD COLUMN `color` VARCHAR(45) NOT NULL DEFAULT '#ffffff' AFTER `name`;");
+        $this->execute("UPDATE `applications_status` SET `name`='Отказ' WHERE `id`='4';");
     }
 
     /**
@@ -20,7 +20,7 @@ class m190711_044942_fix_client_status extends Migration
      */
     public function safeDown()
     {
-        echo "m190711_044942_fix_client_status cannot be reverted.\n";
+        echo "m191008_061746_fix_client_status cannot be reverted.\n";
 
         return false;
     }
@@ -34,7 +34,7 @@ class m190711_044942_fix_client_status extends Migration
 
     public function down()
     {
-        echo "m190711_044942_fix_client_status cannot be reverted.\n";
+        echo "m191008_061746_fix_client_status cannot be reverted.\n";
 
         return false;
     }

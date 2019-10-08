@@ -12,10 +12,10 @@ class m190712_100721_hire_status_insert extends Migration
      */
     public function safeUp()
     {
-        $this->execute("INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('1', 'В прокате', '#000000');
-INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('2', 'Просрочен', '#000000');
-INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('3', 'Бронь', '#000000');
-INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('4', 'Закрыт', '#000000');
+        $this->execute("INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('1', 'В прокате', '#ffffff');
+INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('2', 'Просрочен', '#ffffff');
+INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('3', 'Бронь', '#ffffff');
+INSERT INTO `hire_status` (`id`, `name`, `color`) VALUES ('4', 'Закрыт', '#ffffff');
 ");
     }
 

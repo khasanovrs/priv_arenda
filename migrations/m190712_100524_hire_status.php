@@ -15,7 +15,7 @@ class m190712_100524_hire_status extends Migration
         $this->execute("CREATE TABLE `hire_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(150) CHARACTER SET utf8 NOT NULL,
-  `color` varchar(45) CHARACTER SET utf8 NOT NULL DEFAULT '#000000',
+  `color` varchar(45) CHARACTER SET utf8 NOT NULL DEFAULT '#ffffff',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
