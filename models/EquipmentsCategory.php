@@ -12,6 +12,7 @@ use Yii;
  *
  * @property Equipments[] $equipments
  * @property EquipmentsType[] $equipmentsTypes
+ * @property EquipmentsType[] $equipmentsTypes0
  */
 class EquipmentsCategory extends \yii\db\ActiveRecord
 {
@@ -57,6 +58,14 @@ class EquipmentsCategory extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getEquipmentsTypes()
+    {
+        return $this->hasMany(EquipmentsType::className(), ['category_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsTypes0()
     {
         return $this->hasMany(EquipmentsType::className(), ['category_id' => 'id']);
     }
