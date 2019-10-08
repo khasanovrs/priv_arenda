@@ -550,7 +550,7 @@ class EquipmentsClass
             array_push($arr, $value->id);
         }
 
-        $equipments = Equipments::find()->where(['in', 'stock_id', $arr])->all();
+        $equipments = Equipments::find()->where(['in', 'stock_id', $arr])->andWhere('status=4')->all();
 
         if (empty($equipments)) {
             Yii::error('Список оборудования пуст', __METHOD__);
