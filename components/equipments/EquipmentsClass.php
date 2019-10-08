@@ -440,7 +440,8 @@ class EquipmentsClass
                 'count' => $value->status_id,
                 'name' => $eq->category->name . ' ' . $eq->mark0->name . ' ' . $eq->model,
                 'price' => $eq->price_per_day,
-                'photo' => $eq->photo
+                'photo' => $eq->photo,
+                'photo_alias' => $eq->photo_alias
             ];
         }
 
