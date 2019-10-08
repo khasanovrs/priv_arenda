@@ -669,7 +669,7 @@ class ApplicationsClass
             Yii::info('Опраделеяем статус для оборудования', __METHOD__);
 
             if ($status === 1 || $status === 2) {
-                $equipments->status = '';
+                $equipments->status = $status === 1 ? 1 : 5;
 
                 try {
                     if (!$equipments->save(false)) {
