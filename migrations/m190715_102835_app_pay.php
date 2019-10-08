@@ -18,7 +18,10 @@ class m190715_102835_app_pay extends Migration
   `user_id` int(11) NOT NULL,
   `date_create` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  
+  KEY `fk_application_pay_1_idx` (`application_equipment_id`),
+  KEY `fk_application_pay_2_idx` (`user_id`),
+  CONSTRAINT `fk_application_pay_1` FOREIGN KEY (`application_equipment_id`) REFERENCES `application_equipment` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_application_pay_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
     }

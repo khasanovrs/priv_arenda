@@ -29,7 +29,8 @@ class m190613_151209_arenda_stroika extends Migration
             FOREIGN KEY (`equipments_id`)
             REFERENCES `equipments` (`id`)
             ON DELETE NO ACTION
-            ON UPDATE NO ACTION);
+            ON UPDATE NO ACTION)
+            ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
         ");
     }
 
