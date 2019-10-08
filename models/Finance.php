@@ -13,13 +13,11 @@ use Yii;
  * @property int $category_id
  * @property int $type_id
  * @property string $date_create
- * @property int $payer_id
  * @property string $sum
  * @property int $cashBox_id
  *
  * @property FinanceCategory $category
  * @property FinanceType $type
- * @property Clients $payer
  * @property FinanceCashbox $cashBox
  * @property Branch $branch
  */
@@ -39,14 +37,13 @@ class Finance extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'branch_id', 'category_id', 'type_id', 'payer_id', 'cashBox_id'], 'required'],
-            [['branch_id', 'category_id', 'type_id', 'payer_id', 'cashBox_id'], 'integer'],
+            [['name', 'branch_id', 'category_id', 'type_id', 'cashBox_id'], 'required'],
+            [['branch_id', 'category_id', 'type_id', 'cashBox_id'], 'integer'],
             [['date_create'], 'safe'],
             [['name'], 'string', 'max' => 150],
             [['sum'], 'string', 'max' => 45],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceType::className(), 'targetAttribute' => ['type_id' => 'id']],
-            [['payer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['payer_id' => 'id']],
             [['cashBox_id'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceCashbox::className(), 'targetAttribute' => ['cashBox_id' => 'id']],
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
         ];
@@ -64,7 +61,6 @@ class Finance extends \yii\db\ActiveRecord
             'category_id' => 'Category ID',
             'type_id' => 'Type ID',
             'date_create' => 'Date Create',
-            'payer_id' => 'Payer ID',
             'sum' => 'Sum',
             'cashBox_id' => 'Cash Box ID',
         ];
@@ -84,14 +80,6 @@ class Finance extends \yii\db\ActiveRecord
     public function getType()
     {
         return $this->hasOne(FinanceType::className(), ['id' => 'type_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPayer()
-    {
-        return $this->hasOne(Clients::className(), ['id' => 'payer_id']);
     }
 
     /**

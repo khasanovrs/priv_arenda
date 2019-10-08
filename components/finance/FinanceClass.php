@@ -5,6 +5,7 @@
 
 namespace app\components\finance;
 
+use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\Branch;
 use app\models\Equipments;
@@ -330,29 +331,28 @@ class FinanceClass
                 'category_id' => $finance->category_id,
                 'type' => $finance->type->name,
                 'date_create' => date('d.m.Y', strtotime($finance->date_create)),
-                'payer' => $finance->payer->name,
                 'sum' => $finance->sum,
                 'branch' => $finance->branch->name
             ];
 
             $checkSearch = false;
 
-             if ($finance->type_id === 1) {
-                 foreach ($sum['rate'] as $key => $value) {
-                     if ($value['val'] === $finance->category_id) {
-                         $checkSearch = true;
-                         $sum['rate'][$key]['sum'] += (float)$finance->sum;
-                     }
-                 }
+            if ($finance->type_id === 1) {
+                foreach ($sum['rate'] as $key => $value) {
+                    if ($value['val'] === $finance->category_id) {
+                        $checkSearch = true;
+                        $sum['rate'][$key]['sum'] += (float)$finance->sum;
+                    }
+                }
 
-                 if (!$checkSearch) {
-                     $sum['rate'][] = [
-                         'val' => $finance->category_id,
-                         'name' => $finance->category->name,
-                         'sum' => (float)$finance->sum,
-                     ];
-                 }
-             }
+                if (!$checkSearch) {
+                    $sum['rate'][] = [
+                        'val' => $finance->category_id,
+                        'name' => $finance->category->name,
+                        'sum' => (float)$finance->sum,
+                    ];
+                }
+            }
 
             if ($finance->type_id === 2) {
                 foreach ($sum['income'] as $key => $value) {
@@ -421,8 +421,6 @@ class FinanceClass
             'category' => $finance->category_id,
             'type' => $finance->type_id,
             'date' => date('d.m.Y', strtotime($finance->date_create)),
-            'payer' => $finance->payer->name,
-            'payer_id' => $finance->payer_id,
             'sum' => $finance->sum,
             'cashBox' => $finance->cashBox_id,
             'branch' => $finance->branch_id
@@ -517,13 +515,12 @@ class FinanceClass
      * @param $category
      * @param $type
      * @param $date
-     * @param $payer
      * @param $sum
      * @param $cashBox
      * @param $branch
      * @return array|bool
      */
-    public static function addFinance($id, $name, $category, $type, $date, $payer, $sum, $cashBox, $branch)
+    public static function addFinance($id, $name, $category, $type, $date, $sum, $cashBox, $branch)
     {
         Yii::info('Функция добавления финансов', __METHOD__);
 
@@ -560,15 +557,6 @@ class FinanceClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передана дата'
-            ];
-        }
-
-        if ($payer === '') {
-            Yii::error('Не передан идетификатор плательщика', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идетификатор плательщика'
             ];
         }
 
@@ -660,19 +648,13 @@ class FinanceClass
 
             $newFinance->name = $name;
             $newFinance->category_id = $category;
-            //$newFinance->type_id = $type;
-            //$newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
-            $newFinance->payer_id = $payer;
             $newFinance->branch_id = $branch;
-            //$newFinance->sum = $sum;
-            //$newFinance->cashBox_id = $cashBox;
         } else {
             $newFinance = new Finance();
             $newFinance->name = $name;
             $newFinance->category_id = $category;
             $newFinance->type_id = $type;
             $newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
-            $newFinance->payer_id = $payer;
             $newFinance->sum = $sum;
             $newFinance->branch_id = $branch;
             $newFinance->cashBox_id = $cashBox;
@@ -686,6 +668,18 @@ class FinanceClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при добавлении финансов: ' . serialize($e->getMessage()), __METHOD__);
             return false;
+        }
+        $revert = $type === 1 ? true : false;
+
+        $check_update = PayClass::updateCashBox($cashBox, $sum, $revert);
+
+        if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при обновлении кассы', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при обновлении кассы',
+            ];
         }
 
         Yii::info('Финансовая запись успешно изменена', __METHOD__);

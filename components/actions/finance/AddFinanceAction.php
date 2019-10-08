@@ -22,12 +22,11 @@ class AddFinanceAction extends Action
         $category = $request->getBodyParam('category');
         $type = $request->getBodyParam('type');
         $date = $request->getBodyParam('date');
-        $payer = $request->getBodyParam('payer');
         $sum = $request->getBodyParam('sum');
         $cashBox = $request->getBodyParam('cashBox');
         $branch = $request->getBodyParam('branch');
 
-        $result = FinanceClass::addFinance($id, $name, $category, $type, $date, $payer, $sum, $cashBox, $branch);
+        $result = FinanceClass::addFinance($id, $name, $category, $type, $date, $sum, $cashBox, $branch);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении финансов', __METHOD__);
