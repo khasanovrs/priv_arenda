@@ -9,6 +9,7 @@ use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use app\models\Extension;
+use app\models\FinanceCashbox;
 use Yii;
 
 class PayClass
@@ -113,6 +114,17 @@ class PayClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении общей суммы платежа: ' . serialize($e->getMessage()), __METHOD__);
             return false;
+        }
+
+        $check_update = self::updateCashBox($cashBox, $sum, $revertSum);
+
+        if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при обновлении кассы', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при обновлении кассы',
+            ];
         }
 
         return [
@@ -220,5 +232,52 @@ class PayClass
         ];
     }
 
+    /**
+     * Добавление платежа в кассу
+     * @param $id
+     * @param $sum
+     * @param $revert
+     * @return array|bool
+     */
+    public static function updateCashBox($id, $sum, $revert)
+    {
+        Yii::info('Запуск обновления суммы кассы', __METHOD__);
 
+        /**
+         * @var FinanceCashbox $cash_box
+         */
+        $cash_box = FinanceCashbox::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($cash_box)) {
+            Yii::error('Ошибка при опредении кассы', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении кассы'
+            ];
+        }
+
+        if ($revert) {
+            $cash_box->sum -= (float)$sum;
+        } else {
+            $cash_box->sum += (float)$sum;
+        }
+
+        try {
+            if (!$cash_box->save(false)) {
+                Yii::error('Ошибка при изменении суммы кассы: ' . serialize($cash_box->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении суммы кассы: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Сумма кассы успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Сумма кассы успешно изменена'
+        ];
+    }
 }

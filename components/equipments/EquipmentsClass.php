@@ -5,6 +5,7 @@
 
 namespace app\components\equipments;
 
+use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\Equipments;
@@ -1525,35 +1526,23 @@ class EquipmentsClass
 
 
         if ($amount_repair !== '' || $sale_amount != '') {
-            /**
-             * @var FinanceCashbox $cash_box
-             */
-            $cash_box = FinanceCashbox::find()->where('id=:id', [':id' => $cashBox])->one();
+            if ($amount_repair !== '') {
+                $sum = (float)$amount_repair;
+                $revertSum = true;
+            } else {
+                $sum = (float)$amount_repair;
+                $revertSum = false;
+            }
 
-            if (!is_object($cash_box)) {
-                Yii::error('Ошибка при опредении кассы', __METHOD__);
+            $check_update = PayClass::updateCashBox($cashBox, $sum, $revertSum);
+
+            if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при обновлении кассы', __METHOD__);
 
                 return [
                     'status' => 'ERROR',
-                    'msg' => 'Ошибка при опредении кассы'
+                    'msg' => 'Ошибка при обновлении кассы',
                 ];
-            }
-
-            if ($amount_repair !== '') {
-                $cash_box->sum -= (float)$amount_repair;
-            } else {
-                $cash_box->sum += (float)$sale_amount;
-            }
-
-
-            try {
-                if (!$cash_box->save(false)) {
-                    Yii::error('Ошибка при изменении суммы кассы: ' . serialize($cash_box->getErrors()), __METHOD__);
-                    return false;
-                }
-            } catch (\Exception $e) {
-                Yii::error('Поймали Exception при изменении суммы кассы: ' . serialize($e->getMessage()), __METHOD__);
-                return false;
             }
         }
 
@@ -1964,7 +1953,7 @@ class EquipmentsClass
             ];
         }
 
-        $equipments->is_not_active=1;
+        $equipments->is_not_active = 1;
 
         try {
             if (!$equipments->save(false)) {
