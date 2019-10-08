@@ -13,7 +13,7 @@ class m190613_151209_arenda_stroika extends Migration
     public function safeUp()
     {
         $this->execute("CREATE TABLE `application_equipment` (
-          `id` INT NOT NULL AUTO_INCREMENT,
+          `id` INT(11) INT NOT NULL AUTO_INCREMENT,
           `application_id` INT(11) NOT NULL,
           `equipments_id` INT(11) NOT NULL,
           `equipments_count` INT(11) NOT NULL,
