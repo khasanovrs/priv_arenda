@@ -60,7 +60,7 @@ class MainClass
 
         $applicationEquipmentHire = ApplicationEquipment::find()
             ->joinWith('application')
-            ->where('applications.branch_id=:branch and hire_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->where('status_id in (1,2) and applications.branch_id=:branch and (applications.rent_start < :date_start || applications.rent_end > :date_end)', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count();
 
         $applicationEquipmentRenewals = ApplicationEquipment::find()
