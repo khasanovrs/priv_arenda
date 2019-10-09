@@ -481,7 +481,7 @@ class HireClass
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
-                'current_pay' => $sumCurrenDay
+                'current_pay' => (float)$sumCurrenDay
             ];
         }
 
