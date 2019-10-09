@@ -411,7 +411,7 @@ class HireClass
         }
 
         if (!empty($listFilter)) {
-            $listFilter[]='applications.is_not_active=0 and status_id in (1,2)';
+            $listFilter[] = 'applications.is_not_active=0 and status_id in (1,2)';
             $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->joinWith(['application'])->where('applications.is_not_active=0 and status_id in (1,2)')->orderBy('id desc')->all();
@@ -451,7 +451,7 @@ class HireClass
             /**
              * @var ApplicationPay $checkPay
              */
-            $checkPay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->one();
+            $sumCurrenDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('sum');
 
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
@@ -481,7 +481,7 @@ class HireClass
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
-                'current_pay' => is_object($checkPay) ? $checkPay->sum : '0'
+                'current_pay' => $sumCurrenDay
             ];
         }
 
@@ -952,7 +952,7 @@ class HireClass
             ];
         }
 
-        $applications->is_not_active=1;
+        $applications->is_not_active = 1;
 
         try {
             if (!$applications->save(false)) {
