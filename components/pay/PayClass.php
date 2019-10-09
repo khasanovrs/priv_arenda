@@ -99,12 +99,13 @@ class PayClass
 
         Yii::info('Обновляем общую сумму', __METHOD__);
 
-        if ($revertSum) {
-            $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
-        } else {
-            $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
+        if ($newPay->cashBox0->check_zalog === '0') {
+            if ($revertSum) {
+                $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
+            } else {
+                $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
+            }
         }
-
 
         try {
             if (!$app_eq->save(false)) {

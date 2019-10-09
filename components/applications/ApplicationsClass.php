@@ -6,6 +6,7 @@
 namespace app\components\applications;
 
 use app\components\Clients\ClientsClass;
+use app\components\equipments\EquipmentsClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -361,6 +362,19 @@ class ApplicationsClass
 
         $applications->status_id = $status;
 
+        if ($status === 1 || $status === 2) {
+            $checkChange = EquipmentsClass::changeStatus($applications->equipments_id,$status === 1 ? 1 : 5);
+
+            if (!is_array($checkChange) || !isset($checkChange['status']) || $checkChange['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменении статуса оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении статуса оборудования',
+                ];
+            }
+        }
+
         try {
             if (!$applications->save(false)) {
                 Yii::error('Ошибка при обновлении статуса заявки: ' . serialize($applications->getErrors()), __METHOD__);
@@ -626,20 +640,6 @@ class ApplicationsClass
                 ];
             }
 
-            /**
-             * @var Equipments $equipments
-             */
-            $equipments = Equipments::find()->where('id=:id', [':id' => $value->id])->one();
-
-            if (!is_object($disc)) {
-                Yii::info('Ошибка при получении оборудования', __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при получении оборудования'
-                ];
-            }
-
             $datediff = strtotime($rent_end) - strtotime($rent_start);
             $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
 
@@ -669,16 +669,15 @@ class ApplicationsClass
             Yii::info('Опраделеяем статус для оборудования', __METHOD__);
 
             if ($status === 1 || $status === 2) {
-                $equipments->status = $status === 1 ? 1 : 5;
+                $checkChange = EquipmentsClass::changeStatus($value->id,$status === 1 ? 1 : 5);
 
-                try {
-                    if (!$equipments->save(false)) {
-                        Yii::error('Ошибка при сохранении статуса оборудования: ' . serialize($equipments->getErrors()), __METHOD__);
-                        return false;
-                    }
-                } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при сохранении статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
-                    return false;
+                if (!is_array($checkChange) || !isset($checkChange['status']) || $checkChange['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при изменении статуса оборудования', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при изменении статуса оборудования',
+                    ];
                 }
             }
 

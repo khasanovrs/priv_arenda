@@ -1981,8 +1981,7 @@ class EquipmentsClass
      * @param $id ,
      * @return bool|array
      */
-    public
-    static function DeleteMark($id)
+    public static function DeleteMark($id)
     {
         Yii::info('Запуск функции удаления марки оборудования', __METHOD__);
 
@@ -2018,6 +2017,49 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Марка успешно удалена'
+        ];
+    }
+
+    /**
+     * Функция изменения статуса у оборудования
+     * @param $id_eq ,
+     * @param $status
+     * @return bool|array
+     */
+    public static function changeStatus($id_eq, $status)
+    {
+        Yii::info('Запуск функции изменения статуса у оборудования', __METHOD__);
+
+        /**
+         * @var Equipments $equipments
+         */
+        $equipments = Equipments::find()->where('id=:id', [':id' => $id_eq])->one();
+
+        if (!is_object($equipments)) {
+            Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении оборудования'
+            ];
+        }
+
+        $equipments->status = $status;
+        $equipments->rentals = $status === 1 ? ++$equipments->rentals : $equipments->rentals;
+
+        try {
+            if (!$equipments->save(false)) {
+                Yii::error('Ошибка при сохранении статуса оборудования: ' . serialize($equipments->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно изменено'
         ];
     }
 }
