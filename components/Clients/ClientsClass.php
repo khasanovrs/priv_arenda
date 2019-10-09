@@ -699,30 +699,28 @@ class ClientsClass
             foreach ($clients as $value) {
                 $sourceBD = $value->clientsInfos[0]->source0;
                 $discount = $value->clientsInfos[0]->sale0;
-                $rentalsBD = $value->clientsInfos[0]->rentals;
-                $dohodBD = $value->clientsInfos[0]->dohod;
 
                 if ($source !== '' && $source !== null && $source !== $sourceBD) {
                     continue;
                 }
 
-                if ($rentals_start !== '' && $rentals_start !== null && $rentals_start > $rentalsBD) {
+                if ($rentals_start !== '' && $rentals_start !== null) {
                     continue;
                 }
 
-                if ($rentals_end !== '' && $rentals_end !== null && $rentals_end < $rentalsBD) {
+                if ($rentals_end !== '' && $rentals_end !== null) {
                     continue;
                 }
 
-                if ($dohod_start !== '' && $dohod_start !== null && $dohod_start > $dohodBD) {
+                if ($dohod_start !== '' && $dohod_start !== null) {
                     continue;
                 }
 
-                if ($dohod_end !== '' && $dohod_end !== null && $dohod_end < $dohodBD) {
+                if ($dohod_end !== '' && $dohod_end !== null) {
                     continue;
                 }
 
-                $sum = ApplicationPay::find()->where('client_id=:client_id', [':client_id' => $value->id])->sum('sum');
+                $sum = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and client_id=:client_id', [':client_id' => $value->id])->sum('application_pay.sum');
 
                 $count_app = Applications::find()->where('client_id=:client_id',[':client_id'=>$value->id])->count();
 
@@ -738,8 +736,6 @@ class ClientsClass
                     'date_create' => date('d.m.Y', strtotime($value->date_create)),
                     'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
                     'source' => ['id' => $sourceBD->id, 'name' => $sourceBD->name],
-                    'rentals' => $rentalsBD,
-                    'dohod' => $dohodBD,
                     'sale' => ['code' => $discount->code, 'name' => $discount->name],
                     'sum_pay' => $sum,
                     'count_app' => $count_app
