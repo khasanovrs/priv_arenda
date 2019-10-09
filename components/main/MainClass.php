@@ -94,13 +94,17 @@ class MainClass
 
         Yii::info('Получаем средний чек и общая сумма', __METHOD__);
 
-        $sum = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
+        $payList = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
 
-        if (!empty($sum)) {
+        if (!empty($payList)) {
             /**
              * @var ApplicationPay $value
              */
-            foreach ($sum as $value) {
+            foreach ($payList as $value) {
+                if ($value->cashBox0->check_zalog === '1') {
+                    continue;
+                }
+
                 $allSum += (float)$value->sum;
                 $count++;
             }
