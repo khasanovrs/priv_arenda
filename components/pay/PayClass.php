@@ -105,6 +105,25 @@ class PayClass
             } else {
                 $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
             }
+
+            $eq = $app_eq->equipments;
+
+            if (!is_object($eq)) {
+                Yii::error('Оборудование не найдено', __METHOD__);
+                return false;
+            }
+
+            $eq->revenue += (float)$sum;
+
+            try {
+                if (!$eq->save(false)) {
+                    Yii::error('Ошибка при сохранении информации по оборудованию: ' . serialize($eq->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении информации по оборудованию: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
         }
 
         try {
