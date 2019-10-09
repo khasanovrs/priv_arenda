@@ -363,7 +363,7 @@ class ApplicationsClass
         $applications->status_id = $status;
 
         if ($status === 1 || $status === 2) {
-            $checkChange = EquipmentsClass::changeStatus($applications->equipments_id,$status === 1 ? 1 : 5);
+            $checkChange = EquipmentsClass::changeStatus($applications->equipments_id, $status === 1 ? 1 : 5);
 
             if (!is_array($checkChange) || !isset($checkChange['status']) || $checkChange['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при изменении статуса оборудования', __METHOD__);
@@ -640,8 +640,22 @@ class ApplicationsClass
                 ];
             }
 
+            /**
+             * @var Equipments $equipment
+             */
+            $equipment = Equipments::find()->where('id=:id', [':id' => $value->id])->one();
+
+            if (!is_object($equipment)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
+
             $datediff = strtotime($rent_end) - strtotime($rent_start);
-            $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
+            $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day;
 
             if ((int)$disc->code !== 0) {
                 $price = $price - ($price * $disc->code / 100);
@@ -669,7 +683,7 @@ class ApplicationsClass
             Yii::info('Опраделеяем статус для оборудования', __METHOD__);
 
             if ($status === 1 || $status === 2) {
-                $checkChange = EquipmentsClass::changeStatus($value->id,$status === 1 ? 1 : 5);
+                $checkChange = EquipmentsClass::changeStatus($value->id, $status === 1 ? 1 : 5);
 
                 if (!is_array($checkChange) || !isset($checkChange['status']) || $checkChange['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при изменении статуса оборудования', __METHOD__);
