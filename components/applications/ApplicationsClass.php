@@ -937,7 +937,7 @@ class ApplicationsClass
                     'source' => $application->source->name,
                     'comment' => $application->comment,
                     'user' => $application->user->fio,
-                    'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
+                    'date_create' => $application->date_create,
                 ];
             }
         }
