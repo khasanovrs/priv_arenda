@@ -1286,6 +1286,9 @@ class EquipmentsClass
             ];
         }
 
+        // количетсво ремонтов
+        $repairCurrent = $new_status !== $old_status && $new_status === 2 ? ++$equipment->repairs : $equipment->repairs;
+
         $equipment->mark = $mark;
         $equipment->model = $model;
         $equipment->stock_id = $new_stock;
@@ -1300,8 +1303,8 @@ class EquipmentsClass
         $equipment->degree_wear = $degree_wear;
         $equipment->discount = $discount;
         $equipment->rentals = $rentals;
-        $equipment->repairs = $repairs;
-        $equipment->repairs_sum = $repairs_sum;
+        $equipment->repairs = $repairCurrent;
+        $equipment->repairs_sum += (float)$amount_repair;
         $equipment->profit = $profit;
         $equipment->payback_ratio = $payback_ratio;
         $equipment->photo_alias = $photo_alias;
