@@ -114,8 +114,8 @@ class PayClass
             }
 
             $eq->revenue += (float)$sum;
-            $eq->profit = $eq->revenue - $eq->repairs_sum;
-            $eq->payback_ratio = $eq->profit / $eq->selling_price;
+            $eq->profit = (float)$eq->revenue - (float)$eq->repairs_sum;
+            $eq->payback_ratio = (float)$eq->profit / (float)$eq->selling_price;
 
             try {
                 if (!$eq->save(false)) {
