@@ -117,9 +117,9 @@ class PayClass
             $eq->profit = (float)$eq->revenue - (float)$eq->repairs_sum;
 
 
-            Yii::error('Оборудование не найдено'.serialize($eq->profit), __METHOD__);
+            Yii::error('Оборудование не найдено' . serialize($eq->profit), __METHOD__);
 
-            $eq->payback_ratio = $eq->profit == 0 ? 0 : (float)$eq->profit / (float)$eq->selling_price;
+            $eq->payback_ratio = round($eq->profit == 0 ? 0 : (float)$eq->profit / (float)$eq->selling_price, 2);
 
             try {
                 if (!$eq->save(false)) {

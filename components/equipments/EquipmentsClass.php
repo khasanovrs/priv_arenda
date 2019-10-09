@@ -1413,6 +1413,17 @@ class EquipmentsClass
             }
         }
 
+        $checkUpdateEq = self::updateFinanceEquipment($id);
+
+        if (!is_array($checkUpdateEq) || !isset($checkUpdateEq['status']) || $checkUpdateEq['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при изменении оборудования', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении оборудования',
+            ];
+        }
+
         return [
             'status' => 'SUCCESS',
             'msg' => 'Оборудование успешно изменено'
@@ -2054,6 +2065,48 @@ class EquipmentsClass
             }
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно изменено'
+        ];
+    }
+
+    /**
+     * Функция обновления финансовой информаци об оборудовании
+     * @param $id_eq
+     * @return array|bool
+     */
+    public static function updateFinanceEquipment($id_eq)
+    {
+        Yii::info('Запуск обновления финансовой информаци об оборудовании', __METHOD__);
+
+        /**
+         * @var Equipments $equipments
+         */
+        $equipments = Equipments::find()->where('id=:id', [':id' => $id_eq])->one();
+
+        if (!is_object($equipments)) {
+            Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении оборудования'
+            ];
+        }
+
+        $equipments->profit = (float)$equipments->revenue - (float)$equipments->repairs_sum;
+        $equipments->payback_ratio = round($equipments->profit == 0 ? 0 : (float)$equipments->profit / (float)$equipments->selling_price, 2);
+
+        try {
+            if (!$equipments->save(false)) {
+                Yii::error('Ошибка при сохранении информации по оборудованию: ' . serialize($equipments->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении информации по оборудованию: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
 
