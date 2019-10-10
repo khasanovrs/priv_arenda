@@ -403,17 +403,16 @@ class ApplicationsClass
      * @param $rent_end
      * @param $delivery
      * @param $sum
-     * @param $sum_pay
      * @param $delivery_sum
      * @param $status
      * @param $comment
      * @param $branch
      * @param $source
-     * @param $cashBox
+     * @param $payList
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $sum_pay, $delivery_sum, $status, $comment, $branch, $source, $cashBox)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch, $source, $payList)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -695,17 +694,20 @@ class ApplicationsClass
                 }
             }
 
-            if ($sum_pay !== '') {
-                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $sum_pay, $cashBox, false);
+            if (count($payList) !== 0) {
+                foreach ($payList as $value) {
+                    $checkApp = PayClass::AddPay($newApplicationEquipment->id, $value->sum, $value->cashBox, $value->revertSum);
 
-                if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
-                    Yii::error('Ошибка при добавлении платежа', __METHOD__);
+                    if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
+                        Yii::error('Ошибка при добавлении платежа', __METHOD__);
 
-                    return [
-                        'status' => 'ERROR',
-                        'msg' => 'Ошибка при добавлении платежа',
-                    ];
+                        return [
+                            'status' => 'ERROR',
+                            'msg' => 'Ошибка при добавлении платежа',
+                        ];
+                    }
                 }
+
             }
         }
 
