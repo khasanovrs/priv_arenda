@@ -328,7 +328,8 @@ class FinanceClass
             $result[] = [
                 'id' => $finance->id,
                 'name' => $finance->name,
-                'category_id' => $finance->category_id,
+                'category' => $finance->category->name,
+                'cashBox' => $finance->cashBox->name,
                 'type' => $finance->type->name,
                 'date_create' => date('d.m.Y', strtotime($finance->date_create)),
                 'sum' => $finance->sum,
@@ -418,12 +419,12 @@ class FinanceClass
         $result = [
             'id' => $finance->id,
             'name' => $finance->name,
-            'category' => $finance->category_id,
-            'type' => $finance->type_id,
-            'date' => date('d.m.Y', strtotime($finance->date_create)),
+            'category' => $finance->category->name,
+            'type' => $finance->type->name,
+            'date' => date('d.m.Y H:i:s', strtotime($finance->date_create)),
             'sum' => $finance->sum,
-            'cashBox' => $finance->cashBox_id,
-            'branch' => $finance->branch_id
+            'cashBox' => $finance->cashBox->name,
+            'branch' => $finance->branch->name
         ];
 
         Yii::info('Запись финанса получена', __METHOD__);
@@ -514,13 +515,12 @@ class FinanceClass
      * @param $name
      * @param $category
      * @param $type
-     * @param $date
      * @param $sum
      * @param $cashBox
      * @param $branch
      * @return array|bool
      */
-    public static function addFinance($id, $name, $category, $type, $date, $sum, $cashBox, $branch)
+    public static function addFinance($id, $name, $category, $type, $sum, $cashBox, $branch)
     {
         Yii::info('Функция добавления финансов', __METHOD__);
 
@@ -548,15 +548,6 @@ class FinanceClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передан идентификатор типа'
-            ];
-        }
-
-        if ($date === '') {
-            Yii::error('Не передана дата', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передана дата'
             ];
         }
 
@@ -654,7 +645,7 @@ class FinanceClass
             $newFinance->name = $name;
             $newFinance->category_id = $category;
             $newFinance->type_id = $type;
-            $newFinance->date_create = date('Y-m-d H:i:s', strtotime($date));
+            $newFinance->date_create = date('Y-m-d H:i:s');
             $newFinance->sum = $sum;
             $newFinance->branch_id = $branch;
             $newFinance->cashBox_id = $cashBox;
