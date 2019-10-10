@@ -23,6 +23,7 @@ use Yii;
  * @property string $number_passport
  * @property string $date_create дата создания записи
  * @property string $date_update дата создания записи
+ * @property string $bonus_account
  *
  * @property Clients $client
  * @property Source $source0
@@ -48,7 +49,7 @@ class ClientsInfo extends \yii\db\ActiveRecord
             [['client_id', 'source', 'rentals', 'dohod', 'sale'], 'integer'],
             [['date_create', 'date_update'], 'safe'],
             [['inn'], 'string', 'max' => 20],
-            [['kpp', 'phone_second'], 'string', 'max' => 45],
+            [['kpp', 'phone_second', 'bonus_account'], 'string', 'max' => 45],
             [['name_chief', 'phone_chief', 'date_birth', 'email', 'number_passport'], 'string', 'max' => 150],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['source'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source' => 'id']],
@@ -78,6 +79,7 @@ class ClientsInfo extends \yii\db\ActiveRecord
             'number_passport' => 'Number Passport',
             'date_create' => 'Date Create',
             'date_update' => 'Date Update',
+            'bonus_account' => 'Bonus Account',
         ];
     }
 

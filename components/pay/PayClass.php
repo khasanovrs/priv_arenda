@@ -5,9 +5,11 @@
 
 namespace app\components\pay;
 
+use app\components\Clients\ClientsClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
+use app\models\Clients;
 use app\models\Extension;
 use app\models\FinanceCashbox;
 use Yii;
@@ -129,6 +131,19 @@ class PayClass
             } catch (\Exception $e) {
                 Yii::error('Поймали Exception при сохранении информации по оборудованию: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
+            }
+
+            $clientId = $app_eq->application->client_id;
+
+            $checkChangeBonusAccount = ClientsClass::changeBonusAccountClient($clientId, $sum);
+
+            if (!is_array($checkChangeBonusAccount) || !isset($checkChangeBonusAccount['status']) || $checkChangeBonusAccount['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменении бонусного счета клиента', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении бонусного счета клиента',
+                ];
             }
         }
 

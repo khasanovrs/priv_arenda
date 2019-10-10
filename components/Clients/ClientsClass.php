@@ -722,7 +722,7 @@ class ClientsClass
 
                 $sum = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and client_id=:client_id', [':client_id' => $value->id])->sum('application_pay.sum');
 
-                $count_app = Applications::find()->where('client_id=:client_id',[':client_id'=>$value->id])->count();
+                $count_app = Applications::find()->where('client_id=:client_id', [':client_id' => $value->id])->count();
 
                 $result[] = [
                     'id' => $value->id,
@@ -730,6 +730,7 @@ class ClientsClass
                     'org' => $value->type === 2 ? $value->name : '',
                     'type' => $value->type,
                     'phone' => $value->phone,
+                    'bonus_account' => $value->clientsInfos[0]->bonus_account,
                     'old_status' => $value->status,
                     'new_status' => $value->status,
                     'color' => $value->status0->color,
@@ -980,6 +981,7 @@ class ClientsClass
             'email' => $client->clientsInfos[0]->email,
             'kpp' => $client->clientsInfos[0]->kpp,
             'name_chief' => $client->clientsInfos[0]->name_chief,
+            'bonus_account' => $client->clientsInfos[0]->bonus_account,
             'phone_3' => $client->clientsInfos[0]->phone_chief,
             'phone_2' => $client->clientsInfos[0]->phone_second,
             'date_birth' => $client->clientsInfos[0]->date_birth,
@@ -1174,6 +1176,53 @@ class ClientsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Клиенты успешно удален'
+        ];
+    }
+
+    /**
+     * Изменение бонусного счета
+     * @param $id
+     * @param $sum
+     * @return bool|array
+     */
+    public static function changeBonusAccountClient($id, $sum)
+    {
+        Yii::info('Функция изменения бонусного счета', __METHOD__);
+
+        /**
+         * @var Clients $client
+         */
+        $client = Clients::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($client)) {
+            Yii::error('Клиент не найден, id: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Клиент не найден'
+            ];
+        }
+
+        $bonus_account = round($sum * (3 / 100), 0);
+
+        $clientsInfos = $client->clientsInfos[0];
+        $clientsInfos->bonus_account += (float)$bonus_account;
+
+        try {
+            if (!$clientsInfos->save(false)) {
+                Yii::error('Ошибка при изменении бонусного счета клиента: ' . serialize($clientsInfos->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении бонусного счета клиента: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Бонусный счет успешно изменен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Бонусный счет успешно изменен'
         ];
     }
 }
