@@ -325,6 +325,7 @@ class FinanceClass
          * @var Finance $finance
          */
         foreach ($financeList as $finance) {
+            $branch = is_object($finance->branch) ? $finance->branch->name : '';
             $result[] = [
                 'id' => $finance->id,
                 'name' => $finance->name,
@@ -333,7 +334,8 @@ class FinanceClass
                 'type' => $finance->type->name,
                 'date_create' => date('d.m.Y', strtotime($finance->date_create)),
                 'sum' => $finance->sum,
-                'branch' => $finance->branch->name
+                'branch' => $branch,
+                'eq_id' => $finance->eq_id
             ];
 
             $checkSearch = false;
@@ -518,9 +520,10 @@ class FinanceClass
      * @param $sum
      * @param $cashBox
      * @param $branch
+     * @param $eq_id
      * @return array|bool
      */
-    public static function addFinance($id, $name, $category, $type, $sum, $cashBox, $branch)
+    public static function addFinance($id, $name, $category, $type, $sum, $cashBox, $branch, $eq_id = false)
     {
         Yii::info('Функция добавления финансов', __METHOD__);
 
@@ -569,15 +572,6 @@ class FinanceClass
             ];
         }
 
-        if ($branch === '') {
-            Yii::error('Не передан идентификатор филиала', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор филиала'
-            ];
-        }
-
         $checkCategory = FinanceCategory::find()->where('id=:id', [':id' => $category])->one();
 
         if (!is_object($checkCategory)) {
@@ -611,16 +605,19 @@ class FinanceClass
             ];
         }
 
-        $checkBranch = Branch::find()->where('id=:id', [':id' => $branch])->one();
+        if ($branch != '') {
+            $checkBranch = Branch::find()->where('id=:id', [':id' => $branch])->one();
 
-        if (!is_object($checkBranch)) {
-            Yii::error('Передан некорректный идентификатор филиала, id:' . serialize($cashBox), __METHOD__);
+            if (!is_object($checkBranch)) {
+                Yii::error('Передан некорректный идентификатор филиала, id:' . serialize($cashBox), __METHOD__);
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный идентификатор филиала'
-            ];
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Передан некорректный идентификатор филиала'
+                ];
+            }
         }
+
 
         if ($id !== '') {
             /**
@@ -649,6 +646,7 @@ class FinanceClass
             $newFinance->sum = $sum;
             $newFinance->branch_id = $branch;
             $newFinance->cashBox_id = $cashBox;
+            $newFinance->eq_id = $eq_id;
         }
 
         try {

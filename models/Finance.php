@@ -15,6 +15,7 @@ use Yii;
  * @property string $date_create
  * @property string $sum
  * @property int $cashBox_id
+ * @property int $eq_id идентификатор оборудования
  *
  * @property FinanceCategory $category
  * @property FinanceType $type
@@ -37,8 +38,8 @@ class Finance extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'branch_id', 'category_id', 'type_id', 'cashBox_id'], 'required'],
-            [['branch_id', 'category_id', 'type_id', 'cashBox_id'], 'integer'],
+            [['name', 'category_id', 'type_id', 'cashBox_id'], 'required'],
+            [['branch_id', 'category_id', 'type_id', 'cashBox_id', 'eq_id'], 'integer'],
             [['date_create'], 'safe'],
             [['name'], 'string', 'max' => 150],
             [['sum'], 'string', 'max' => 45],
@@ -63,6 +64,7 @@ class Finance extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'sum' => 'Sum',
             'cashBox_id' => 'Cash Box ID',
+            'eq_id' => 'Eq ID',
         ];
     }
 

@@ -5,6 +5,7 @@
 
 namespace app\components\equipments;
 
+use app\components\finance\FinanceClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -1549,6 +1550,37 @@ class EquipmentsClass
             }
 
             $check_update = PayClass::updateCashBox($cashBox, $sum, $revertSum);
+
+            if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при обновлении кассы', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при обновлении кассы',
+                ];
+            }
+        }
+
+        if ($amount_repair !== '') {
+            Yii::info('Добавляем запись в финансы', __METHOD__);
+
+            /**
+             * @var Equipments $eq
+             */
+            $eq = Equipments::find()->where('id=:id', [':id' => $id])->one();
+
+            if (!is_object($eq)) {
+                Yii::error('Ошибка при опредении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при опредении оборудования'
+                ];
+            }
+
+            $name = $eq->type0->name . ' ' . $eq->mark0->name . ' ' . $eq->model;
+
+            $check_update = FinanceClass::addFinance('', $name, 5, 1, $amount_repair, $cashBox, '', $id);
 
             if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при обновлении кассы', __METHOD__);
