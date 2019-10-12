@@ -1593,6 +1593,38 @@ class EquipmentsClass
             }
         }
 
+        if ($new_status !== $old_status && $new_status === 6) {
+            Yii::info('Добавляем запись в финансы', __METHOD__);
+
+            /**
+             * @var Equipments $eq
+             */
+            $eq = Equipments::find()->where('id=:id', [':id' => $id])->one();
+
+            if (!is_object($eq)) {
+                Yii::error('Ошибка при опредении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при опредении оборудования'
+                ];
+            }
+
+            $name = $eq->type0->name . ' ' . $eq->mark0->name . ' ' . $eq->model;
+            $branch = $eq->stock->branch->id;
+
+            $check_update = FinanceClass::addFinance('', $name, 10, 2, $sale_amount, $cashBox, $branch, $id);
+
+            if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при обновлении кассы', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при обновлении кассы',
+                ];
+            }
+        }
+
 
         Yii::info('Запись успешно добавлена', __METHOD__);
 
