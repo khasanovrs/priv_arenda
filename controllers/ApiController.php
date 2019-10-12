@@ -390,6 +390,15 @@ class ApiController extends Controller
             'get-bailiffs' => [
                 'class' => 'app\components\actions\bailiffs\GetBailiffsAction',
             ],
+            /**
+             * Управление настройками
+             */
+            'get-settings' => [
+                'class' => 'app\components\actions\settings\GetSettingsAction',
+            ],
+            'add-settings' => [
+                'class' => 'app\components\actions\settings\AddSettingsAction',
+            ],
         ];
     }
 
