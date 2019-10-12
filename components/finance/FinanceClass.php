@@ -572,6 +572,15 @@ class FinanceClass
             ];
         }
 
+        if ($branch === '') {
+            Yii::error('Не передан идентификатор филиала', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор филиала'
+            ];
+        }
+
         $checkCategory = FinanceCategory::find()->where('id=:id', [':id' => $category])->one();
 
         if (!is_object($checkCategory)) {

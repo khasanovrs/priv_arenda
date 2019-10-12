@@ -1580,7 +1580,7 @@ class EquipmentsClass
 
             $name = $eq->type0->name . ' ' . $eq->mark0->name . ' ' . $eq->model;
 
-            $check_update = FinanceClass::addFinance('', $name, 5, 1, $amount_repair, $cashBox, '', $id);
+            $check_update = FinanceClass::addFinance('', $name, 5, 1, $amount_repair, $cashBox, '1', $id);
 
             if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при обновлении кассы', __METHOD__);
