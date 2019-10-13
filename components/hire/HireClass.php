@@ -6,6 +6,7 @@
 namespace app\components\hire;
 
 use app\components\Clients\ClientsClass;
+use app\components\equipments\EquipmentsClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -451,7 +452,7 @@ class HireClass
             /**
              * @var ApplicationPay $checkPay
              */
-            $sumCurrenDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
+            $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
 
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
@@ -481,7 +482,7 @@ class HireClass
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
-                'current_pay' => (float)$sumCurrenDay
+                'current_pay' => (float)$sumCurrentDay
             ];
         }
 
@@ -602,7 +603,7 @@ class HireClass
                 [
                     'equipments_id' => $applicationEq->equipments_id,
                     'name' => $category . ' ' . $mark . ' ' . $model,
-                    'state' => $applicationEq->hireState->name,
+                    'state' => $applicationEq->equipments->status0->name,
                     'photo' => $applicationEq->equipments->photo,
                     'photo_alias' => $applicationEq->equipments->photo_alias
                 ],
@@ -1049,6 +1050,17 @@ class HireClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
             return false;
+        }
+
+        $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id,4);
+
+        if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при добавлении финансов', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении статуса',
+            ];
         }
 
         Yii::info('Заявка успешно изменена', __METHOD__);
