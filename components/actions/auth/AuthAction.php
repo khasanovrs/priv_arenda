@@ -77,12 +77,17 @@ class AuthAction extends Action
             ];
         }
 
+        $data = [
+            'branch' => $user->branch_id,
+            'type' => $user->user_type
+        ];
+
         Yii::info('Авторизация прошла успешно', __METHOD__);
 
         return [
             'status' => 'OK',
             'msg' => 'Успешная авторизация',
-            'data'=>['branch'=>$user->branch_id]
+            'data' => $data
         ];
     }
 }
