@@ -81,7 +81,8 @@ class AuthAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Успешная авторизация'
+            'msg' => 'Успешная авторизация',
+            'data'=>['branch'=>$user->branch_id]
         ];
     }
 }
