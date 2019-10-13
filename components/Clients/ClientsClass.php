@@ -21,6 +21,7 @@ use app\models\ClientStatusChange;
 use app\models\ClientUr;
 use app\models\ClientUrInfo;
 use app\models\Discount;
+use app\models\Settings;
 use app\models\ShowFieldClient;
 use app\models\Source;
 use Codeception\Application;
@@ -1203,7 +1204,21 @@ class ClientsClass
             ];
         }
 
-        $bonus_account = round($sum * (3 / 100), 0);
+        /**
+         * @var Settings $settings
+         */
+        $settings = Settings::find()->where('id=1')->one();
+
+        if (!is_object($settings)) {
+            Yii::error('Настройки не найдены', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Настройки не найдены'
+            ];
+        }
+
+        $bonus_account = round($sum * ((float)$settings->value / 100), 0);
 
         $clientsInfos = $client->clientsInfos[0];
         $clientsInfos->bonus_account += (float)$bonus_account;
