@@ -363,6 +363,7 @@ class EquipmentsClass
                 'stock' => $value->stock->name,
                 'type' => $value->type0->name,
                 'status' => $value->status0->name,
+                'dop_status' => $value->dop_status,
                 'color' => $value->status0->color,
                 'selling_price' => $value->selling_price,
                 'price_per_day' => $value->price_per_day,
@@ -2100,9 +2101,11 @@ class EquipmentsClass
      * Функция изменения статуса у оборудования
      * @param $id_eq ,
      * @param $status
+     * @param $rent_start
+     * @param $rent_end
      * @return bool|array
      */
-    public static function changeStatus($id_eq, $status)
+    public static function changeStatus($id_eq, $status, $rent_start = false, $rent_end = false)
     {
         Yii::info('Запуск функции изменения статуса у оборудования', __METHOD__);
 
@@ -2122,6 +2125,11 @@ class EquipmentsClass
 
         $equipments->status = $status;
         $equipments->rentals = $status === 1 ? ++$equipments->rentals : $equipments->rentals;
+
+        if ($rent_start) {
+            $txt = 'с ' . date('d.m.Y H:i:s',strtotime($rent_start)). ' до ' . date('d.m.Y H:i:s',strtotime($rent_end));
+            $equipments->dop_status = $status === 1 ? 'В аренде ' .$txt  : 'Бронь ' .$txt;
+        }
 
         try {
             if (!$equipments->save(false)) {

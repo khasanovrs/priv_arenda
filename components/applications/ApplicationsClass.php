@@ -682,7 +682,7 @@ class ApplicationsClass
             Yii::info('Опраделеяем статус для оборудования', __METHOD__);
 
             if ($status === 1 || $status === 2) {
-                $checkChange = EquipmentsClass::changeStatus($value->id, $status === 1 ? 1 : 5);
+                $checkChange = EquipmentsClass::changeStatus($value->id, $status === 1 ? 1 : 5, $rent_start, $rent_end);
 
                 if (!is_array($checkChange) || !isset($checkChange['status']) || $checkChange['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при изменении статуса оборудования', __METHOD__);

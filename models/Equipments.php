@@ -31,6 +31,7 @@ use Yii;
  * @property string $countHire количество прокатов
  * @property string $photo_alias
  * @property string $is_not_active
+ * @property string $dop_status
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property EquipmentsCategory $category
@@ -65,6 +66,7 @@ class Equipments extends \yii\db\ActiveRecord
             [['model', 'photo'], 'string', 'max' => 150],
             [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio', 'countHire', 'is_not_active'], 'string', 'max' => 45],
             [['photo_alias'], 'string', 'max' => 250],
+            [['dop_status'], 'string', 'max' => 500],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsStatus::className(), 'targetAttribute' => ['status' => 'id']],
@@ -104,6 +106,7 @@ class Equipments extends \yii\db\ActiveRecord
             'countHire' => 'Count Hire',
             'photo_alias' => 'Photo Alias',
             'is_not_active' => 'Is Not Active',
+            'dop_status' => 'Dop Status',
         ];
     }
 
