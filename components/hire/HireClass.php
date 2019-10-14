@@ -959,7 +959,7 @@ class HireClass
             $price = $price - ($price * $disc / 100);
         }
 
-        $state = round($price) > $app_eq->sum ? 5 : 4;
+        $state = round($price) > $app_eq->total_paid ? 5 : 4;
 
         $app_eq->sum = round($price);
         $app_eq->hire_state_id = $state;
