@@ -945,6 +945,24 @@ class HireClass
             ];
         }
 
+        if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
+            if ($app_eq->sum != $app_eq->total_paid) {
+                Yii::info('Сумма не совпадает', __METHOD__);
+                Yii::info('Заявка в статусе: долг', __METHOD__);
+                $app_eq->hire_state_id = 5;
+
+                try {
+                    if (!$app_eq->save(false)) {
+                        Yii::error('Ошибка при сохранении состояния: ' . serialize($app_eq->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+            }
+        }
+
         Yii::info('Заявка успешно изменена', __METHOD__);
 
         return [
@@ -1060,10 +1078,9 @@ class HireClass
     /**
      * Проверка и изменение состояния у проката
      * @param $ap_eq_id
-     * @param $checkPrim
      * @return array|bool
      */
-    public static function checkHire($ap_eq_id, $checkPrim = false)
+    public static function checkHire($ap_eq_id)
     {
         Yii::info('Проверка и изменение состояния проката', __METHOD__);
 
