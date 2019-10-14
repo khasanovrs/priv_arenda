@@ -921,17 +921,76 @@ class HireClass
         }
 
         /**
+         * @var Equipments $eq
+         */
+        $eq = $app_eq->equipments;
+
+        if (!is_object($eq)) {
+            Yii::info('Информация об оборудовании не найдено', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Информация об оборудовании не найдено'
+            ];
+        }
+
+        /**
          * @var Applications $app
          */
         $app = $app_eq->application;
 
         if (!is_object($app)) {
-            Yii::info('Заявка не найдена', __METHOD__);
+            Yii::info('Информация об оборудовании по заявке не найдена', __METHOD__);
 
             return [
                 'status' => 'ERROR',
                 'msg' => 'Заявка не найдена'
             ];
+        }
+
+        $rent_start = $app->rent_start;
+        $rent_end = date('Y-m-d H:i:s');
+        $disc = $app->discount->code;
+
+        $datediff = strtotime($rent_end) - strtotime($rent_start);
+        $price = ($datediff / (60 * 60 * 24)) * $eq->price_per_day;
+
+        if ((int)$disc !== 0) {
+            $price = $price - ($price * $disc / 100);
+        }
+
+        $state = round($price) > $app_eq->sum ? 5 : 4;
+
+        $app_eq->sum = round($price);
+        $app_eq->hire_state_id = $state;
+        $app->rent_end = $rent_end;
+
+        if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
+            if ($app_eq->sum != $app_eq->total_paid) {
+                Yii::info('Сумма не совпадает', __METHOD__);
+                Yii::info('Заявка в статусе: долг', __METHOD__);
+                $app_eq->hire_state_id = 5;
+            }
+        }
+
+        try {
+            if (!$app_eq->save(false)) {
+                Yii::error('Ошибка при сохранении состояния: ' . serialize($app_eq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        try {
+            if (!$app->save(false)) {
+                Yii::error('Ошибка при сохранении состояния: ' . serialize($app->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
         }
 
         $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id,4);
@@ -943,24 +1002,6 @@ class HireClass
                 'status' => 'ERROR',
                 'msg' => 'Ошибка при изменении статуса',
             ];
-        }
-
-        if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
-            if ($app_eq->sum != $app_eq->total_paid) {
-                Yii::info('Сумма не совпадает', __METHOD__);
-                Yii::info('Заявка в статусе: долг', __METHOD__);
-                $app_eq->hire_state_id = 5;
-
-                try {
-                    if (!$app_eq->save(false)) {
-                        Yii::error('Ошибка при сохранении состояния: ' . serialize($app_eq->getErrors()), __METHOD__);
-                        return false;
-                    }
-                } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
-                    return false;
-                }
-            }
         }
 
         Yii::info('Заявка успешно изменена', __METHOD__);
