@@ -1,6 +1,6 @@
 <?php
 /**
- * Закрытие проката
+ * Удаление проката
  */
 
 namespace app\components\actions\hire;

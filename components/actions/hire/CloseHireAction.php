@@ -1,6 +1,6 @@
 <?php
 /**
- * Возврат оборудования на склад
+ * Закрытие проката
  */
 
 namespace app\components\actions\hire;
@@ -13,17 +13,16 @@ class CloseHireAction extends Action
 {
     public function run()
     {
-        Yii::info('Запуск функции возврата оборудования на склад', __METHOD__);
+        Yii::info('Запуск функции закрытия проката', __METHOD__);
 
         $request = Yii::$app->request;
 
         $id = $request->getBodyParam('id');
-        $checkPrim = $request->getBodyParam('checkPrim');
 
-        $result = HireClass::closeHire($id, $checkPrim);
+        $result = HireClass::closeHire($id);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при возврате оборудования на склад', __METHOD__);
+            Yii::error('Ошибка при закрытии проката', __METHOD__);
 
             if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
                 return $result;
@@ -31,15 +30,15 @@ class CloseHireAction extends Action
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при возврате оборудования на склад',
+                'msg' => 'Ошибка при закрытии проката',
             ];
         }
 
-        Yii::info('Оборудование успешно вернули на склад', __METHOD__);
+        Yii::info('Прокат успешно закрыт', __METHOD__);
 
         return [
             'status' => 'OK',
-            'msg' => 'Оборудование успешно вернули на склад'
+            'msg' => 'Прокат успешно закрыт'
         ];
     }
 }

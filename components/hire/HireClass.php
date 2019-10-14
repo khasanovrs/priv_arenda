@@ -604,6 +604,7 @@ class HireClass
                     'equipments_id' => $applicationEq->equipments_id,
                     'name' => $category . ' ' . $mark . ' ' . $model,
                     'state' => $applicationEq->equipments->status0->name,
+                    'state_id' => $applicationEq->equipments->status,
                     'photo' => $applicationEq->equipments->photo,
                     'photo_alias' => $applicationEq->equipments->photo_alias
                 ],
@@ -890,10 +891,9 @@ class HireClass
     /**
      * Функция возврата товара на склад
      * @param $app_id
-     * @param $checkPrim
      * @return array|bool
      */
-    public static function closeHire($app_id, $checkPrim)
+    public static function equipmentReturn($app_id)
     {
         Yii::info('Запуск функции closeHire', __METHOD__);
 
@@ -906,14 +906,42 @@ class HireClass
             ];
         }
 
-        $check = self::checkHire($app_id, $checkPrim);
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $app_id])->one();
 
-        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при продлении контракта', __METHOD__);
+        if (!is_object($app_eq)) {
+            Yii::info('Информация об оборудовании по заявке не найдена', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при изменении состояния',
+                'msg' => 'Заявка не найдена'
+            ];
+        }
+
+        /**
+         * @var Applications $app
+         */
+        $app = $app_eq->application;
+
+        if (!is_object($app)) {
+            Yii::info('Заявка не найдена', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена'
+            ];
+        }
+
+        $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id,4);
+
+        if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при добавлении финансов', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении статуса',
             ];
         }
 
@@ -925,7 +953,11 @@ class HireClass
         ];
     }
 
-
+    /**
+     * Удаление проката
+     * @param $app_id
+     * @return array|bool
+     */
     public static function deleteHire($app_id)
     {
         Yii::info('Запуск функции deleteHire', __METHOD__);
@@ -970,6 +1002,58 @@ class HireClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Прокат успешно удален'
+        ];
+    }
+
+    /**
+     * Закрытие проката
+     * @param $app_id
+     * @return array|bool
+     */
+    public static function closeHire($app_id)
+    {
+        Yii::info('Запуск функции closeHire', __METHOD__);
+
+        if ($app_id === '') {
+            Yii::error('Не передан идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор заявки',
+            ];
+        }
+
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $app_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::info('Ошибка при получении заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении оборудования'
+            ];
+        }
+
+        $app_eq->hire_state_id = 3;
+
+        try {
+            if (!$app_eq->save(false)) {
+                Yii::error('Ошибка при закрытии проката: ' . serialize($app_eq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Прокат успешно закрыт', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Прокат успешно закрыт'
         ];
     }
 
@@ -1033,11 +1117,6 @@ class HireClass
                 Yii::info('Заявка в статусе: долг', __METHOD__);
                 $state = 5;
             }
-
-            if ($checkPrim) {
-                Yii::info('Заявка в статусе: замечение', __METHOD__);
-                $state = 6;
-            }
         }
 
         $app_eq->hire_state_id = $state;
@@ -1050,17 +1129,6 @@ class HireClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
             return false;
-        }
-
-        $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id,4);
-
-        if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при добавлении финансов', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при изменении статуса',
-            ];
         }
 
         Yii::info('Заявка успешно изменена', __METHOD__);

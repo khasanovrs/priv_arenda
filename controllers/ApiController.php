@@ -363,11 +363,14 @@ class ApiController extends Controller
             'extend-rental' => [
                 'class' => 'app\components\actions\hire\ExtendRentalAction',
             ],
-            'close-hire' => [
-                'class' => 'app\components\actions\hire\CloseHireAction',
+            'equipment-return' => [
+                'class' => 'app\components\actions\hire\EquipmentReturnAction',
             ],
             'delete-hire' => [
                 'class' => 'app\components\actions\hire\DeleteHireAction',
+            ],
+            'close-hire' => [
+                'class' => 'app\components\actions\hire\CloseHireAction',
             ],
             /**
              * Работа с отчетами
