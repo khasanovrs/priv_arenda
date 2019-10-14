@@ -1211,15 +1211,15 @@ class ClientsClass
         $settings = Settings::find()->where('id=1')->one();
 
         if (!is_object($settings)) {
-            Yii::error('Настроек нет', __METHOD__);
+            Yii::error('Настройки не найдены', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Настроек нет'
+                'msg' => 'Настройки не найдены'
             ];
         }
 
-        $bonus_account = round($sum * ($settings->value / 100), 0);
+        $bonus_account = round($sum * ((float)$settings->value / 100), 0);
 
         $clientsInfos = $client->clientsInfos[0];
 
