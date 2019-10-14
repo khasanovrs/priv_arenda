@@ -963,6 +963,9 @@ class HireClass
         $app_eq->hire_state_id = $state;
         $app->rent_end = $rent_end;
 
+        Yii::info('ololo:'.serialize((float)$app_eq->sum), __METHOD__);
+        Yii::info('ololo2:'.serialize((float)$app_eq->total_paid), __METHOD__);
+
         if ((float)$app_eq->sum > (float)$app_eq->total_paid) {
             Yii::info('Сумма не совпадает', __METHOD__);
             Yii::info('Заявка в статусе: долг', __METHOD__);
