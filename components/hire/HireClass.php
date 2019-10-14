@@ -963,12 +963,10 @@ class HireClass
         $app_eq->hire_state_id = $state;
         $app->rent_end = $rent_end;
 
-        if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
-            if ($app_eq->sum != $app_eq->total_paid) {
-                Yii::info('Сумма не совпадает', __METHOD__);
-                Yii::info('Заявка в статусе: долг', __METHOD__);
-                $app_eq->hire_state_id = 5;
-            }
+        if ((float)$app_eq->sum > (float)$app_eq->total_paid) {
+            Yii::info('Сумма не совпадает', __METHOD__);
+            Yii::info('Заявка в статусе: долг', __METHOD__);
+            $app_eq->hire_state_id = 5;
         }
 
         try {
@@ -991,7 +989,7 @@ class HireClass
             return false;
         }
 
-        $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id,4);
+        $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id, 4);
 
         if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении финансов', __METHOD__);
