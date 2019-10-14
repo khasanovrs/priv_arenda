@@ -402,6 +402,12 @@ class ApiController extends Controller
             'add-settings' => [
                 'class' => 'app\components\actions\settings\AddSettingsAction',
             ],
+            /**
+             * Упралвение документами
+             */
+            'get-doc' => [
+                'class' => 'app\components\actions\documents\GetDocumentsAction',
+            ],
         ];
     }
 

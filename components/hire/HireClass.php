@@ -13,13 +13,11 @@ use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use app\models\Applications;
 use app\models\Equipments;
-use app\models\EquipmentsStatus;
 use app\models\Extension;
 use app\models\HireField;
 use app\models\HireShowField;
 use app\models\HireState;
 use app\models\HireStatus;
-use Symfony\Component\Console\Application;
 use Yii;
 
 class HireClass
