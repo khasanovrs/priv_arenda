@@ -21,6 +21,7 @@ use app\models\ClientStatusChange;
 use app\models\ClientUr;
 use app\models\ClientUrInfo;
 use app\models\Discount;
+use app\models\Settings;
 use app\models\ShowFieldClient;
 use app\models\Source;
 use Codeception\Application;
@@ -1183,9 +1184,10 @@ class ClientsClass
      * Изменение бонусного счета
      * @param $id
      * @param $sum
+     * @param $revertSum
      * @return bool|array
      */
-    public static function changeBonusAccountClient($id, $sum)
+    public static function changeBonusAccountClient($id, $sum, $revertSum = false)
     {
         Yii::info('Функция изменения бонусного счета', __METHOD__);
 
@@ -1203,10 +1205,29 @@ class ClientsClass
             ];
         }
 
-        $bonus_account = round($sum * (3 / 100), 0);
+        /**
+         * @var Settings $settings
+         */
+        $settings = Settings::find()->where('id=1')->one();
+
+        if (!is_object($settings)) {
+            Yii::error('Настроек нет', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Настроек нет'
+            ];
+        }
+
+        $bonus_account = round($sum * ($settings->value / 100), 0);
 
         $clientsInfos = $client->clientsInfos[0];
-        $clientsInfos->bonus_account += (float)$bonus_account;
+
+        if ($revertSum) {
+            $clientsInfos->bonus_account = (float)$clientsInfos->bonus_account - (float)$bonus_account;
+        } else {
+            $clientsInfos->bonus_account = (float)$clientsInfos->bonus_account + (float)$bonus_account;
+        }
 
         try {
             if (!$clientsInfos->save(false)) {

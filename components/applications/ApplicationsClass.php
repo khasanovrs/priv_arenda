@@ -602,7 +602,7 @@ class ApplicationsClass
         $session = $Sessions->getSession();
 
         $newApplications = new Applications();
-        $newApplications->client_id = $client_id || 0;
+        $newApplications->client_id = $client_id !== '' ? $client_id : 0;
         $newApplications->user_id = $session->user_id;
         $newApplications->source_id = $source;
         $newApplications->discount_id = $sale;

@@ -102,6 +102,7 @@ class PayClass
         Yii::info('Обновляем общую сумму', __METHOD__);
 
         if ($newPay->cashBox0->check_zalog === '0') {
+            Yii::info('Работа м полем "Оплачено всего"', __METHOD__);
             if ($revertSum) {
                 $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
             } else {
@@ -115,12 +116,15 @@ class PayClass
                 return false;
             }
 
-            $eq->revenue += (float)$sum;
+            Yii::info('Работа с полем "выручка"', __METHOD__);
+
+            if ($revertSum) {
+                $eq->revenue = (float)$eq->revenue - (float)$sum;
+            } else {
+                $eq->revenue = (float)$eq->revenue + (float)$sum;
+            }
+
             $eq->profit = (float)$eq->revenue - (float)$eq->repairs_sum;
-
-
-            Yii::error('Оборудование не найдено' . serialize($eq->profit), __METHOD__);
-
             $eq->payback_ratio = round($eq->profit == 0 ? 0 : (float)$eq->profit / (float)$eq->selling_price, 2);
 
             try {
@@ -135,7 +139,7 @@ class PayClass
 
             $clientId = $app_eq->application->client_id;
 
-            $checkChangeBonusAccount = ClientsClass::changeBonusAccountClient($clientId, $sum);
+            $checkChangeBonusAccount = ClientsClass::changeBonusAccountClient($clientId, $sum, $revertSum);
 
             if (!is_array($checkChangeBonusAccount) || !isset($checkChangeBonusAccount['status']) || $checkChangeBonusAccount['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при изменении бонусного счета клиента', __METHOD__);
