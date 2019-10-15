@@ -457,7 +457,7 @@ class HireClass
             $type = $value->equipments->type0->name;
             $sum = $value->equipments->price_per_day;
             $sale = $application->discount->name;
-            $total_paid = (float)$sum - ((float)$sum * (float)$sale / 100);
+            $sale_sum = (float)$sum - ((float)$sum * (float)$sale / 100);
 
             $client = ClientsClass::GetClientInfo($application->client_id);
 
@@ -473,9 +473,9 @@ class HireClass
                 'state' => $value->hireState->name,
                 'color' => $value->hireStatus->color,
                 'sum' => $sum,
-                'sale_sum' => $total_paid,
+                'sale_sum' => $sale_sum,
                 'total_paid' => $value->total_paid,
-                'remainder' => $value->sum - $value->total_paid,
+                'remainder' => (float)$value->total_paid - (float)$value->sum,
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
@@ -484,7 +484,7 @@ class HireClass
             ];
         }
 
-        Yii::info('Список прокатов получен', __METHOD__);
+        Yii::info('Список прокатов получен' . serialize($result), __METHOD__);
 
         return [
             'status' => 'SUCCESS',
@@ -962,15 +962,6 @@ class HireClass
         $app_eq->sum = round($price);
         $app_eq->hire_state_id = $state;
         $app->rent_end = $rent_end;
-
-        Yii::info('ololo:'.serialize((float)$app_eq->sum), __METHOD__);
-        Yii::info('ololo2:'.serialize((float)$app_eq->total_paid), __METHOD__);
-
-        if ((float)$app_eq->sum > (float)$app_eq->total_paid) {
-            Yii::info('Сумма не совпадает', __METHOD__);
-            Yii::info('Заявка в статусе: долг', __METHOD__);
-            $app_eq->hire_state_id = 5;
-        }
 
         try {
             if (!$app_eq->save(false)) {
