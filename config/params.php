@@ -25,6 +25,7 @@ return [
         'api/change-client-fields',
         'api/update-client-info',
         'api/get-stock',
-        'api/get-applications-status'
+        'api/get-applications-status',
+        'api/get-doc'
     ],
 ];

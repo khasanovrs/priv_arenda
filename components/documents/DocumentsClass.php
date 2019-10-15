@@ -16,7 +16,6 @@ class DocumentsClass
     public static function getDocuments()
     {
         Yii::info('Запуск функции getDocuments', __METHOD__);
-
         $document = new \PhpOffice\PhpWord\TemplateProcessor('test.docx'); //шаблон
         $document->setValue('name_v', '777'); //номер договора
         $document->saveAs('uploads/doc/test1.docx');
@@ -28,7 +27,6 @@ class DocumentsClass
         header('Content-Disposition: attachment; filename=' . basename($file));
 
         Yii::info('Список типов оборудования получен', __METHOD__);
-
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список типов оборудования получен',
