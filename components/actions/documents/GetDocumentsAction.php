@@ -31,6 +31,7 @@ class GetDocumentsAction extends Action
         return [
             'status' => 'OK',
             'msg' => 'Список документов успешно получен',
+             'data' => $result['data']
         ];
     }
 }

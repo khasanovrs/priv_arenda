@@ -4,23 +4,6 @@
  */
 
 namespace app\components\documents;
-
-use app\components\finance\FinanceClass;
-use app\components\pay\PayClass;
-use app\components\Session\Sessions;
-use app\models\ApplicationEquipment;
-use app\models\Equipments;
-use app\models\EquipmentsCategory;
-use app\models\EquipmentsField;
-use app\models\EquipmentsHistory;
-use app\models\EquipmentsHistoryChangeStatus;
-use app\models\EquipmentsInfo;
-use app\models\EquipmentsMark;
-use app\models\EquipmentsShowField;
-use app\models\EquipmentsStatus;
-use app\models\EquipmentsType;
-use app\models\FinanceCashbox;
-use app\models\Stock;
 use Yii;
 
 class DocumentsClass
@@ -36,16 +19,20 @@ class DocumentsClass
 
         $document = new \PhpOffice\PhpWord\TemplateProcessor('test.docx'); //шаблон
         $document->setValue('name_v', '777'); //номер договора
-        $document->saveAs('test1.docx');
+        $document->saveAs('uploads/doc/test1.docx');
 
+        $data = file_get_contents('uploads/doc/test1.docx');
+        $file = '/uploads/doc/test1.docx';
+        header('X-Accel-Redirect: ' . $file);
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="test1.docx"');
+        header('Content-Disposition: attachment; filename=' . basename($file));
 
         Yii::info('Список типов оборудования получен', __METHOD__);
 
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список типов оборудования получен',
+            'data'=>$data
         ];
     }
 }
