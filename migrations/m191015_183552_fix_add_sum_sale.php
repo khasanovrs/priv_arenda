@@ -13,7 +13,7 @@ class m191015_183552_fix_add_sum_sale extends Migration
     public function safeUp()
     {
         $this->execute("ALTER TABLE `application_equipment` 
-CHANGE COLUMN `sum_sale` `sum_sale` VARCHAR(45) NOT NULL AFTER `sum`;
+ADD COLUMN `sum_sale` VARCHAR(45) NOT NULL DEFAULT 0 AFTER `sum`;
 ");
     }
 
