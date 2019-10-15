@@ -655,9 +655,10 @@ class ApplicationsClass
 
             $datediff = strtotime($rent_end) - strtotime($rent_start);
             $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day;
+            $sale_sum = 0;
 
             if ((int)$disc->code !== 0) {
-                $price = $price - ($price * $disc->code / 100);
+                $sale_sum = $price - ($price * $disc->code / 100);
             }
 
             $newApplicationEquipment = new ApplicationEquipment();
@@ -667,6 +668,7 @@ class ApplicationsClass
             $newApplicationEquipment->hire_state_id = $status === 1 ? 4 : 1;
             $newApplicationEquipment->equipments_count = $value->count;
             $newApplicationEquipment->sum = round($price);
+            $newApplicationEquipment->sum_sale = round($sale_sum);
             $newApplicationEquipment->delivery_sum = $delivery_sum;
 
             try {

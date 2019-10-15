@@ -455,9 +455,6 @@ class HireClass
             $mark = $value->equipments->mark0->name;
             $model = $value->equipments->model;
             $type = $value->equipments->type0->name;
-            $sum = $value->equipments->price_per_day;
-            $sale = $application->discount->name;
-            $sale_sum = (float)$sum - ((float)$sum * (float)$sale / 100);
 
             $client = ClientsClass::GetClientInfo($application->client_id);
 
@@ -472,8 +469,9 @@ class HireClass
                 'status' => $value->hire_status_id,
                 'state' => $value->hireState->name,
                 'color' => $value->hireStatus->color,
-                'sum' => $sum,
-                'sale_sum' => $sale_sum,
+                'sum' => $value->equipments->price_per_day,
+                'sum_hire' => $value->sum,
+                'sale_sum' => $value->sum_sale,
                 'total_paid' => $value->total_paid,
                 'remainder' => (float)$value->total_paid - (float)$value->sum,
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
@@ -950,9 +948,20 @@ class HireClass
         $rent_end = date('Y-m-d H:i:s');
         $disc = $app->discount->code;
 
-        $datediff = strtotime($rent_end) - strtotime($rent_start);
-        $price = ($datediff / (60 * 60 * 24)) * $eq->price_per_day;
+        $datediff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
 
+        Yii::info('ololo1:' . serialize($datediff), __METHOD__);
+
+        if ($datediff < 30) {
+            Yii::info('Период аренды не должен бать меньше 30 дней', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Период аренды не должен бать меньше 30 дней'
+            ];
+        }
+
+        $price = $datediff * $eq->price_per_day;
         if ((int)$disc !== 0) {
             $price = $price - ($price * $disc / 100);
         }

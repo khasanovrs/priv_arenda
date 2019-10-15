@@ -16,8 +16,8 @@ use Yii;
  * @property int $equipments_count
  * @property string $delivery_sum
  * @property string $sum
+ * @property string $sum_sale
  * @property string $total_paid
- * @property string $remainder
  * @property string $hire_date
  * @property string $renewals_date
  *
@@ -44,10 +44,10 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status_id', 'hire_state_id', 'application_id', 'equipments_id', 'equipments_count', 'sum'], 'required'],
+            [['status_id', 'hire_state_id', 'application_id', 'equipments_id', 'equipments_count', 'sum', 'sum_sale'], 'required'],
             [['status_id', 'hire_status_id', 'hire_state_id', 'application_id', 'equipments_id', 'equipments_count'], 'integer'],
             [['hire_date', 'renewals_date'], 'safe'],
-            [['delivery_sum', 'sum', 'total_paid', 'remainder'], 'string', 'max' => 45],
+            [['delivery_sum', 'sum', 'sum_sale', 'total_paid'], 'string', 'max' => 45],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Applications::className(), 'targetAttribute' => ['application_id' => 'id']],
             [['equipments_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['equipments_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsStatus::className(), 'targetAttribute' => ['status_id' => 'id']],
@@ -71,8 +71,8 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
             'equipments_count' => 'Equipments Count',
             'delivery_sum' => 'Delivery Sum',
             'sum' => 'Sum',
+            'sum_sale' => 'Sum Sale',
             'total_paid' => 'Total Paid',
-            'remainder' => 'Remainder',
             'hire_date' => 'Hire Date',
             'renewals_date' => 'Renewals Date',
         ];
