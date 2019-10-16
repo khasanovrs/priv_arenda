@@ -950,14 +950,12 @@ class HireClass
 
         $datediff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
 
-        Yii::info('ololo1:' . serialize($datediff), __METHOD__);
-
-        if ($datediff < 30) {
-            Yii::info('Период аренды не должен бать меньше 30 дней', __METHOD__);
+        if ($datediff < 1) {
+            Yii::info('Аренда не менее 1 сутки', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Период аренды не должен бать меньше 30 дней'
+                'msg' => 'Аренда не менее 1 сутки'
             ];
         }
 
