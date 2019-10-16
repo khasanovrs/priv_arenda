@@ -583,6 +583,8 @@ class HireClass
             'typeLease' => $application->typeLease->name,
             'typeLease_id' => $application->type_lease_id,
             'sale' => $application->discount_id,
+            'hire_state_id' => $applicationEq->hire_state_id,
+            'hire_state' => $applicationEq->hireState->name,
             'source' => $application->source->name,
             'comment' => $application->comment,
             'rent_start' => $application->rent_start,
@@ -951,11 +953,11 @@ class HireClass
         $datediff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
 
         if ($datediff < 1) {
-            Yii::info('Аренда не менее 1 сутки', __METHOD__);
+            Yii::info('Аренда не менее одной сутки', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Аренда не менее 1 сутки'
+                'msg' => 'Аренда не менее одной сутки'
             ];
         }
 
