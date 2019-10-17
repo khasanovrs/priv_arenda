@@ -56,6 +56,7 @@ class AddUrClientAction extends Action
         return [
             'status' => 'OK',
             'msg' => $resultChange['msg'],
+            'data' => $resultChange['data'],
         ];
     }
 }

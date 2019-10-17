@@ -254,7 +254,6 @@ class ClientsClass
             ];
         }
 
-
         $newClientInfo->client_id = $client->id;
         $newClientInfo->email = $email;
         $newClientInfo->source = $source;
@@ -289,9 +288,19 @@ class ClientsClass
                 'msg' => 'Клиент успешно изменен'
             ];
         } else {
+            $user = [
+                'client_email' => $email,
+                'client_fio' => $fio === '' ? $name : $fio,
+                'client_id' => $newClientInfo->id,
+                'client_number_passport' => $number_passport,
+                'client_phone' => $phone_1,
+                'client_type' => $type = $fio === '' ? 2 : 1
+            ];
+
             return [
                 'status' => 'SUCCESS',
-                'msg' => 'Клиент успешно добавлен'
+                'msg' => 'Клиент успешно добавлен',
+                'data' => $user
             ];
         }
     }
