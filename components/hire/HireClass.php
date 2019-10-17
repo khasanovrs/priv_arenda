@@ -595,7 +595,7 @@ class HireClass
             'sum' => $applicationEq->sum,
             'sum_sale' => $sum_sale,
             'total_paid' => $applicationEq->total_paid,
-            'remainder' => $sum_sale - $applicationEq->total_paid,
+            'remainder' => (float)$applicationEq->total_paid - (float)$sum_sale,
             'count' => $applicationEq->equipments_count,
             'equipments' =>
                 [
