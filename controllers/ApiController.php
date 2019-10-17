@@ -33,6 +33,9 @@ class ApiController extends Controller
             'auth' => [
                 'class' => 'app\components\actions\auth\AuthAction',
             ],
+            'get-user' => [
+                'class' => 'app\components\actions\users\GetAuthUserAction',
+            ],
             'exit' => [
                 'class' => 'app\components\actions\auth\ExitAction',
             ],

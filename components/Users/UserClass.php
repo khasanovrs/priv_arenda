@@ -5,6 +5,7 @@
 
 namespace app\components\Users;
 
+use app\components\Session\Sessions;
 use app\models\Branch;
 use app\models\BunchUserRight;
 use app\models\Users;
@@ -463,6 +464,59 @@ class UserClass
         }
 
         Yii::info('Пользователи успешно получены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Пользователи успешно получены',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение информации по авторизованному пользователю
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function GetUserInfo()
+    {
+        Yii::info('Запуск функции получении информации по авторизованному пользователю', __METHOD__);
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var Users $user
+         */
+        $user = Users::find()->where('id=:id', [':id' => $session->user_id])->one();
+
+        if (!is_object($user)) {
+            Yii::error('Пользователь не найден', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Пользователь не найден',
+            ];
+        }
+
+        Yii::info('Пользователь найден', __METHOD__);
+
+        $result = [
+            'branch' => $user->branch_id,
+            'type' => $user->user_type
+        ];
+
 
         return [
             'status' => 'SUCCESS',
