@@ -21,8 +21,9 @@ class AddCashBoxAction extends Action
         $sum = $request->getBodyParam('sum');
         $val = $request->getBodyParam('val');
         $zalog = $request->getBodyParam('zalog');
+        $delivery = $request->getBodyParam('delivery');
 
-        $resultChange = CashBoxClass::AddCashBox($name, $sum, $val, $zalog);
+        $resultChange = CashBoxClass::AddCashBox($name, $sum, $val, $zalog, $delivery);
 
         if (!is_array($resultChange) || !isset($resultChange['status']) || $resultChange['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении новой кассы', __METHOD__);

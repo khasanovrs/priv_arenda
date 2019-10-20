@@ -9,8 +9,6 @@ use Yii;
  *
  * @property int $id
  * @property string $name
- *
- * @property ApplicationEquipment[] $applicationEquipments
  */
 class HireState extends \yii\db\ActiveRecord
 {
@@ -42,13 +40,5 @@ class HireState extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getApplicationEquipments()
-    {
-        return $this->hasMany(ApplicationEquipment::className(), ['hire_state_id' => 'id']);
     }
 }

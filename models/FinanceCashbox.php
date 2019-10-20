@@ -11,6 +11,7 @@ use Yii;
  * @property string $name Наименование категории
  * @property string $sum
  * @property string $check_zalog Залог касса. 0-нет,1-да
+ * @property string $delivery
  *
  * @property ApplicationPay[] $applicationPays
  * @property Finance[] $finances
@@ -31,9 +32,9 @@ class FinanceCashbox extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name', 'delivery'], 'required'],
             [['name'], 'string', 'max' => 150],
-            [['sum', 'check_zalog'], 'string', 'max' => 45],
+            [['sum', 'check_zalog', 'delivery'], 'string', 'max' => 45],
         ];
     }
 
@@ -47,6 +48,7 @@ class FinanceCashbox extends \yii\db\ActiveRecord
             'name' => 'Name',
             'sum' => 'Sum',
             'check_zalog' => 'Check Zalog',
+            'delivery' => 'Delivery',
         ];
     }
 
