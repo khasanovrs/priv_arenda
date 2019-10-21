@@ -13,7 +13,7 @@ class m191021_194202_fix_app_eq extends Migration
     public function safeUp()
     {
         $this->execute("INSERT INTO `hire_field` (`id`, `code`, `name`) VALUES ('18', 'delivery_sum', 'Сумма доставки');
-INSERT INTO `hire_field` (`id`, `code`, `name`) VALUES ('19', 'delivery_suь_paid', 'Сумма доставки оплачено');
+INSERT INTO `hire_field` (`id`, `code`, `name`) VALUES ('19', 'delivery_sum_paid', 'Сумма доставки оплачено');
 ");
     }
 
