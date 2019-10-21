@@ -960,7 +960,7 @@ class HireClass
 
         $datediff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
 
-        $datediff = $datediff < 1 ? 30 : $datediff;
+        $datediff = $datediff < 1 ? 1 : $datediff;
         $price = $datediff * $eq->price_per_day;
 
         if ((int)$disc !== 0) {
