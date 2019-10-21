@@ -504,8 +504,6 @@ class EquipmentsClass
         $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
         where(['in', 'stock_id', $arr])->
         andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)', [':filter' => $filter])->
-
-        andWhere('equipments.status=4')->
         orderBy('equipments.id desc')->
         all();
 
@@ -523,12 +521,41 @@ class EquipmentsClass
          * @var Equipments $value
          */
         foreach ($equipments as $value) {
+            if ($value->status === 1 || $value->status === 5) {
+
+                /**
+                 * @var ApplicationEquipment $ap_eq
+                 */
+                $ap_eq = ApplicationEquipment::find()->joinWith(['application'])->where('equipments_id=:id and hire_state_id in (1,4) and applications.branch_id=:branch_id', [':id' => $value->id, ':branch_id' => $branch])->one();
+
+                if (!is_object($ap_eq)) {
+                    Yii::error('Ошибка при поиске заявки у оборудования', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при поиске заявки у оборудования'
+                    ];
+                }
+
+                $rent_end = date('d.m.Y H:i',strtotime($ap_eq->application->rent_end));
+                $rent_start = date('d.m.Y H:i',strtotime($ap_eq->application->rent_start));
+
+                $status = $value->status0->name . ' с '.$rent_start . ' до '.$rent_end;
+                $checkClick = '0';
+            } else {
+                $status = $value->status0->name;
+                $checkClick = '1';
+            }
+
             $result[] = [
                 'id' => $value->id,
                 'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
                 'price_per_day' => $value->price_per_day,
-                'count' => $value->count,
-                'photo' => $value->photo
+                'status' => $status,
+                'check_click' => $checkClick,
+
+                //'count' => $value->count,
+                //'photo' => $value->photo
             ];
         }
 
