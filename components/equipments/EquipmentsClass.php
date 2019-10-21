@@ -457,72 +457,21 @@ class EquipmentsClass
         ];
     }
 
-
-    /**
-     * Получение списка оборудования по поиску
-     * @param $filter
-     * @return array
-     */
-    public static function GetEquipmentsSearch($filter)
-    {
-        Yii::info('Запуск функции GetEquipmentsSearch', __METHOD__);
-        $result = [];
-
-        if ($filter === '') {
-            Yii::error('Фильтр не передан', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Фильтр не передан'
-            ];
-        }
-
-        $filter = strtolower($filter);
-        $filter = '%' . $filter . '%';
-
-        $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->where('equipments.status=4 and (lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)', [':filter' => $filter])->orderBy('id desc')->all();
-
-        if (empty($equipments)) {
-            Yii::error('Список оборудования пуст', __METHOD__);
-
-            return [
-                'status' => 'SUCCESS',
-                'msg' => 'Список оборудования пуст',
-                'data' => $result
-            ];
-        }
-
-        /**
-         * @var Equipments $value
-         */
-        foreach ($equipments as $value) {
-            $result[] = [
-                'id' => $value->id,
-                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
-                'price_per_day' => $value->price_per_day,
-                'count' => $value->count,
-                'photo' => $value->photo
-            ];
-        }
-
-        Yii::info('Список оборудования получен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Список оборудования получен',
-            'data' => $result
-        ];
-    }
-
     /**
      * Получение списка оборудования по поиску
      * @param $branch
+     * @param $filter
      * @return array
      */
-    public static function GetAllEquipmentsBranch($branch)
+    public static function GetAllEquipmentsBranch($filter, $branch)
     {
         Yii::info('Запуск функции GetEquipmentsSearch', __METHOD__);
         $result = [];
+
+        //if ($filter !== '') {
+        $filter = strtolower($filter);
+        $filter = '%' . $filter . '%';
+        //}
 
         if ($branch === '') {
             Yii::error('Филиал не передан', __METHOD__);
@@ -552,7 +501,13 @@ class EquipmentsClass
             array_push($arr, $value->id);
         }
 
-        $equipments = Equipments::find()->where(['in', 'stock_id', $arr])->andWhere('status=4')->all();
+        $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
+        where(['in', 'stock_id', $arr])->
+        andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)', [':filter' => $filter])->
+
+        andWhere('equipments.status=4')->
+        orderBy('equipments.id desc')->
+        all();
 
         if (empty($equipments)) {
             Yii::error('Список оборудования пуст', __METHOD__);
@@ -2127,8 +2082,8 @@ class EquipmentsClass
         $equipments->rentals = $status === 1 ? ++$equipments->rentals : $equipments->rentals;
 
         if ($rent_start) {
-            $txt = 'с ' . date('d.m.Y H:i:s',strtotime($rent_start)). ' до ' . date('d.m.Y H:i:s',strtotime($rent_end));
-            $equipments->dop_status = $status === 1 ? 'В аренде ' .$txt  : 'Бронь ' .$txt;
+            $txt = 'с ' . date('d.m.Y H:i:s', strtotime($rent_start)) . ' до ' . date('d.m.Y H:i:s', strtotime($rent_end));
+            $equipments->dop_status = $status === 1 ? 'В аренде ' . $txt : 'Бронь ' . $txt;
         }
 
         try {
