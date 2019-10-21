@@ -480,7 +480,7 @@ class HireClass
                 'sum_hire' => $value->sum,
                 'sale_sum' => $value->sum_sale,
                 'total_paid' => $value->total_paid,
-                'remainder' => (float)$value->sum - (float)$value->total_paid,
+                'remainder' => (float)$value->sum_sale - (float)$value->total_paid,
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
@@ -602,7 +602,7 @@ class HireClass
             'sum' => $applicationEq->sum,
             'sum_sale' => $sum_sale,
             'total_paid' => $applicationEq->total_paid,
-            'remainder' => (float)$applicationEq->total_paid - (float)$sum_sale,
+            'remainder' => (float)$sum_sale-(float)$applicationEq->total_paid,
             'count' => $applicationEq->equipments_count,
             'equipments' =>
                 [
