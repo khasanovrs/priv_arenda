@@ -13,7 +13,7 @@ class m191015_183552_fix_add_sum_sale extends Migration
     public function safeUp()
     {
         $this->execute("ALTER TABLE `application_equipment` 
-ADD INDEX `fk_application_equipment_5_idx1` (`hire_status_id` ASC) VISIBLE;;");
+ADD INDEX `fk_application_equipment_5_idx1` (`hire_status_id` ASC);");
     }
 
     /**
