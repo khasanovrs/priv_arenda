@@ -13,7 +13,7 @@ class m190906_072238_hire_state extends Migration
     public function safeUp()
     {
         $this->execute("CREATE TABLE `hire_state` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(150) CHARACTER SET 'utf8' NOT NULL,
   PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
