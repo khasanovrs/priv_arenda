@@ -12,13 +12,13 @@ class m191021_061716_fix_app_eq extends Migration
      */
     public function safeUp()
     {
-       /* $this->execute("ALTER TABLE `application_equipment`
+        $this->execute("ALTER TABLE `application_equipment`
 ADD CONSTRAINT `fk_application_equipment_5`
   FOREIGN KEY (`hire_state_id`)
   REFERENCES `hire_state` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
-");*/
+");
     }
 
     /**

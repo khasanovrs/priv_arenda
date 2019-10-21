@@ -20,7 +20,7 @@ class m190929_083918_history_changes_client extends Migration
   `new_params` VARCHAR(45) NULL COMMENT 'новое значение',
   `reason` VARCHAR(450) NULL COMMENT 'Причина изменения',
   `date_create` DATETIME NULL DEFAULT NULL,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
     }
 

@@ -37,7 +37,7 @@ $this->execute("CREATE TABLE `client_status_change` (
     FOREIGN KEY (`new_status`)
     REFERENCES `client_status` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ");
     }

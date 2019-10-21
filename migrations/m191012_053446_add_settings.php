@@ -17,7 +17,7 @@ class m191012_053446_add_settings extends Migration
   `code` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `value` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
     }
 

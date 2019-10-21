@@ -15,7 +15,8 @@ class m190929_083719_type_changes extends Migration
         $this->execute("CREATE TABLE `type_changes` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(150) NOT NULL,
-  PRIMARY KEY (`id`));");
+  PRIMARY KEY (`id`))
+  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;");
     }
 
     /**

@@ -23,7 +23,7 @@ class m190916_145944_fix_table extends Migration
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
     }
 

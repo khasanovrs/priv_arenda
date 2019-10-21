@@ -46,7 +46,7 @@ class m191002_130913_add_eq_history_change_status extends Migration
     FOREIGN KEY (`user_id`)
     REFERENCES `users` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
     }
 
