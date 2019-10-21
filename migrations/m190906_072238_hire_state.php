@@ -15,7 +15,7 @@ class m190906_072238_hire_state extends Migration
         $this->execute("CREATE TABLE `hire_state` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(150) CHARACTER SET 'utf8' NOT NULL,
-  PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ");
     }
 
