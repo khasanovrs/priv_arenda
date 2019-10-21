@@ -485,6 +485,8 @@ class HireClass
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
                 'branch' => $application->branch->name,
+                'delivery_sum' => $value->delivery_sum,
+                'delivery_sum_paid' => $value->delivery_sum_paid,
                 'current_pay' => (float)$sumCurrentDay
             ];
         }

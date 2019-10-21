@@ -15,6 +15,7 @@ use Yii;
  * @property int $equipments_id
  * @property int $equipments_count
  * @property string $delivery_sum
+ * @property string $delivery_sum_paid
  * @property string $sum
  * @property string $sum_sale
  * @property string $total_paid
@@ -25,8 +26,8 @@ use Yii;
  * @property Applications $application
  * @property Equipments $equipments
  * @property ApplicationsStatus $status
- * @property HireStatus $hireStatus
  * @property HireState $hireState
+ * @property HireStatus $hireStatus
  * @property ApplicationPay[] $applicationPays
  */
 class ApplicationEquipment extends \yii\db\ActiveRecord
@@ -48,12 +49,12 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
             [['status_id', 'hire_state_id', 'application_id', 'equipments_id', 'equipments_count', 'sum'], 'required'],
             [['status_id', 'hire_status_id', 'hire_state_id', 'application_id', 'equipments_id', 'equipments_count'], 'integer'],
             [['hire_date', 'renewals_date'], 'safe'],
-            [['delivery_sum', 'sum', 'sum_sale', 'total_paid', 'remainder'], 'string', 'max' => 45],
+            [['delivery_sum', 'delivery_sum_paid', 'sum', 'sum_sale', 'total_paid', 'remainder'], 'string', 'max' => 45],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Applications::className(), 'targetAttribute' => ['application_id' => 'id']],
             [['equipments_id'], 'exist', 'skipOnError' => true, 'targetClass' => Equipments::className(), 'targetAttribute' => ['equipments_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsStatus::className(), 'targetAttribute' => ['status_id' => 'id']],
-            [['hire_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => HireStatus::className(), 'targetAttribute' => ['hire_status_id' => 'id']],
             [['hire_state_id'], 'exist', 'skipOnError' => true, 'targetClass' => HireState::className(), 'targetAttribute' => ['hire_state_id' => 'id']],
+            [['hire_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => HireStatus::className(), 'targetAttribute' => ['hire_status_id' => 'id']],
         ];
     }
 
@@ -71,6 +72,7 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
             'equipments_id' => 'Equipments ID',
             'equipments_count' => 'Equipments Count',
             'delivery_sum' => 'Delivery Sum',
+            'delivery_sum_paid' => 'Delivery Sum Paid',
             'sum' => 'Sum',
             'sum_sale' => 'Sum Sale',
             'total_paid' => 'Total Paid',
@@ -107,17 +109,17 @@ class ApplicationEquipment extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getHireStatus()
+    public function getHireState()
     {
-        return $this->hasOne(HireStatus::className(), ['id' => 'hire_status_id']);
+        return $this->hasOne(HireState::className(), ['id' => 'hire_state_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getHireState()
+    public function getHireStatus()
     {
-        return $this->hasOne(HireState::className(), ['id' => 'hire_state_id']);
+        return $this->hasOne(HireStatus::className(), ['id' => 'hire_status_id']);
     }
 
     /**
