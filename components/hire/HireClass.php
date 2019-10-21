@@ -362,9 +362,10 @@ class HireClass
      * @param $date_end
      * @param $sum_start
      * @param $sum_end
+     * @param $show_close_hire
      * @return array
      */
-    public static function GetHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end)
+    public static function GetHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end, $show_close_hire)
     {
         Yii::info('Запуск функции GetHire', __METHOD__);
         $result = [];
@@ -407,6 +408,11 @@ class HireClass
             $like = '%' . $like . '%';
             $listFilter[] = ' lower(clients.name) like :like or lower(equipments.model) like :like or lower(equipments_mark.name) like :like or lower(equipments_type.name) like :like';
             $params[':like'] = $like;
+        }
+
+        if ($show_close_hire === '0') {
+            Yii::info('Параметр show_close_hire: ' . serialize($show_close_hire), __METHOD__);
+            $listFilter[] = 'hire_state_id!=3';
         }
 
         if (!empty($listFilter)) {
@@ -655,11 +661,12 @@ class HireClass
             ];
         }
 
-        $applicationEq->application->comment = $comment;
+        $app = $applicationEq->application;
+        $app->comment = $comment;
 
         try {
-            if (!$applicationEq->save(false)) {
-                Yii::error('Ошибка при изменении заявки: ' . serialize($applicationEq->getErrors()), __METHOD__);
+            if (!$app->save(false)) {
+                Yii::error('Ошибка при изменении заявки: ' . serialize($app->getErrors()), __METHOD__);
                 return false;
             }
         } catch (\Exception $e) {
@@ -952,16 +959,9 @@ class HireClass
 
         $datediff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
 
-        if ($datediff < 1) {
-            Yii::info('Аренда не менее одной сутки', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Аренда не менее одной сутки'
-            ];
-        }
-
+        $datediff = $datediff < 1 ? 30 : $datediff;
         $price = $datediff * $eq->price_per_day;
+
         if ((int)$disc !== 0) {
             $price = $price - ($price * $disc / 100);
         }

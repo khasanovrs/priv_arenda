@@ -24,8 +24,9 @@ class GetHireAction extends Action
         $date_end = $request->getBodyParam('date_end');
         $sum_start = $request->getBodyParam('sum_start');
         $sum_end = $request->getBodyParam('sum_end');
+        $show_close_hire = $request->getBodyParam('show_close_hire');
 
-        $result = HireClass::getHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end);
+        $result = HireClass::getHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end, $show_close_hire);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка прокатов', __METHOD__);
