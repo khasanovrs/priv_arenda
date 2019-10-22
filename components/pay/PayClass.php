@@ -9,7 +9,6 @@ use app\components\Clients\ClientsClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
-use app\models\Clients;
 use app\models\Extension;
 use app\models\FinanceCashbox;
 use Yii;
@@ -101,8 +100,8 @@ class PayClass
 
         Yii::info('Обновляем общую сумму', __METHOD__);
 
-        if ($newPay->cashBox0->check_zalog === '0') {
-            Yii::info('Работа м полем "Оплачено всего"', __METHOD__);
+        if ($newPay->cashBox0->check_zalog === '0' && $newPay->cashBox0->delivery === '0') {
+            Yii::info('Работаем полем "Оплачено всего"', __METHOD__);
             if ($revertSum) {
                 $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
             } else {
@@ -148,6 +147,13 @@ class PayClass
                     'status' => 'ERROR',
                     'msg' => 'Ошибка при изменении бонусного счета клиента',
                 ];
+            }
+        } elseif ($newPay->cashBox0->delivery === '1') {
+            Yii::info('Работаем полем "оплата доставки"', __METHOD__);
+            if ($revertSum) {
+                $app_eq->delivery_sum_paid = (float)$app_eq->delivery_sum_paid - (float)$sum;
+            } else {
+                $app_eq->delivery_sum_paid = (float)$app_eq->delivery_sum_paid + (float)$sum;
             }
         }
 
