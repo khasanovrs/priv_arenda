@@ -5,6 +5,7 @@
 
 namespace app\components\branch;
 
+use app\components\Clients\ClientsClass;
 use app\models\Applications;
 use app\models\Branch;
 use app\models\Clients;
@@ -61,6 +62,7 @@ class BranchClass
      * @param $val
      * @param $region
      * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
     public static function AddBranch($branch, $val, $region)
     {
@@ -92,6 +94,17 @@ class BranchClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при добавлении нового филиала: ' . serialize($e->getMessage()), __METHOD__);
             return false;
+        }
+
+        $checkAdd = ClientsClass::AddClient('', '', 1, $newBranch->id, 2, 2, '', 6, '', '', '', 'Тестовы пользователь', 79111111111, '', '', '', '', '',3);
+
+        if (!is_array($checkAdd) || !isset($checkAdd['status']) || $checkAdd['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при добавлении нового клиента', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при добавлении нового клинета',
+            ];
         }
 
         return [

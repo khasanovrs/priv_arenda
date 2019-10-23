@@ -49,10 +49,11 @@ class ClientsClass
      * @param $email
      * @param $number_passport
      * @param $date_birth
+     * @param $type
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport, $date_birth)
+    public static function AddClient($clientId, $name, $sale, $branch, $new_status, $old_status, $reason_change_status, $source, $inn, $kpp, $name_chief, $fio, $phone_1, $phone_2, $phone_3, $email, $number_passport, $date_birth, $type = '')
     {
         Yii::info('Запуск функции добавления клиента', __METHOD__);
 
@@ -146,7 +147,7 @@ class ClientsClass
         /**
          * @var Clients $check_phone
          */
-        $check_phone = Clients::find()->where('phone=:phone', [':phone' => $phone_1])->one();
+        $check_phone = Clients::find()->where('phone=:phone and type!=3', [':phone' => $phone_1])->one();
 
         if (is_object($check_phone) && $clientId != $check_phone->id) {
             Yii::error('Клиент с данным номер телефона уже зарегестрирован, phone:' . serialize($phone_1), __METHOD__);
@@ -224,7 +225,7 @@ class ClientsClass
         }
 
         $newClient->name = $fio === '' ? $name : $fio;
-        $newClient->type = $fio === '' ? 2 : 1;
+        $newClient->type = $type !== '' ? $type : ($fio === '' ? 2 : 1);
         $newClient->phone = $phone_1;
         $newClient->branch_id = $branch;
         $newClient->last_contact = date('Y-m-d H:i:s');
@@ -696,10 +697,10 @@ class ClientsClass
         }
 
         if (!empty($listFilter)) {
-            $listFilter[] = 'is_not_active=0';
+            $listFilter[] = 'is_not_active=0 and type!=3';
             $clients = Clients::find()->with('clientsInfos')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
         } else {
-            $clients = Clients::find()->with('clientsInfos')->where('is_not_active=0')->orderBy('last_contact desc')->all();
+            $clients = Clients::find()->with('clientsInfos')->where('is_not_active=0 and type!=3')->orderBy('last_contact desc')->all();
         }
 
         if (is_array($clients)) {

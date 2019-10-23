@@ -604,7 +604,7 @@ class HireClass
             'sum' => $applicationEq->sum,
             'sum_sale' => $sum_sale,
             'total_paid' => $applicationEq->total_paid,
-            'remainder' => (float)$sum_sale-(float)$applicationEq->total_paid,
+            'remainder' => (float)$sum_sale - (float)$applicationEq->total_paid,
             'count' => $applicationEq->equipments_count,
             'equipments' =>
                 [
@@ -1098,7 +1098,21 @@ class HireClass
             ];
         }
 
-        $app_eq->hire_state_id = 3;
+        if ($app_eq->equipments->status !== 1 && $app_eq->equipments->status !== 5) {
+            if ($app_eq->sum_sale > $app_eq->total_paid) {
+                $hire_state_id = 5;
+            } else {
+                $hire_state_id = 6;
+            }
+        } else {
+            if ($app_eq->sum_sale > $app_eq->total_paid) {
+                $hire_state_id = 2;
+            } else {
+                $hire_state_id = 6;
+            }
+        }
+
+        $app_eq->hire_state_id = $hire_state_id;
 
         try {
             if (!$app_eq->save(false)) {
