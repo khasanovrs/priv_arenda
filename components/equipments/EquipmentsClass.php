@@ -529,11 +529,11 @@ class EquipmentsClass
                 $ap_eq = ApplicationEquipment::find()->joinWith(['application'])->where('equipments_id=:id and hire_state_id in (1,4) and applications.branch_id=:branch_id', [':id' => $value->id, ':branch_id' => $branch])->one();
 
                 if (!is_object($ap_eq)) {
-                    Yii::error('Ошибка при поиске заявки у оборудования', __METHOD__);
+                    Yii::error('Оборудования в данном филиале нет', __METHOD__);
 
                     return [
-                        'status' => 'ERROR',
-                        'msg' => 'Ошибка при поиске заявки у оборудования'
+                        'status' => 'SUCCESS',
+                        'data' => []
                     ];
                 }
 

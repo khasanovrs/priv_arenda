@@ -502,6 +502,24 @@ class ApplicationsClass
             }
         }
 
+        if ($status === 3 && $client_id === null) {
+            /**
+             * @var Clients $client
+             */
+            $client = Clients::find()->where('branch_id=:branch_id and phone="79111111111"', [':branch_id' => $branch])->one();
+
+            if (!is_object($client)) {
+                Yii::error('Виртуальный клиент не найден, branch: ' . serialize($branch), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Виртуальный клиент не найден',
+                ];
+            }
+
+            $client_id = $client->id;
+        }
+
         if (!is_numeric($delivery)) {
             Yii::error('Не указан способ доставки, delivery: ' . serialize($delivery), __METHOD__);
 
