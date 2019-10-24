@@ -8,7 +8,6 @@ namespace app\components\branch;
 use app\components\Clients\ClientsClass;
 use app\models\Applications;
 use app\models\Branch;
-use app\models\Clients;
 use app\models\Stock;
 use app\models\Users;
 use Yii;
@@ -44,6 +43,7 @@ class BranchClass
                 'val' => $value->id,
                 'name' => $value->name,
                 'region' => $value->region,
+                'time_diff' => $value->time_diff,
             ];
         }
 
@@ -61,10 +61,11 @@ class BranchClass
      * @param $branch
      * @param $val
      * @param $region
+     * @param $time_diff
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddBranch($branch, $val, $region)
+    public static function AddBranch($branch, $val, $region, $time_diff)
     {
         Yii::info('Запуск функции AddBranch', __METHOD__);
 
@@ -85,6 +86,7 @@ class BranchClass
 
         $newBranch->name = $branch;
         $newBranch->region = $region;
+        $newBranch->time_diff = $time_diff;
 
         try {
             if (!$newBranch->save(false)) {
