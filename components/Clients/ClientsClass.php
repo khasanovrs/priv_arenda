@@ -1080,7 +1080,7 @@ class ClientsClass
 
         $result = [];
 
-        $clients = Clients::find()->where('branch_id = :branch', [':branch' => $branch])->all();
+        $clients = Clients::find()->where('branch_id = :branch and phone!="79111111111"', [':branch' => $branch])->all();
 
         if (empty($clients)) {
             Yii::error('Клиенты не найдены, like: ' . serialize($branch), __METHOD__);
@@ -1091,6 +1091,8 @@ class ClientsClass
                 'data' => []
             ];
         }
+
+        Yii::error('ololo: ' . serialize($clients), __METHOD__);
 
         /**
          * @var Clients $value

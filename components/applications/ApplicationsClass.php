@@ -603,8 +603,12 @@ class ApplicationsClass
                 'msg' => 'Не передан идентификатор филиала',
             ];
         }
-        $check = Branch::find()->where('id=:id', [':id' => $branch])->one();
-        if (!is_object($check)) {
+
+        /**
+         * @var Branch $checkBranch
+         */
+        $checkBranch = Branch::find()->where('id=:id', [':id' => $branch])->one();
+        if (!is_object($checkBranch)) {
             Yii::error('Филиал не найден, branch: ' . serialize($branch), __METHOD__);
 
             return [
@@ -628,8 +632,8 @@ class ApplicationsClass
         $newApplications->type_lease_id = $typeLease;
         $newApplications->branch_id = $branch;
         $newApplications->comment = $comment;
-        $newApplications->rent_start = $rent_start;
-        $newApplications->rent_end = $rent_end;
+        $newApplications->rent_start = date('Y-m-d H:i:s', strtotime($rent_start . "+" . $checkBranch->time_diff . " hours"));
+        $newApplications->rent_end = date('Y-m-d H:i:s', strtotime($rent_end . "+" . $checkBranch->time_diff . " hours"));
         $newApplications->date_create = date('Y-m-d H:i:s');
 
         try {
