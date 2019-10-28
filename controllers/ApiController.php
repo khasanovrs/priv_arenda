@@ -222,6 +222,9 @@ class ApiController extends Controller
             'add-equipment' => [
                 'class' => 'app\components\actions\equipments\AddEquipmentAction',
             ],
+            'add-equipment-mini' => [
+                'class' => 'app\components\actions\equipments\AddEquipmentMiniAction',
+            ],
             'add-equipment-photo' => [
                 'class' => 'app\components\actions\equipments\AddEquipmentPhotoAction',
             ],

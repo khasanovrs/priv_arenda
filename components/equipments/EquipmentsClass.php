@@ -186,9 +186,10 @@ class EquipmentsClass
      * @param $profit_end
      * @param $degree_wear_start
      * @param $degree_wear_end
+     * @param $confirmed
      * @return array
      */
-    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end)
+    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed)
     {
         Yii::info('Запуск функции GetEquipments' . serialize($like), __METHOD__);
 
@@ -326,6 +327,12 @@ class EquipmentsClass
             Yii::info('Параметр degree_wear_end: ' . serialize($degree_wear_end), __METHOD__);
             $listFilter[] = 'degree_wear<:degree_wear_end';
             $params[':degree_wear_end'] = $degree_wear_end;
+        }
+
+        if ($confirmed !== '') {
+            Yii::info('Параметр confirmed: ' . serialize($confirmed), __METHOD__);
+            $listFilter[] = 'confirmed=:confirmed';
+            $params[':confirmed'] = $confirmed;
         }
 
         if ($like !== '' and $like !== null) {
@@ -537,10 +544,10 @@ class EquipmentsClass
                     ];
                 }
 
-                $rent_end = date('d.m.Y H:i',strtotime($ap_eq->application->rent_end));
-                $rent_start = date('d.m.Y H:i',strtotime($ap_eq->application->rent_start));
+                $rent_end = date('d.m.Y H:i', strtotime($ap_eq->application->rent_end));
+                $rent_start = date('d.m.Y H:i', strtotime($ap_eq->application->rent_start));
 
-                $status = $value->status0->name . ' с '.$rent_start . ' до '.$rent_end;
+                $status = $value->status0->name . ' с ' . $rent_start . ' до ' . $rent_end;
                 $checkClick = '0';
             } else {
                 $status = $value->status0->name;
@@ -662,6 +669,7 @@ class EquipmentsClass
             'frequency_hits' => $equipment->equipmentsInfos[0]->frequency_hits,
             'comment' => $equipment->equipmentsInfos[0]->comment,
             'change_history' => $change_history,
+            'confirmed' => $equipment->confirmed,
             'change_history_status' => $change_history_status
         ];
 
@@ -899,9 +907,10 @@ class EquipmentsClass
      * @param $photo
      * @param $photo_alias
      * @param $comment
+     * @param $confirmed
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $confirmed)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -979,6 +988,7 @@ class EquipmentsClass
         $newEquipment->payback_ratio = $payback_ratio;
         $newEquipment->photo = $photo;
         $newEquipment->photo_alias = $photo_alias;
+        $newEquipment->confirmed = $confirmed;
 
         try {
             if (!$newEquipment->save(false)) {
@@ -1126,11 +1136,14 @@ class EquipmentsClass
      * @param $amount_repair
      * @param $cash_box
      * @param $sale_amount
+     * @param $confirmed
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount)
+    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed)
     {
+        Yii::error('ololo: ' . serialize($amount_repair), __METHOD__);
+
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
             return [
@@ -1143,7 +1156,7 @@ class EquipmentsClass
             Yii::error('Не передана марка оборудования, mark: ' . serialize($mark), __METHOD__);
             return [
                 'status' => 'ERROR',
-                'msg' => 'Не передано наименование оборудования',
+                'msg' => 'Не передано марка оборудования',
             ];
         }
 
@@ -1176,22 +1189,6 @@ class EquipmentsClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Не передана категория оборудования',
-            ];
-        }
-
-        if ($count === '') {
-            Yii::error('Не передано количество оборудования, count: ' . serialize($count), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передано количество оборудования',
-            ];
-        }
-
-        if ($tool_number === '') {
-            Yii::error('Не передан номер оборудования, tool_number: ' . serialize($tool_number), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан номер оборудования',
             ];
         }
 
@@ -1288,10 +1285,11 @@ class EquipmentsClass
         $equipment->discount = $discount;
         $equipment->rentals = $rentals;
         $equipment->repairs = $repairCurrent;
-        $equipment->repairs_sum += (float)$amount_repair;
+        $equipment->repairs_sum = $amount_repair;
         $equipment->profit = $profit;
         $equipment->payback_ratio = $payback_ratio;
         $equipment->photo_alias = $photo_alias;
+        $equipment->confirmed = $confirmed;
 
         try {
             if (!$equipment->save(false)) {
