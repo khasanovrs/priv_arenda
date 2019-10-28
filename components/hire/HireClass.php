@@ -1182,7 +1182,7 @@ class HireClass
         }
 
         if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
-            if ($app_eq->sum == $app_eq->total_paid) {
+            if ($app_eq->sum_sale <= $app_eq->total_paid) {
                 Yii::info('Сумма совпадает', __METHOD__);
                 Yii::info('Заявка в статусе: закрыт', __METHOD__);
                 $state = 3;
