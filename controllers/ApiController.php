@@ -348,9 +348,6 @@ class ApiController extends Controller
             'get-hire-state' => [
                 'class' => 'app\components\actions\hire\GetHireStateAction',
             ],
-            'update-hire-status' => [
-                'class' => 'app\components\actions\hire\UpdateHireStatusAction',
-            ],
             'add-hire-status' => [
                 'class' => 'app\components\actions\hire\AddHireStatusAction',
             ],

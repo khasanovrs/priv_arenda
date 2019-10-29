@@ -281,79 +281,6 @@ class HireClass
     }
 
     /**
-     * Обновлене статуса у проката
-     * @param $id
-     * @param $status
-     * @return array|bool
-     */
-    public static function UpdateHireStatus($id, $status)
-    {
-        Yii::info('Запуск функции UpdateHireStatus', __METHOD__);
-
-        if ($id === '' || !is_int($status)) {
-            Yii::error('Не передан идентификтор заявки, id: ' . serialize($id), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификтор заявки',
-            ];
-        }
-
-        if ($status === '' || !is_int($status)) {
-            Yii::error('Передан некорректный статус, status: ' . serialize($status), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
-            ];
-        }
-
-        $check_status = HireStatus::find()->where('id=:id', [':id' => $status])->one();
-
-        if (!is_object($check_status)) {
-            Yii::error('Передан некорректный статус, status:' . serialize($status), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Передан некорректный статус',
-            ];
-        }
-
-        /**
-         * @var ApplicationEquipment $applications
-         */
-        $applications = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
-
-        if (!is_object($applications)) {
-            Yii::error('По данному идентификатору заявка не найдена, id' . serialize($id), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Заявка не найдена',
-            ];
-        }
-
-        $applications->hire_status_id = $status;
-
-        try {
-            if (!$applications->save(false)) {
-                Yii::error('Ошибка при обновлении статуса проката: ' . serialize($applications->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при обновлении статуса проката: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
-
-        Yii::info('Статус проката успешно изменен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Статус проката успешно изменен'
-        ];
-    }
-
-    /**
      * Получение списка прокатов
      * @param $status
      * @param $like
@@ -1084,52 +1011,15 @@ class HireClass
             ];
         }
 
-        /**
-         * @var ApplicationEquipment $app_eq
-         */
-        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $app_id])->one();
+        $check = self::checkHire($app_id);
 
-        if (!is_object($app_eq)) {
-            Yii::info('Ошибка при получении заявки', __METHOD__);
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при получении оборудования'
+                'msg' => 'Ошибка при изменении состояния',
             ];
-        }
-
-        $hire_state_id = $app_eq->hire_state_id;
-
-        $date = date('Y-m-d H:i:s');
-        $rent_end = $app_eq->application->rent_end;
-
-        $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
-
-        // закрыт - (тстутствии долгов и возвращении оборудования на склад)
-        if ($app_eq->sum_sale <= $app_eq->total_paid && $app_eq->equipments->status === 4) {
-            $hire_state_id = 3;
-        }
-
-        // просрочен - времени первичного проката прокат не продлен, оборудование не возвращено
-        if ($dateDiff > 3 && $app_eq->equipments->status === 1) {
-            $hire_state_id = 2;
-        }
-
-        // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if ($dateDiff > 3 && $app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
-            $hire_state_id = 3;
-        }
-
-        $app_eq->hire_state_id = $hire_state_id;
-
-        try {
-            if (!$app_eq->save(false)) {
-                Yii::error('Ошибка при закрытии проката: ' . serialize($app_eq->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
         }
 
         Yii::info('Прокат успешно закрыт', __METHOD__);
@@ -1163,53 +1053,43 @@ class HireClass
             ];
         }
 
-        /**
-         * @var Applications $app
-         */
-        $app = $app_eq->application;
+        $hire_state_id = $app_eq->hire_state_id;
 
-        if (!is_object($app)) {
-            Yii::info('Заявка не найдена', __METHOD__);
+        $date = date('Y-m-d H:i:s');
+        $rent_end = $app_eq->application->rent_end;
+        $rent_start = $app_eq->application->rent_start;
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Заявка не найдена'
-            ];
+        $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
+
+        // статус заявки в прокате
+        if ($rent_start < $date && $date < $rent_end) {
+            $hire_state_id = 4;
+        };
+
+        // закрыт - (отстутствии долгов и возвращении оборудования на склад)
+        if ($app_eq->sum_sale <= $app_eq->total_paid && $app_eq->equipments->status === 4) {
+            $hire_state_id = 3;
         }
 
-        $state = '';
-
-        if (date('Y-m-d H:i:s', strtotime($app->rent_start)) < date('Y-m-d H:i:s') && date('Y-m-d H:i:s', strtotime($app->rent_end)) > date('Y-m-d H:i:s')) {
-            Yii::info('Заявка в статусе: прокат', __METHOD__);
-            $state = '4';
+        // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
+        if ($dateDiff > 3 && $app_eq->equipments->status === 1) {
+            $hire_state_id = 2;
         }
 
-        if (date('Y-m-d H:i:s', strtotime($app->rent_start)) > date('Y-m-d H:i:s')) {
-            Yii::info('Заявка в статусе: бронь', __METHOD__);
-            $state = '1';
+        // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
+        if ($dateDiff > 3 && $app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
+            $hire_state_id = 5;
         }
 
-        if (date('Y-m-d H:i:s', strtotime($app->rent_end)) < date('Y-m-d H:i:s')) {
-            if ($app_eq->sum_sale <= $app_eq->total_paid) {
-                Yii::info('Сумма совпадает', __METHOD__);
-                Yii::info('Заявка в статусе: закрыт', __METHOD__);
-                $state = 3;
-            } else {
-                Yii::info('Сумма не совпадает', __METHOD__);
-                Yii::info('Заявка в статусе: долг', __METHOD__);
-                $state = 5;
-            }
-        }
-
-        $app_eq->hire_state_id = $state;
+        $app_eq->hire_state_id = $hire_state_id;
 
         try {
             if (!$app_eq->save(false)) {
-                Yii::error('Ошибка при сохранении состояния: ' . serialize($app_eq->getErrors()), __METHOD__);
+                Yii::error('Ошибка при закрытии проката: ' . serialize($app_eq->getErrors()), __METHOD__);
                 return false;
             }
         } catch (\Exception $e) {
-            Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
+            Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
             return false;
         }
 
