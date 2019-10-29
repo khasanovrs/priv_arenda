@@ -896,7 +896,10 @@ class HireClass
             $price = $price - ($price * $disc / 100);
         }
 
-        $state = round($price) > $app_eq->total_paid ? 5 : 4;
+        $date = date('Y-m-d H:i:s');
+        $datediffHours = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
+        // если прошло не более 3х часов, то оставляем прокат
+        $state = round($price) > $app_eq->total_paid && $datediffHours > 3 ? 5 : 4;
 
         $app_eq->sum = round($price);
         $app_eq->hire_state_id = $state;
