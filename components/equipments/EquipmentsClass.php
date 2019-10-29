@@ -908,9 +908,10 @@ class EquipmentsClass
      * @param $photo_alias
      * @param $comment
      * @param $confirmed
+     * @param $count
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $confirmed)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $confirmed, $count)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -968,55 +969,60 @@ class EquipmentsClass
             ];
         }
 
-        $newEquipment = new Equipments();
-        $newEquipment->status = $status;
-        $newEquipment->mark = $mark;
-        $newEquipment->model = $model;
-        $newEquipment->stock_id = $stock;
-        $newEquipment->type = $equipmentsType;
-        $newEquipment->category_id = $equipmentsCategory;
-        $newEquipment->tool_number = $tool_number;
-        $newEquipment->selling_price = $selling_price;
-        $newEquipment->price_per_day = $price_per_day;
-        $newEquipment->revenue = $revenue;
-        $newEquipment->degree_wear = $degree_wear;
-        $newEquipment->discount = $discount;
-        $newEquipment->rentals = $rentals;
-        $newEquipment->repairs = $repairs;
-        $newEquipment->repairs_sum = $repairs_sum;
-        $newEquipment->profit = $profit;
-        $newEquipment->payback_ratio = $payback_ratio;
-        $newEquipment->photo = $photo;
-        $newEquipment->photo_alias = $photo_alias;
-        $newEquipment->confirmed = $confirmed;
+        $i = 0;
+        while ($count > $i) {
+            $newEquipment = new Equipments();
+            $newEquipment->status = $status;
+            $newEquipment->mark = $mark;
+            $newEquipment->model = $model;
+            $newEquipment->stock_id = $stock;
+            $newEquipment->type = $equipmentsType;
+            $newEquipment->category_id = $equipmentsCategory;
+            $newEquipment->tool_number = $tool_number;
+            $newEquipment->selling_price = $selling_price;
+            $newEquipment->price_per_day = $price_per_day;
+            $newEquipment->revenue = $revenue;
+            $newEquipment->degree_wear = $degree_wear;
+            $newEquipment->discount = $discount;
+            $newEquipment->rentals = $rentals;
+            $newEquipment->repairs = $repairs;
+            $newEquipment->repairs_sum = $repairs_sum;
+            $newEquipment->profit = $profit;
+            $newEquipment->payback_ratio = $payback_ratio;
+            $newEquipment->photo = $photo;
+            $newEquipment->photo_alias = $photo_alias;
+            $newEquipment->confirmed = $confirmed;
 
-        try {
-            if (!$newEquipment->save(false)) {
-                Yii::error('Ошибка при добавлении оборудования: ' . serialize($newEquipment->getErrors()), __METHOD__);
+            try {
+                if (!$newEquipment->save(false)) {
+                    Yii::error('Ошибка при добавлении оборудования: ' . serialize($newEquipment->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении оборудования: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при добавлении оборудования: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
 
-        $newEquipmentsInfo = new EquipmentsInfo();
-        $newEquipmentsInfo->equipments_id = $newEquipment->id;
-        $newEquipmentsInfo->power_energy = $power_energy;
-        $newEquipmentsInfo->length = $length;
-        $newEquipmentsInfo->network_cord = $network_cord;
-        $newEquipmentsInfo->power = $power;
-        $newEquipmentsInfo->comment = $comment;
-        $newEquipmentsInfo->frequency_hits = $frequency_hits;
+            $newEquipmentsInfo = new EquipmentsInfo();
+            $newEquipmentsInfo->equipments_id = $newEquipment->id;
+            $newEquipmentsInfo->power_energy = $power_energy;
+            $newEquipmentsInfo->length = $length;
+            $newEquipmentsInfo->network_cord = $network_cord;
+            $newEquipmentsInfo->power = $power;
+            $newEquipmentsInfo->comment = $comment;
+            $newEquipmentsInfo->frequency_hits = $frequency_hits;
 
-        try {
-            if (!$newEquipmentsInfo->save(false)) {
-                Yii::error('Ошибка при добавлении дополнительной информации об оборудовании: ' . serialize($newEquipmentsInfo->getErrors()), __METHOD__);
+            try {
+                if (!$newEquipmentsInfo->save(false)) {
+                    Yii::error('Ошибка при добавлении дополнительной информации об оборудовании: ' . serialize($newEquipmentsInfo->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении дополнительной информации об оборудовании: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при добавлении дополнительной информации об оборудовании: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
+
+            $i++;
         }
 
         return [
