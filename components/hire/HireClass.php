@@ -1098,18 +1098,26 @@ class HireClass
             ];
         }
 
-        if ($app_eq->equipments->status !== 1 && $app_eq->equipments->status !== 5) {
-            if ($app_eq->sum_sale > $app_eq->total_paid) {
-                $hire_state_id = 5;
-            } else {
-                $hire_state_id = 6;
-            }
-        } else {
-            if ($app_eq->sum_sale > $app_eq->total_paid) {
-                $hire_state_id = 2;
-            } else {
-                $hire_state_id = 6;
-            }
+        $hire_state_id = $app_eq->hire_state_id;
+
+        $date = date('Y-m-d H:i:s');
+        $rent_end = $app_eq->application->rent_end;
+
+        $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
+
+        // закрыт - (тстутствии долгов и возвращении оборудования на склад)
+        if ($app_eq->sum_sale <= $app_eq->total_paid && $app_eq->equipments->status === 4) {
+            $hire_state_id = 3;
+        }
+
+        // просрочен - времени первичного проката прокат не продлен, оборудование не возвращено
+        if ($dateDiff > 3 && $app_eq->equipments->status === 1) {
+            $hire_state_id = 2;
+        }
+
+        // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
+        if ($dateDiff > 3 && $app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
+            $hire_state_id = 3;
         }
 
         $app_eq->hire_state_id = $hire_state_id;

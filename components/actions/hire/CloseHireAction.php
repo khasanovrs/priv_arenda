@@ -34,11 +34,11 @@ class CloseHireAction extends Action
             ];
         }
 
-        Yii::info('Прокат успешно закрыт', __METHOD__);
+        Yii::info('Прокат успешно обновлен', __METHOD__);
 
         return [
             'status' => 'OK',
-            'msg' => 'Прокат успешно закрыт'
+            'msg' => 'Прокат успешно обновлен'
         ];
     }
 }
