@@ -12,7 +12,6 @@ use Yii;
  * @property string $color
  *
  * @property ApplicationEquipment[] $applicationEquipments
- * @property ApplicationEquipment[] $applicationEquipments0
  */
 class HireStatus extends \yii\db\ActiveRecord
 {
@@ -52,14 +51,6 @@ class HireStatus extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getApplicationEquipments()
-    {
-        return $this->hasMany(ApplicationEquipment::className(), ['hire_status_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getApplicationEquipments0()
     {
         return $this->hasMany(ApplicationEquipment::className(), ['hire_status_id' => 'id']);
     }

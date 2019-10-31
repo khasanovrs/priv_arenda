@@ -32,7 +32,7 @@ class FinanceCashbox extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'delivery'], 'required'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 150],
             [['sum', 'check_zalog', 'delivery'], 'string', 'max' => 45],
         ];
