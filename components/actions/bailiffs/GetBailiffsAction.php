@@ -37,7 +37,7 @@ class GetBailiffsAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Клиент успешно проверен',
+            'msg' => $result['msg'],
             'data' => $result['data']
         ];
     }

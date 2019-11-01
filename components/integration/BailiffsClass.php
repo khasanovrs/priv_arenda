@@ -65,7 +65,7 @@ class BailiffsClass
             ];
         }
 
-        if ($type === 1) {
+        if ($type === '1') {
             $fio = explode(" ", $fio);
             $clientParam = [
                 'token' => 'zC9MhiUcVmiA',
@@ -100,41 +100,60 @@ class BailiffsClass
             Yii::error('Поймали Exception при проверке клиента у приставов: ' . serialize($ll), __METHOD__);
             return [
                 'status' => 'ERROR',
-                'msg' => ' Ошибка при проверке клиента у приставов',
-                'data' => $result
+                'msg' => 'Ошибка при проверке клиента у приставов',
+                'data' => '',
             ];
         }
 
         if (is_object($ll) && isset($ll->status) && $ll->status === 'success' && is_object($ll->response) && isset($ll->response->task)) {
             Yii::info('У клиента есть долги:' . serialize($ll->response->task), __METHOD__);
+            sleep(2);
+            $clientParam = [
+                'token' => 'zC9MhiUcVmiA',
+                'task' => $ll->response->task
+            ];
 
             try {
                 $curl = new curl\Curl();
-                $response = $curl->setGetParams(['token' => 'zC9MhiUcVmiA', 'task' => $ll->response->task])->get('https://api-ip.fssprus.ru/api/v1.0/result');
+                $response = $curl->setGetParams($clientParam)->get('https://api-ip.fssprus.ru/api/v1.0/result');
                 $resultDolg = json_decode($response);
             } catch (\Exception $e) {
                 Yii::error('Поймали Exception при проверке клиента у приставов: ' . serialize($e->getMessage()), __METHOD__);
                 return [
                     'status' => 'ERROR',
-                    'msg' => ' Ошибка при проверке клиента у приставов',
-                    'data' => $result
+                    'msg' => 'Ошибка при проверке клиента у приставов',
+                    'data' => ''
                 ];
             }
 
             Yii::info('Получили данные:' . serialize($resultDolg), __METHOD__);
+            Yii::error('ololo: ' . serialize($resultDolg->response->status), __METHOD__);
 
-            return [
-                'status' => 'SUCCESS',
-                'msg' => 'Клиент успешно проверен',
-                'data' => [$ll->response->task]
-            ];
+            if (is_object($resultDolg->response) && isset($resultDolg->response->status) && ($resultDolg->response->status === 0 || $resultDolg->response->status === 2)) {
+                Yii::info('Нашли долги', __METHOD__);
+
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'У клиента есть долги',
+                    'data' => $resultDolg->response->result[0]->result
+                ];
+            } else {
+                Yii::info('Данные по задолженности не получены', __METHOD__);
+
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'У клиента есть долги, но получить полную информацию не получилось',
+                    'data' => ''
+                ];
+            }
+
         } else {
             Yii::info('Клиент проверен', __METHOD__);
 
             return [
                 'status' => 'SUCCESS',
-                'msg' => 'Клиент успешно проверен',
-                'data' => $result
+                'msg' => 'У клиента нет долгов',
+                'data' => ''
             ];
         }
     }

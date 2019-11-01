@@ -461,7 +461,7 @@ class ApiController extends Controller
             $result['session_id'] = $session->session_id;
         }
 
-        if (isset($result['data'])) {
+        if (isset($result['data']) && $result['data'] != '') {
             $result['data'] = json_encode($result['data']);
             $result['data'] = base64_encode($result['data']);
         }
