@@ -96,7 +96,41 @@ class BailiffsClass
 
         Yii::info('Получили данные:' . serialize($ll), __METHOD__);
 
-        if (is_object($ll) && isset($ll->status) && $ll->status === 'success') {
+        if (!is_object($ll) || !isset($ll->status) || $ll->status !== 'success') {
+            Yii::error('Поймали Exception при проверке клиента у приставов: ' . serialize($ll), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => ' Ошибка при проверке клиента у приставов',
+                'data' => $result
+            ];
+        }
+
+        if (is_object($ll) && isset($ll->status) && $ll->status === 'success' && is_object($ll->response) && isset($ll->response->task)) {
+            Yii::info('У клиента есть долги:' . serialize($ll->response->task), __METHOD__);
+
+            try {
+                $curl = new curl\Curl();
+                $response = $curl->setGetParams(['token' => 'zC9MhiUcVmiA', 'task' => $ll->response->task])->get('https://api-ip.fssprus.ru/api/v1.0/result');
+                $resultDolg = json_decode($response);
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при проверке клиента у приставов: ' . serialize($e->getMessage()), __METHOD__);
+                return [
+                    'status' => 'ERROR',
+                    'msg' => ' Ошибка при проверке клиента у приставов',
+                    'data' => $result
+                ];
+            }
+
+            Yii::info('Получили данные:' . serialize($resultDolg), __METHOD__);
+
+            return [
+                'status' => 'SUCCESS',
+                'msg' => 'Клиент успешно проверен',
+                'data' => [$ll->response->task]
+            ];
+        } else {
+            Yii::info('Клиент проверен', __METHOD__);
+
             return [
                 'status' => 'SUCCESS',
                 'msg' => 'Клиент успешно проверен',
