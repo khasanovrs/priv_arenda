@@ -749,7 +749,7 @@ class ClientsClass
                     'last_contact' => date('d.m.Y', strtotime($value->last_contact)),
                     'source' => ['id' => $sourceBD->id, 'name' => $sourceBD->name],
                     'sale' => ['code' => $discount->code, 'name' => $discount->name],
-                    'sum_pay' => $sum,
+                    'sum_pay' => +$sum,
                     'count_app' => $count_app
                 ];
             }
