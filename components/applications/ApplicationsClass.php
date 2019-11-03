@@ -632,8 +632,8 @@ class ApplicationsClass
         $newApplications->type_lease_id = $typeLease;
         $newApplications->branch_id = $branch;
         $newApplications->comment = $comment;
-        $newApplications->rent_start = date('Y-m-d H:i:s', strtotime($rent_start . "+" . $checkBranch->time_diff . " hours"));
-        $newApplications->rent_end = date('Y-m-d H:i:s', strtotime($rent_end . "+" . $checkBranch->time_diff . " hours"));
+        $newApplications->rent_start = $rent_start;
+        $newApplications->rent_end = $rent_end;
         $newApplications->date_create = date('Y-m-d H:i:s');
 
         try {
