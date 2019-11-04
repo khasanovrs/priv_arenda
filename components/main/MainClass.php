@@ -94,7 +94,11 @@ class MainClass
 
         Yii::info('Получаем средний чек и общая сумма', __METHOD__);
 
-        $payList = ApplicationPay::find()->where(['between', 'date_create', $date_start, $date_end])->all();
+        $payList = ApplicationPay::find()
+            ->joinWith(['applicationEquipment','applicationEquipment.application'])
+            ->where(['between', 'application_pay.date_create', $date_start, $date_end])
+            ->andWhere('applications.branch_id=:branch',[':branch' => $branch])
+            ->all();
 
         if (!empty($payList)) {
             /**
