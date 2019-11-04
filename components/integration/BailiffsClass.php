@@ -106,7 +106,7 @@ class BailiffsClass
         }
 
         if (is_object($ll) && isset($ll->status) && $ll->status === 'success' && is_object($ll->response) && isset($ll->response->task)) {
-            Yii::info('У клиента есть долги:' . serialize($ll->response->task), __METHOD__);
+            Yii::info('Получили task:' . serialize($ll->response->task), __METHOD__);
             sleep(2);
             $clientParam = [
                 'token' => 'zC9MhiUcVmiA',
@@ -126,10 +126,7 @@ class BailiffsClass
                 ];
             }
 
-            Yii::info('Получили данные:' . serialize($resultDolg), __METHOD__);
-            Yii::error('ololo: ' . serialize($resultDolg->response->status), __METHOD__);
-
-            if (is_object($resultDolg->response) && isset($resultDolg->response->status) && ($resultDolg->response->status === 0 || $resultDolg->response->status === 2)) {
+            if (is_object($resultDolg->response) && isset($resultDolg->response->status) && ($resultDolg->response->status === 0 || $resultDolg->response->status === 2) && !empty($resultDolg->response->result[0]->result)) {
                 Yii::info('Нашли долги', __METHOD__);
 
                 return [
@@ -142,7 +139,7 @@ class BailiffsClass
 
                 return [
                     'status' => 'SUCCESS',
-                    'msg' => 'У клиента есть долги, но получить полную информацию не получилось',
+                    'msg' => 'У клиента нет долгов',
                     'data' => ''
                 ];
             }

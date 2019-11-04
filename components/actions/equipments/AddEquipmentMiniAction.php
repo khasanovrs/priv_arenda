@@ -23,7 +23,7 @@ class AddEquipmentMiniAction extends Action
         $equipmentsType = $request->getBodyParam('equipmentsType');
         $equipmentsCategory = $request->getBodyParam('equipmentsCategory');
 
-        $result = EquipmentsClass::AddEquipment($model, $mark, 7, $stock, $equipmentsType, $equipmentsCategory, '', '', '', '', '', 1, '', '', '', '', '', '', '', '', '', '', '', '', '',0, 1);
+        $result = EquipmentsClass::AddEquipment($model, $mark, 7, $stock, $equipmentsType, $equipmentsCategory, '', 0, 0, '', '', 1, '', '', '', '', '', '', '', '', '', '', '', '', '',0, 1);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении оборудования', __METHOD__);
