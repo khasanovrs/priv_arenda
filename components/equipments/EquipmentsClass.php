@@ -468,9 +468,10 @@ class EquipmentsClass
      * Получение списка оборудования по поиску
      * @param $branch
      * @param $filter
+     * @param $applicationStatus
      * @return array
      */
-    public static function GetAllEquipmentsBranch($filter, $branch)
+    public static function GetAllEquipmentsBranch($filter, $branch, $applicationStatus)
     {
         Yii::info('Запуск функции GetEquipmentsSearch', __METHOD__);
         $result = [];
@@ -508,9 +509,12 @@ class EquipmentsClass
             array_push($arr, $value->id);
         }
 
+        // показываем или нет оборудование со спросом
+        $secondFilter = $applicationStatus !== 3 ? ' and status!=7' : '';
+
         $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
         where(['in', 'stock_id', $arr])->
-        andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)', [':filter' => $filter])->
+        andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)' . $secondFilter, [':filter' => $filter])->
         orderBy('equipments.id desc')->
         all();
 

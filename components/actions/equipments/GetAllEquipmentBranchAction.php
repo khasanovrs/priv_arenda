@@ -19,8 +19,9 @@ class GetAllEquipmentBranchAction extends Action
 
         $filter = $request->getBodyParam('filter');
         $branch = $request->getBodyParam('branch');
+        $applicationStatus = $request->getBodyParam('applicationStatus');
 
-        $result = EquipmentsClass::GetAllEquipmentsBranch($filter, $branch);
+        $result = EquipmentsClass::GetAllEquipmentsBranch($filter, $branch, $applicationStatus);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка оборудования', __METHOD__);
