@@ -30,7 +30,7 @@ class CheckStateHireEqController extends Controller
              * @var ApplicationEquipment $item
              */
             foreach ($app_eq as $item) {
-                $result = HireClass::checkHire($item);
+                $result = HireClass::checkHire($item->id);
 
                 if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при добавлении нового статуса для заявки', __METHOD__);
