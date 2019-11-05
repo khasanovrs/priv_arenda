@@ -509,15 +509,21 @@ class ApplicationsClass
             $client = Clients::find()->where('branch_id=:branch_id and phone="79111111111"', [':branch_id' => $branch])->one();
 
             if (!is_object($client)) {
-                Yii::error('Виртуальный клиент не найден, branch: ' . serialize($branch), __METHOD__);
+                $checkAdd = ClientsClass::AddClient('', '', 1, $branch, 2, 2, '', 6, '', '', '', 'Тестовы пользователь', 79111111111, '', '', '', '', '',3);
 
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Виртуальный клиент не найден',
-                ];
+                if (!is_array($checkAdd) || !isset($checkAdd['status']) || $checkAdd['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при добавлении нового клиента', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при добавлении нового клинета',
+                    ];
+                }
+
+                $client_id = $checkAdd['data']['id'];
+            } else {
+                $client_id = $client->id;
             }
-
-            $client_id = $client->id;
         }
 
         if (!is_numeric($delivery)) {

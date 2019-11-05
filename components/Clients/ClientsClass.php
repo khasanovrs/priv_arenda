@@ -290,6 +290,7 @@ class ClientsClass
             ];
         } else {
             $user = [
+                'id' => $client->id,
                 'client_email' => $email,
                 'client_fio' => $fio === '' ? $name : $fio,
                 'client_id' => $newClientInfo->id,
