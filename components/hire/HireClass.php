@@ -1069,8 +1069,8 @@ class HireClass
             $hire_state_id = 4;
         };
 
-        // закрыт - (отстутствии долгов и возвращении оборудования на склад)
-        if ($app_eq->sum_sale <= $app_eq->total_paid && $app_eq->equipments->status === 4) {
+        // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
+        if ($app_eq->sum_sale <= $app_eq->total_paid && $dateDiff < 3 && $app_eq->equipments->status === 4) {
             $hire_state_id = 3;
         }
 

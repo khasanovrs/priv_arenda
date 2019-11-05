@@ -126,13 +126,21 @@ class BailiffsClass
                 ];
             }
 
-            if (is_object($resultDolg->response) && isset($resultDolg->response->status) && ($resultDolg->response->status === 0 || $resultDolg->response->status === 2) && !empty($resultDolg->response->result[0]->result)) {
+            if (is_object($resultDolg->response) && isset($resultDolg->response->status) && $resultDolg->response->status === 0 && !empty($resultDolg->response->result[0]->result)) {
                 Yii::info('Нашли долги', __METHOD__);
 
                 return [
                     'status' => 'SUCCESS',
                     'msg' => 'У клиента есть долги',
                     'data' => $resultDolg->response->result[0]->result
+                ];
+            } elseif (is_object($resultDolg->response) && isset($resultDolg->response->status) && $resultDolg->response->status === 2) {
+                Yii::info('Проверка клиента находится в очереди', __METHOD__);
+
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'Не смогли проверить клиента. Попробуйте попозже',
+                    'data' => ''
                 ];
             } else {
                 Yii::info('Данные по задолженности не получены', __METHOD__);
