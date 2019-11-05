@@ -344,10 +344,10 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
-            $listFilter[] = 'is_not_active=0';
+            $listFilter[] = 'is_not_active=0 and status!=7';
             $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->where('is_not_active=0')->all();
+            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->where('is_not_active=0 and status!=7')->all();
         }
 
         if (!is_array($equipmentsTypeList)) {
