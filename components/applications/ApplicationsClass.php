@@ -22,6 +22,7 @@ use app\models\Clients;
 use app\models\Discount;
 use app\models\Equipments;
 use app\models\Source;
+use app\models\Users;
 use Yii;
 
 class ApplicationsClass
@@ -509,7 +510,7 @@ class ApplicationsClass
             $client = Clients::find()->where('branch_id=:branch_id and phone="79111111111"', [':branch_id' => $branch])->one();
 
             if (!is_object($client)) {
-                $checkAdd = ClientsClass::AddClient('', '', 1, $branch, 2, 2, '', 6, '', '', '', 'Тестовы пользователь', 79111111111, '', '', '', '', '',3);
+                $checkAdd = ClientsClass::AddClient('', '', 1, $branch, 2, 2, '', 6, '', '', '', 'Тестовы пользователь', 79111111111, '', '', '', '', '', 3);
 
                 if (!is_array($checkAdd) || !isset($checkAdd['status']) || $checkAdd['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при добавлении нового клиента', __METHOD__);
@@ -885,6 +886,7 @@ class ApplicationsClass
      * @param $date_start
      * @param $date_end
      * @return array
+     * @throws \yii\base\InvalidConfigException
      */
     public static function getApplications($status, $source, $branch, $date_start, $date_end)
     {
@@ -892,6 +894,51 @@ class ApplicationsClass
         $result = [];
         $listFilter = [];
         $params = [];
+        $stockUser = '';
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var Users $user
+         */
+        $user = Users::find()->where('id=:id', [':id' => $session->user_id])->one();
+
+        if (!is_object($user)) {
+            Yii::error('Пользователь не найден', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Пользователь не найден',
+            ];
+        }
+
+        if ($user->user_type === 2) {
+            $stockUserObject = $user->branch;
+
+            if (!is_object($stockUserObject)) {
+                Yii::error('Ошибка при определении филиала у менеджера' . serialize($stockUser), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при определении филиала у менеджера',
+                ];
+            }
+
+            $stockUser = $stockUserObject->id;
+        }
 
         if ($status !== '' and $status !== null) {
             Yii::info('Параметр status: ' . serialize($status), __METHOD__);
@@ -924,11 +971,16 @@ class ApplicationsClass
             $params[':branch_id'] = $branch;
         }
 
-        if (!empty($listFilter)) {
+        if ($stockUser !== '') {
+            $listFilter[] = 'is_not_active=0 and branch_id=' . $stockUser;
+        } else {
             $listFilter[] = 'is_not_active=0';
+        }
+
+        if (!empty($listFilter)) {
             $applications = Applications::find()->joinWith('applicationEquipments')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $applications = Applications::find()->joinWith('applicationEquipments')->where('is_not_active=0')->orderBy('id desc')->all();
+            $applications = Applications::find()->joinWith('applicationEquipments')->where(implode(" and ", $listFilter))->orderBy('id desc')->all();
         }
 
         if (!is_array($applications)) {
