@@ -21,6 +21,7 @@ use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
 use app\models\FinanceCashbox;
 use app\models\Stock;
+use app\models\Users;
 use Yii;
 
 class EquipmentsClass
@@ -188,6 +189,7 @@ class EquipmentsClass
      * @param $degree_wear_end
      * @param $confirmed
      * @return array
+     * @throws \yii\base\InvalidConfigException
      */
     public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed)
     {
@@ -196,6 +198,51 @@ class EquipmentsClass
         $result = [];
         $listFilter = [];
         $params = [];
+        $stockUser = '';
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var Users $user
+         */
+        $user = Users::find()->where('id=:id', [':id' => $session->user_id])->one();
+
+        if (!is_object($user)) {
+            Yii::error('Пользователь не найден', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Пользователь не найден',
+            ];
+        }
+
+        if ($user->user_type === 2) {
+            $stockUserObject = $user->branch->stocks[0];
+
+            if (!is_object($stockUserObject)) {
+                Yii::error('Ошибка при определении филиала у менеджера' . serialize($stockUser), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при определении филиала у менеджера',
+                ];
+            }
+
+            $stockUser = $stockUserObject->id;
+        }
 
         if ($status !== '' and $status !== null) {
             Yii::info('Параметр status: ' . serialize($status), __METHOD__);
@@ -343,11 +390,16 @@ class EquipmentsClass
             $params[':like'] = strtolower($like);
         }
 
-        if (!empty($listFilter)) {
+        if ($stockUser !== '') {
+            $listFilter[] = 'is_not_active=0 and status!=7 and stock_id=' . $stockUser;
+        } else {
             $listFilter[] = 'is_not_active=0 and status!=7';
+        }
+
+        if (!empty($listFilter)) {
             $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->where('is_not_active=0 and status!=7')->all();
+            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->where(implode(" and ", $listFilter))->all();
         }
 
         if (!is_array($equipmentsTypeList)) {
