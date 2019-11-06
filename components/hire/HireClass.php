@@ -18,6 +18,7 @@ use app\models\HireField;
 use app\models\HireShowField;
 use app\models\HireState;
 use app\models\HireStatus;
+use app\models\Users;
 use Yii;
 
 class HireClass
@@ -291,6 +292,7 @@ class HireClass
      * @param $sum_end
      * @param $show_close_hire
      * @return array
+     * @throws \yii\base\InvalidConfigException
      */
     public static function GetHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end, $show_close_hire)
     {
@@ -298,6 +300,51 @@ class HireClass
         $result = [];
         $listFilter = [];
         $params = [];
+        $stockUser = '';
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var Users $user
+         */
+        $user = Users::find()->where('id=:id', [':id' => $session->user_id])->one();
+
+        if (!is_object($user)) {
+            Yii::error('Пользователь не найден', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Пользователь не найден',
+            ];
+        }
+
+        if ($user->user_type === 2) {
+            $stockUserObject = $user->branch;
+
+            if (!is_object($stockUserObject)) {
+                Yii::error('Ошибка при определении филиала у менеджера' . serialize($stockUser), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при определении филиала у менеджера',
+                ];
+            }
+
+            $stockUser = $stockUserObject->id;
+        }
 
         if ($status !== '' and $status !== null) {
             Yii::info('Параметр status: ' . serialize($status), __METHOD__);
@@ -342,11 +389,17 @@ class HireClass
             $listFilter[] = 'hire_state_id!=3';
         }
 
-        if (!empty($listFilter)) {
+        if ($stockUser !== '') {
+            $listFilter[] = 'applications.is_not_active=0 and status_id in (1,2) and applications.branch_id=' . $stockUser;
+        } else {
             $listFilter[] = 'applications.is_not_active=0 and status_id in (1,2)';
+        }
+
+
+        if (!empty($listFilter)) {
             $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $list = ApplicationEquipment::find()->joinWith(['application'])->where('applications.is_not_active=0 and status_id in (1,2)')->orderBy('id desc')->all();
+            $list = ApplicationEquipment::find()->joinWith(['application'])->where(implode(" and ", $listFilter))->orderBy('id desc')->all();
         }
 
 
