@@ -810,7 +810,7 @@ class HireClass
         }
 
         $app_eq->sum = round($price);
-        $app_eq->hire_state_id = 7;
+        $app_eq->hire_state_id = 4;
         $app_eq->renewals_date = date('Y-m-d H:i:s');
 
         Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
