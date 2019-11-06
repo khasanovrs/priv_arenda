@@ -456,11 +456,11 @@ class HireClass
                 'status' => $value->hire_status_id,
                 'state' => $value->hireState->name,
                 'color' => $value->hireStatus->color,
-                'sum' => $value->equipments->price_per_day,
-                'sum_hire' => $value->sum,
-                'sale_sum' => $value->sum_sale,
-                'total_paid' => $value->total_paid,
-                'remainder' => (float)$value->sum_sale - (float)$value->total_paid,
+                'sum' => $value->equipments->price_per_day, // цена оборудования
+                'sum_hire' => $value->sum, // сумма аренды со скдикой
+                'sale_sum' => $value->sum_sale, // общая сумма со скидкой
+                'total_paid' => $value->total_paid, // всего оплачено
+                'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
                 'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
                 'comment' => $application->comment,
                 'date_end' => $application->date_end,
@@ -809,7 +809,7 @@ class HireClass
             $price = $price - ($price * $applications->discount->code / 100);
         }
 
-        $app_eq->sum = $price;
+        $app_eq->sum = round($price);
         $app_eq->hire_state_id = 7;
         $app_eq->renewals_date = date('Y-m-d H:i:s');
 
