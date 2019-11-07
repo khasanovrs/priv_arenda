@@ -908,70 +908,6 @@ class HireClass
             ];
         }
 
-        /**
-         * @var Equipments $eq
-         */
-        $eq = $app_eq->equipments;
-
-        if (!is_object($eq)) {
-            Yii::info('Информация об оборудовании не найдено', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Информация об оборудовании не найдено'
-            ];
-        }
-
-        /**
-         * @var Applications $app
-         */
-        $app = $app_eq->application;
-
-        if (!is_object($app)) {
-            Yii::info('Информация об оборудовании по заявке не найдена', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Заявка не найдена'
-            ];
-        }
-
-        $rent_start = $app->rent_start;
-        $rent_end = date('Y-m-d H:i:s');
-        $disc = $app->discount->code;
-
-        $datediff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
-
-        $datediff = $datediff < 1 ? 1 : $datediff;
-        $price = $datediff * $eq->price_per_day;
-
-        if ((int)$disc !== 0) {
-            $price = $price - ($price * $disc / 100);
-        }
-
-        $app_eq->sum = round($price);
-        $app->rent_end = $rent_end;
-
-        try {
-            if (!$app_eq->save(false)) {
-                Yii::error('Ошибка при сохранении состояния: ' . serialize($app_eq->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
-
-        try {
-            if (!$app->save(false)) {
-                Yii::error('Ошибка при сохранении состояния: ' . serialize($app->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при сохранении состояния: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
-
         $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id, 4);
 
         if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
@@ -1116,7 +1052,7 @@ class HireClass
 
         $hire_state_id = $app_eq->hire_state_id;
 
-        $date = date('Y-m-d H:i:s',strtotime("+1 minute"));
+        $date = date('Y-m-d H:i:s');
         $rent_end = $app_eq->application->rent_end;
         $rent_start = $app_eq->application->rent_start;
 
