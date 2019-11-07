@@ -7,6 +7,7 @@ namespace app\components\applications;
 
 use app\components\Clients\ClientsClass;
 use app\components\equipments\EquipmentsClass;
+use app\components\hire\HireClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
@@ -740,6 +741,17 @@ class ApplicationsClass
                     }
                 }
 
+            }
+
+            $check = HireClass::checkHire($newApplicationEquipment->id);
+
+            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при определии статуса', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении состояния',
+                ];
             }
         }
 

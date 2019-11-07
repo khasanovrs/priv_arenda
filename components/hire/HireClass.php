@@ -1117,6 +1117,11 @@ class HireClass
 
         $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
 
+        Yii::info('Текущее время: ' . serialize($date), __METHOD__);
+        Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
+
+        Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
+
         // статус заявки в прокате
         if ($rent_start < $date && $date < $rent_end) {
             $hire_state_id = 4;

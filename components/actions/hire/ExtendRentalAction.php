@@ -13,7 +13,7 @@ class ExtendRentalAction extends Action
 {
     public function run()
     {
-        Yii::info('Запуск функции получения списка заявок', __METHOD__);
+        Yii::info('Запуск функции продления проката', __METHOD__);
 
         $request = Yii::$app->request;
 
