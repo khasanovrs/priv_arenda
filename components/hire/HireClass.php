@@ -949,13 +949,7 @@ class HireClass
             $price = $price - ($price * $disc / 100);
         }
 
-        $date = date('Y-m-d H:i:s');
-        $datediffHours = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
-        // если прошло не более 3х часов, то оставляем прокат
-        $state = round($price) > $app_eq->total_paid && $datediffHours > 3 ? 5 : 4;
-
         $app_eq->sum = round($price);
-        $app_eq->hire_state_id = $state;
         $app->rent_end = $rent_end;
 
         try {
@@ -986,6 +980,17 @@ class HireClass
             return [
                 'status' => 'ERROR',
                 'msg' => 'Ошибка при изменении статуса',
+            ];
+        }
+
+        $check = self::checkHire($app_id);
+
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении состояния',
             ];
         }
 
@@ -1111,7 +1116,7 @@ class HireClass
 
         $hire_state_id = $app_eq->hire_state_id;
 
-        $date = date('Y-m-d H:i:s');
+        $date = date('Y-m-d H:i:s',strtotime("+1 minute"));
         $rent_end = $app_eq->application->rent_end;
         $rent_start = $app_eq->application->rent_start;
 
@@ -1133,12 +1138,12 @@ class HireClass
         }
 
         // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
-        if ($dateDiff > 3 && $app_eq->equipments->status === 1) {
+        if ($app_eq->sum_sale > $app_eq->total_paid && $date > $rent_end && $app_eq->equipments->status === 1) {
             $hire_state_id = 2;
         }
 
         // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if ($dateDiff > 3 && $app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
+        if ($date > $rent_end && $app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
             $hire_state_id = 5;
         }
 
