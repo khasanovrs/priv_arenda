@@ -408,6 +408,12 @@ class ApiController extends Controller
             'get-doc' => [
                 'class' => 'app\components\actions\documents\GetDocumentsAction',
             ],
+            /**
+             * Запуск крона
+             */
+            'start-cron' => [
+                'class' => 'app\components\actions\cron\CronAction',
+            ],
         ];
     }
 
