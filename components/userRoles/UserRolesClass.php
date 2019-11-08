@@ -96,7 +96,7 @@ class UserRolesClass
 
     /**
      * Функция удаления филиала
-     * @param $role
+     * @param $id
      * @return array|bool
      */
     public static function DeleteRole($id)

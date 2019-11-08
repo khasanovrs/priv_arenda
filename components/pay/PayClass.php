@@ -184,6 +184,11 @@ class PayClass
         ];
     }
 
+    /**
+     * Получение списка платежей
+     * @param $application_equipment_id
+     * @return array
+     */
     public static function getPayList($application_equipment_id)
     {
         Yii::info('Запуск функции getPayList', __METHOD__);

@@ -1182,8 +1182,6 @@ class EquipmentsClass
      * @param $degree_wear
      * @param $discount
      * @param $rentals
-     * @param $repairs
-     * @param $repairs_sum
      * @param $profit
      * @param $payback_ratio
      * @param $power_energy
@@ -1202,7 +1200,7 @@ class EquipmentsClass
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed)
+    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed)
     {
         Yii::error('ololo: ' . serialize($amount_repair), __METHOD__);
 

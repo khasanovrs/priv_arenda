@@ -288,13 +288,11 @@ class HireClass
      * @param $branch
      * @param $date_start
      * @param $date_end
-     * @param $sum_start
-     * @param $sum_end
      * @param $show_close_hire
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function GetHire($status, $like, $branch, $date_start, $date_end, $sum_start, $sum_end, $show_close_hire)
+    public static function GetHire($status, $like, $branch, $date_start, $date_end, $show_close_hire)
     {
         Yii::info('Запуск функции GetHire', __METHOD__);
         $result = [];

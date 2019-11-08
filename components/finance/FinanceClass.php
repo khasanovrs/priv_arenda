@@ -22,6 +22,7 @@ use Yii;
 class FinanceClass
 {
     /**
+     * Получение списка полей для раздела финансы
      * @return array
      * @throws \yii\base\InvalidConfigException
      */

@@ -108,45 +108,6 @@ class ApplicationsClass
     }
 
     /**
-     * Получение статусов источников
-     * @return bool|array
-     */
-    public static function GetApplicationsSource()
-    {
-        Yii::info('Запуск функции GetApplicationsSource', __METHOD__);
-        $result = [];
-
-        $list = ApplicationsSource::find()->orderBy('id')->all();
-
-        if (!is_array($list)) {
-            Yii::error('Список источников заявок пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список источников заявок пуст'
-            ];
-        }
-
-        /**
-         * @var ApplicationsSource $value
-         */
-        foreach ($list as $value) {
-            $result[] = [
-                'val' => $value->id,
-                'name' => $value->name
-            ];
-        }
-
-        Yii::info('Список источников заявок получен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Список источников заявок получен',
-            'data' => $result
-        ];
-    }
-
-    /**
      * Получение статусов доставки заявки
      * @return bool|array
      */
@@ -728,8 +689,8 @@ class ApplicationsClass
             }
 
             if (count($payList) !== 0) {
-                foreach ($payList as $value) {
-                    $checkApp = PayClass::AddPay($newApplicationEquipment->id, $value->sum, $value->cashBox, $value->revertSum);
+                foreach ($payList as $valueSecond) {
+                    $checkApp = PayClass::AddPay($newApplicationEquipment->id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
 
                     if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                         Yii::error('Ошибка при добавлении платежа', __METHOD__);
@@ -766,8 +727,7 @@ class ApplicationsClass
     /**
      * Получение детальной информации о заявке
      * @param $applicationId
-     * @return array|bool
-     * @throws \yii\base\InvalidConfigException
+     * @return array
      */
     public static function getApplicationInfo($applicationId)
     {

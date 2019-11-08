@@ -58,7 +58,7 @@ class CashBoxClass
      * @param $name
      * @param $sum
      * @param $val
-     * @param zalog
+     * @param $zalog
      * @param $delivery
      * @return array|bool
      */

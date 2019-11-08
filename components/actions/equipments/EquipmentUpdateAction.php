@@ -33,8 +33,6 @@ class EquipmentUpdateAction extends Action
         $degree_wear = $request->getBodyParam('degree_wear');
         $discount = $request->getBodyParam('discount');
         $rentals = $request->getBodyParam('rentals');
-        $repairs = $request->getBodyParam('repairs');
-        $repairs_sum = $request->getBodyParam('repairs_sum');
         $profit = $request->getBodyParam('profit');
         $payback_ratio = $request->getBodyParam('payback_ratio');
         $power_energy = $request->getBodyParam('power_energy');
@@ -51,7 +49,7 @@ class EquipmentUpdateAction extends Action
         $sale_amount = $request->getBodyParam('sale_amount');
         $confirmed = $request->getBodyParam('confirmed');
 
-        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed);
+        $result = EquipmentsClass::changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении оборудования', __METHOD__);

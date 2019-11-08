@@ -1156,8 +1156,6 @@ class ClientsClass
     {
         Yii::info('Запуск функции GetAllClient', __METHOD__);
 
-        $result = [];
-
         /**
          * @var Clients $client
          */

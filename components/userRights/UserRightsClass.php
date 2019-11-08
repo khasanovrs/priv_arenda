@@ -98,7 +98,7 @@ class UserRightsClass
 
     /**
      * Функция удаления филиала
-     * @param $right
+     * @param $id
      * @return array|bool
      */
     public static function DeleteRight($id)
