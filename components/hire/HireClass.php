@@ -1068,7 +1068,7 @@ class HireClass
         }
 
         // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if ($date > $rent_end && $app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
+        if ($app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
             $hire_state_id = 5;
         }
 
