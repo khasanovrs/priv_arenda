@@ -1074,7 +1074,7 @@ class HireClass
         }
 
         // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
-        if ($app_eq->sum_sale > $app_eq->total_paid && $date > $rent_end && $app_eq->equipments->status === 1) {
+        if ($date > $rent_end && $app_eq->equipments->status === 1) {
             $hire_state_id = 2;
         }
 
