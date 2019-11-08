@@ -1057,7 +1057,7 @@ class HireClass
         };
 
         // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
-        if ($app_eq->sum_sale <= $app_eq->total_paid && $dateDiff < 3 && $app_eq->equipments->status === 4) {
+        if ($app_eq->sum <= $app_eq->total_paid && $dateDiff < 3 && $app_eq->equipments->status === 4) {
             $hire_state_id = 3;
             $msg = 'Прокат успешно закрыт';
         }
@@ -1069,7 +1069,7 @@ class HireClass
         }
 
         // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if ($app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
+        if ($app_eq->sum > $app_eq->total_paid && $app_eq->equipments->status === 4) {
             $hire_state_id = 5;
             $msg = 'Невозможно закрыть. Есть долг';
         }
