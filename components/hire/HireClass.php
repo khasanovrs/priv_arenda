@@ -919,22 +919,11 @@ class HireClass
             ];
         }
 
-        $check = self::checkHire($app_id);
-
-        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при продлении контракта', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при изменении состояния',
-            ];
-        }
-
-        Yii::info('Заявка успешно изменена', __METHOD__);
+        Yii::info('Оборудование успешно вернули', __METHOD__);
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Заявка успешно изменена'
+            'msg' => 'Оборудование успешно вернули'
         ];
     }
 
