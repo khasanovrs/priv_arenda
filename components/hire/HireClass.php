@@ -1012,7 +1012,7 @@ class HireClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Прокат успешно закрыт'
+            'msg' => $check['msg']
         ];
     }
 
@@ -1052,6 +1052,7 @@ class HireClass
 
         Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
 
+        $msg = 'Состояние успешно изменено';
         // статус заявки в прокате
         if ($rent_start < $date && $date < $rent_end) {
             $hire_state_id = 4;
@@ -1060,16 +1061,19 @@ class HireClass
         // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
         if ($app_eq->sum_sale <= $app_eq->total_paid && $dateDiff < 3 && $app_eq->equipments->status === 4) {
             $hire_state_id = 3;
+            $msg = 'Прокат успешно закрыт';
         }
 
         // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
         if ($date > $rent_end && $app_eq->equipments->status === 1) {
             $hire_state_id = 2;
+            $msg = 'Невозможно закрыть. Оборудование у клиента';
         }
 
         // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
         if ($app_eq->sum_sale > $app_eq->total_paid && $app_eq->equipments->status === 4) {
             $hire_state_id = 5;
+            $msg = 'Невозможно закрыть. Есть долг';
         }
 
         $app_eq->hire_state_id = $hire_state_id;
@@ -1088,7 +1092,7 @@ class HireClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => 'Состояние успешно изменено'
+            'msg' => $msg
         ];
     }
 }

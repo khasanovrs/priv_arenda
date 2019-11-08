@@ -38,7 +38,7 @@ class CloseHireAction extends Action
 
         return [
             'status' => 'OK',
-            'msg' => 'Прокат успешно обновлен'
+            'msg' => $result['msg']
         ];
     }
 }
