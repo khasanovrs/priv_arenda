@@ -907,12 +907,33 @@ class HireClass
         $checkChangeStatus = EquipmentsClass::changeStatus($app_eq->equipments_id, 4);
 
         if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при добавлении финансов', __METHOD__);
+            Yii::error('Ошибка при изменении статуса', __METHOD__);
 
             return [
                 'status' => 'ERROR',
                 'msg' => 'Ошибка при изменении статуса',
             ];
+        }
+
+        $hire_state_id = '';
+
+        // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
+        if ($app_eq->sum > $app_eq->total_paid && $app_eq->equipments->status === 4) {
+            $hire_state_id = 5;
+        }
+
+        if ($hire_state_id !== '') {
+            $app_eq->hire_state_id = $hire_state_id;
+
+            try {
+                if (!$app_eq->save(false)) {
+                    Yii::error('Ошибка при закрытии проката: ' . serialize($app_eq->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
         }
 
         Yii::info('Оборудование успешно вернули', __METHOD__);
