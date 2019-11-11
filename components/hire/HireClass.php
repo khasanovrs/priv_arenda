@@ -525,7 +525,6 @@ class HireClass
          * @var Applications $application
          */
 
-        $sum_sale = (float)$applicationEq->sum - ((float)$applicationEq->sum * (float)$application->discount->name / 100);
         $client = ClientsClass::GetClientInfo($application->client_id);
 
         $mark = $applicationEq->equipments->mark0->name;
@@ -580,9 +579,8 @@ class HireClass
             'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
-            'sum_sale' => $sum_sale,
             'total_paid' => $applicationEq->total_paid,
-            'remainder' => (float)$sum_sale - (float)$applicationEq->total_paid,
+            'remainder' => $applicationEq->sum - (float)$applicationEq->total_paid,
             'count' => $applicationEq->equipments_count,
             'equipments' =>
                 [
