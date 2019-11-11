@@ -18,11 +18,11 @@ class DocumentsClass
     {
         Yii::info('Запуск функции getDocuments', __METHOD__);
         $document = new \PhpOffice\PhpWord\TemplateProcessor('test.docx'); //шаблон
-        $document->setValue('name_v', '555'); //номер договора
-        $document->saveAs('uploads/doc/test1.docx');
+        //$document->setValue('name_v', '555'); //номер договора
+        $document->saveAs('uploads/doc/eq_hire.docx');
 
 
-        $file = '/uploads/doc/test1.docx';
+        $file = '/uploads/doc/eq_hire.docx';
         header('X-Accel-Redirect: ' . $file);
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename=' . basename($file));
@@ -33,7 +33,7 @@ class DocumentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список типов оборудования получен',
-            'data' => 'test1.docx'
+            'data' => 'file.docx'
         ];
     }
 }
