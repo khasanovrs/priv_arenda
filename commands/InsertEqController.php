@@ -5,9 +5,11 @@ namespace app\commands;
 use app\models\Branch;
 use app\models\Equipments;
 use app\models\EquipmentsCategory;
+use app\models\EquipmentsInfo;
 use app\models\EquipmentsMark;
 use app\models\EquipmentsStatus;
 use app\models\EquipmentsType;
+use app\models\Stock;
 use Yii;
 use yii\console\Controller;
 
@@ -44,9 +46,10 @@ class InsertEqController extends Controller
 
             //ищем марку
             $checkMark = '';
-            $r = $markArr = explode(",", $name);
+            $r = $markArr = explode(" ", $name);
 
             foreach ($r as $value) {
+                if ($value === '') continue;
                 /**
                  * @var EquipmentsMark $checkMark
                  */
@@ -57,120 +60,186 @@ class InsertEqController extends Controller
                 }
             }
 
-
-            if (!is_object($checkMark)) {
+            if (is_object($checkMark) && $branch !== null && $state !== null) {
 
                 $ll = explode(' ' . $checkMark->name . ' ', $name);
-                $type = $ll[0];
-                $model = $ll[1];
+                $category = trim($category);
 
-                // ищем категорию
-                $checkCategory = EquipmentsCategory::find()->where('lower(name)=:name', [':name' => strtolower($category)])->one();
+                if (isset($ll[0]) && isset($ll[1])) {
+                    $type = $ll[0];
+                    $model = $ll[1];
 
-                if (!is_object($checkCategory)) {
-                    // добавляем категорию
-                    $checkCategory = new EquipmentsMark();
-                    $checkCategory->name = ucfirst(strtolower($category));
+                    // ищем категорию
+                    $checkCategory = EquipmentsCategory::find()->where('name=:name', [':name' => strtolower($category)])->one();
+
+                    if (!is_object($checkCategory)) {
+                        // добавляем категорию
+                        $checkCategory = new EquipmentsCategory();
+                        $checkCategory->name = ucfirst(strtolower($category));
+
+                        try {
+                            if (!$checkCategory->save(false)) {
+                                Yii::error('Ошибка при сохранении категории: ' . serialize($checkCategory->getErrors()), __METHOD__);
+                                return false;
+                            }
+                        } catch (\Exception $e) {
+                            Yii::error('Поймали Exception при сохранении категории: ' . serialize($e->getMessage()), __METHOD__);
+                            return false;
+                        }
+                    }
+
+                    // ищем тип
+                    $checkType = EquipmentsType::find()->where('name=:name and category_id=:category_id', [':name' => strtolower($type), ':category_id' => $checkCategory->id])->one();
+
+                    if (!is_object($checkType)) {
+                        // добавляем категорию
+                        $checkType = new EquipmentsType();
+                        $checkType->name = ucfirst(strtolower($type));
+                        $checkType->category_id = $checkCategory->id;
+
+                        try {
+                            if (!$checkType->save(false)) {
+                                Yii::error('Ошибка при сохранении типа: ' . serialize($checkType->getErrors()), __METHOD__);
+                                return false;
+                            }
+                        } catch (\Exception $e) {
+                            Yii::error('Поймали Exception при сохранении типа: ' . serialize($e->getMessage()), __METHOD__);
+                            return false;
+                        }
+                    }
+
+                    // поиск филиала
+                    $branch = $branch === 'Казань (ММ)' ? 'Казань' : $branch;
+
+                    /**
+                     * @var Branch $checkBranch
+                     */
+
+                    $checkBranch = Branch::find()->where('name=:name', [':name' => $branch])->one();
+                    if (!is_object($checkBranch)) {
+                        Yii::error('Филиал не найден: ' . serialize($branch), __METHOD__);
+                        return false;
+                    }
+
+                    /**
+                     * @var Stock $checkStock
+                     */
+                    $checkStock = $checkBranch->stocks;
+                    if (empty($checkStock)) {
+                        Yii::error('Склад не найден: ' . serialize($branch), __METHOD__);
+                        return false;
+                    }
+
+                    // поиск состояния
+                    /**
+                     * @var EquipmentsStatus $checkState
+                     */
+                    $state = $state === 'Списано' ? 'Списан' : $state;
+                    $state = $state === 'В наличии' ? 'Доступен' : $state;
+                    $state = $state === 'Просрочен' ? 'В аренде' : $state;
+                    $checkState = EquipmentsStatus::find()->where('name=:name', [':name' => strtolower($state)])->one();
+                    if (!is_object($checkState)) {
+                        Yii::error('Состояние не найдено: ' . serialize($state), __METHOD__);
+                        return false;
+                    }
+
+                    // очищаем серийный номер от лишних символов
+                    $tool_number = str_replace("№", "", $tool_number);
+
+                    // ищем тип
+                    $checkEq = Equipments::find()->where(
+                        'mark=:mark and model=:model and stock_id=:stock_id and category_id=:category_id and type=:type', [':mark' => $checkMark->id, ':model' => $model, ':stock_id' => $checkStock[0]->id, ':category_id' => $checkCategory->id, ':type' => $checkType->id])->one();
+
+                    if (is_object($checkEq)) {
+                        continue;
+                    }
+
+                    $newEq = new Equipments();
+                    $newEq->status = $checkState->id;
+                    $newEq->mark = $checkMark->id;
+                    $newEq->model = $model;
+                    $newEq->stock_id = $checkStock[0]->id;
+                    $newEq->type = $checkType->id;
+                    $newEq->category_id = $checkCategory->id;
+                    $newEq->tool_number = $tool_number;
+                    $newEq->selling = $sum;
+                    $newEq->selling_price = $selling_price;
+                    $newEq->price_per_day = $price_per_day;
+                    $newEq->revenue = $revenue;
+                    $newEq->degree_wear = 0;
+                    $newEq->countHire = $hire_count || 0;
+                    $newEq->discount = 1;
+                    $newEq->date_create = date('Y-m-d H:i:s', strtotime($date_create));
+                    $newEq->rentals = $arenda;
+                    $newEq->repairs = 0;
+                    $newEq->repairs_sum = $repairs_sum;
+                    $newEq->profit = $revenue - $sum - $repairs_sum;
+                    $newEq->payback_ratio = 0;
+                    $newEq->photo = $foto;
+                    $newEq->photo_alias = '';
+                    $newEq->confirmed = 1;
 
                     try {
-                        if (!$checkCategory->save(false)) {
-                            Yii::error('Ошибка при сохранении категории: ' . serialize($checkCategory->getErrors()), __METHOD__);
+                        if (!$newEq->save(false)) {
+                            Yii::error('Ошибка при сохранении оборудования: ' . serialize($newEq->getErrors()), __METHOD__);
                             return false;
                         }
                     } catch (\Exception $e) {
-                        Yii::error('Поймали Exception при сохранении категории: ' . serialize($e->getMessage()), __METHOD__);
+                        Yii::error('Поймали Exception при сохранении оборудования: ' . serialize($e->getMessage()), __METHOD__);
                         return false;
                     }
-                }
 
-                // ищем тип
-                $checkType = EquipmentsType::find()->where('lower(name)=:name and category_id=:category_id', [':name' => strtolower($category), ':category_id' => $checkCategory->id])->one();
-
-                if (!is_object($checkType)) {
-                    // добавляем категорию
-                    $checkType = new EquipmentsType();
-                    $checkType->name = ucfirst(strtolower($type));
-                    $checkType->category_id = $checkCategory->id;
+                    $newEquipmentsInfo = new EquipmentsInfo();
+                    $newEquipmentsInfo->equipments_id = $newEq->id;
+                    $newEquipmentsInfo->power_energy = 0;
+                    $newEquipmentsInfo->length = 0;
+                    $newEquipmentsInfo->network_cord = 0;
+                    $newEquipmentsInfo->power = 0;
+                    $newEquipmentsInfo->comment = $coment;
+                    $newEquipmentsInfo->frequency_hits = 0;
 
                     try {
-                        if (!$checkType->save(false)) {
-                            Yii::error('Ошибка при сохранении категории: ' . serialize($checkType->getErrors()), __METHOD__);
+                        if (!$newEquipmentsInfo->save(false)) {
+                            Yii::error('Ошибка при добавлении дополнительной информации об оборудовании: ' . serialize($newEquipmentsInfo->getErrors()), __METHOD__);
                             return false;
                         }
                     } catch (\Exception $e) {
-                        Yii::error('Поймали Exception при сохранении категории: ' . serialize($e->getMessage()), __METHOD__);
+                        Yii::error('Поймали Exception при добавлении дополнительной информации об оборудовании: ' . serialize($e->getMessage()), __METHOD__);
                         return false;
                     }
-                }
-
-                // поиск филиала
-                $branch = $branch === 'Казань (ММ)' ? 'Казань' : $branch;
-
-                /**
-                 * @var Branch $checkBranch
-                 */
-                $checkBranch = Branch::find()->where(['in', 'stock_id', $branch])->one();
-                if (!is_object($checkBranch)) {
-                    Yii::error('Филиал не найден: ' . serialize($branch), __METHOD__);
-                    return false;
-                }
-
-                // поиск состояния
-                /**
-                 * @var EquipmentsStatus $checkState
-                 */
-                $checkState = EquipmentsStatus::find()->where('lower(name)=:name', [':name' => strtolower($state)])->one();
-                if (!is_object($checkState)) {
-                    Yii::error('Состояние не найдено: ' . serialize($state), __METHOD__);
-                    return false;
-                }
-
-
-                // очищаем серийный номер от лишних символов
-                $tool_number = str_replace("№", "", $tool_number);
-
-
-                $newEq = new Equipments();
-
-                $newEq->status = $checkState->id;
-                $newEq->mark = $checkMark->id;
-                $newEq->model = $model;
-                $newEq->stock_id = $checkBranch->id;
-                $newEq->type = $checkType->id;
-                $newEq->category_id = $checkCategory->id;
-                $newEq->tool_number = $tool_number;
-                $newEq->selling = $sum;
-                $newEq->selling_price = $selling_price;
-                $newEq->price_per_day = $price_per_day;
-                $newEq->revenue = $revenue;
-                $newEq->degree_wear = 0;
-                $newEq->countHire = $hire_count;
-                $newEq->discount = 1;
-                $newEq->date_create = date('Y-m-d H:i:s', strtotime($date_create));
-                $newEq->rentals = $arenda;
-                $newEq->repairs = 0;
-                $newEq->repairs_sum = $repairs_sum;
-                $newEq->profit = $revenue - $sum - $repairs_sum;
-                $newEq->payback_ratio = 0;
-                $newEq->photo = $foto;
-                $newEq->photo_alias = '';
-                $newEq->confirmed = 1;
-                $newEq->comment = $coment;
-
-                try {
-                    if (!$newEq->save(false)) {
-                        Yii::error('Ошибка при сохранении оборудования: ' . serialize($newEq->getErrors()), __METHOD__);
-                        return false;
+                } else {
+                    if (!isset($ll[0])) {
+                        $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет типа оборудования');
+                    } else {
+                        $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет марки оборудования');
                     }
-                } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при сохранении оборудования: ' . serialize($e->getMessage()), __METHOD__);
-                    return false;
                 }
             } else {
-                // записываем в документ
+                if ($branch === null) {
+                    $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет филиала');
+                } elseif ($state === null) {
+                    $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет состояния');
+                } else {
+                    $Excel->getActiveSheet()->setCellValue('U' . $i, 'Не нашли марку в БД');
+                }
             }
         }
 
+
+        $Start = 2;
+
+        for ($i = $Start; $i <= 5000; $i++) {
+            $check = $Excel->getActiveSheet()->getCell('U' . $i)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
+
+            if ($check === null) {
+                $Excel->getActiveSheet()->removeRow($i);
+                $i --;
+            }
+        }
+
+        $fileType = 'Excel5';
+        $objWriter = \PHPExcel_IOFactory::createWriter($Excel, $fileType);
+        $objWriter->save('eq2.xlsx');
         return true;
     }
 
@@ -180,7 +249,7 @@ class InsertEqController extends Controller
      */
     public function actionInsertMark()
     {
-        $markList = 'Makita,Karcher,Hitachi,Master,Champion,Extra,Ballu,Elitech,Huter,Endress,Hyundai,Etalon,Prorab,Ronix,Тепломаш,Doncheng,Remington,Sturm,Daire,Timberk,Калибр,Akvilon,Stihl,Husqvarna,Союз,МАКАР,Wagner,Forza,Wacker,Patriot,ADA,Сплитстоун,Grost,Tsunami,Энергомаш,Красный маяк,Профмаш,Dewalt,Hammer,Wester,Dexter,Rebir,SWL,Jet,Пионер,Умелец,Desa,Sial,ЛРСП,Настил,Bosch,ВСРП,ТСДЗ,RedVerg,Bau,Арсенал,Generac,Инстар,ЛШМ,Garret,Diam Vega,Quattro,ТСС,СТРОЙМАШ,Metabo,Aztec,Saad,Eco,Вихрь,GLANZEN,САИ,СПЕЦ,СФО,Hilti,Тропик,Daewoo,Grinda,ВСП,Griff,Zitrek,SDS-Max,SDS-Plus,TSS,Gesan,Fubag,OTTO KURTBACH,STANLEY,Diam,Carver,ПСРВ,KOLNER,ПАРМА,Kerona,МИCOM,ТТ,ТВ,Циклон,Tor,Elektric,Интерсколл,СИБРТЕХРОС,КЭВ,Kress,Kacher,Профтепло,VEK,Black&Decker,GEOBOX,Sarayli-M,Ryobi,Вагнер,RGK,Cedima,Rothenberger,Sali,Helmut,Marina-Speroni,ПЛЭ,Minelab,Прораб,СПБ,nterra,Печенег,Brait,ELEKON POWER,БРИГ,ГВ,Арктос,Шнек,ТПЦ,Koshin,Valtec,Aurora Pro ORMAN,Equation,Rothenberger,ПСМ,PIT,WIT,Gemini,Testo,Дастпром,КТПТО,Forward,Rolinset,Wet&Dry Vacuum Cleaner,орвет,Biber,ИНСТАН,ПГР,АБП,Sot,ПГУ,V-Cut,Schwamborn,Эйфель,AEG,Standers,Kronwer,Gigant,General,Tesla,Gibli,Grundfos,Honda,Tiger-King,Matrix,Wert';
+        $markList = 'Makita,Karcher,Hitachi,Master,Champion,Extra,Ballu,Elitech,Huter,Endress,Hyundai,Etalon,Prorab,Ronix,Тепломаш,Doncheng,Remington,Sturm,Daire,Timberk,Калибр,Akvilon,Stihl,Husqvarna,Союз,МАКАР,Wagner,Forza,Wacker,Patriot,ADA,Сплитстоун,Grost,Tsunami,Энергомаш,Красный маяк,Профмаш,Dewalt,Hammer,Wester,Dexter,Rebir,SWL,Jet,Пионер,Умелец,Desa,Sial,ЛРСП,Настил,Bosch,ВСРП,ТСДЗ,RedVerg,Bau,Арсенал,Generac,Инстар,ЛШМ,Garret,Diam Vega,Quattro,ТСС,СТРОЙМАШ,Metabo,Aztec,Saad,Eco,Вихрь,GLANZEN,САИ,СПЕЦ,СФО,Hilti,Тропик,Daewoo,Grinda,ВСП,Griff,Zitrek,SDS-Max,SDS-Plus,TSS,Gesan,Fubag,OTTO KURTBACH,STANLEY,Diam,Carver,ПСРВ,KOLNER,ПАРМА,Kerona,МИCOM,ТТ,ТВ,Циклон,Tor,Elektric,Интерсколл,СИБРТЕХРОС,КЭВ,Kress,Kacher,Профтепло,VEK,Black&Decker,GEOBOX,Sarayli-M,Ryobi,Вагнер,RGK,Cedima,Rothenberger,Sali,Helmut,Marina-Speroni,ПЛЭ,Minelab,Прораб,СПБ,nterra,Печенег,Brait,ELEKON POWER,БРИГ,ГВ,Арктос,Шнек,ТПЦ,Koshin,Valtec,Aurora Pro ORMAN,Equation,Rothenberger,ПСМ,PIT,WIT,Gemini,Testo,Дастпром,КТПТО,Forward,Rolinset,Wet&Dry Vacuum Cleaner,орвет,Biber,ИНСТАН,ПГР,АБП,Sot,ПГУ,V-Cut,Schwamborn,Эйфель,AEG,Standers,Kronwer,Gigant,General,Tesla,Gibli,Grundfos,Honda,Tiger-King,Matrix,Wert,СО,ADA';
 
         $markArr = explode(",", $markList);
 
