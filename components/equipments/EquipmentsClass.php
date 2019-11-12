@@ -1051,6 +1051,7 @@ class EquipmentsClass
             $newEquipment->photo = $photo;
             $newEquipment->photo_alias = $photo_alias;
             $newEquipment->confirmed = $confirmed;
+            $newEq->date_create = date('Y-m-d H:i:s');
 
             try {
                 if (!$newEquipment->save(false)) {
