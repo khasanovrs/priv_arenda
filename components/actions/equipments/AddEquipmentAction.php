@@ -25,6 +25,7 @@ class AddEquipmentAction extends Action
         $equipmentsCategory = $request->getBodyParam('equipmentsCategory');
         $tool_number = $request->getBodyParam('tool_number');
         $selling_price = $request->getBodyParam('selling_price');
+        $selling = $request->getBodyParam('selling');
         $price_per_day = $request->getBodyParam('price_per_day');
         $revenue = $request->getBodyParam('revenue');
         $degree_wear = $request->getBodyParam('degree_wear');
@@ -44,7 +45,7 @@ class AddEquipmentAction extends Action
         $comment = $request->getBodyParam('comment');
         $count = $request->getBodyParam('count');
 
-        $result = EquipmentsClass::AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, 1, $count);
+        $result = EquipmentsClass::AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, 1, $count);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при добавлении оборудования', __METHOD__);

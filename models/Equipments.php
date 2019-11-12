@@ -16,6 +16,7 @@ use Yii;
  * @property int $discount
  * @property int $status Доступность
  * @property string $count
+ * @property string $selling стоимость оборудования
  * @property string $selling_price Цена продажи
  * @property string $price_per_day Цена за сутки
  * @property string $rentals Количество прокатов 
@@ -65,7 +66,7 @@ class Equipments extends \yii\db\ActiveRecord
             [['mark', 'category_id', 'stock_id', 'type', 'discount', 'status'], 'integer'],
             [['date_create'], 'safe'],
             [['model', 'photo'], 'string', 'max' => 150],
-            [['count', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio', 'countHire', 'is_not_active', 'confirmed'], 'string', 'max' => 45],
+            [['count', 'selling', 'selling_price', 'price_per_day', 'rentals', 'repairs', 'repairs_sum', 'tool_number', 'revenue', 'profit', 'degree_wear', 'payback_ratio', 'countHire', 'is_not_active', 'confirmed'], 'string', 'max' => 45],
             [['photo_alias'], 'string', 'max' => 250],
             [['dop_status'], 'string', 'max' => 500],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
@@ -92,6 +93,7 @@ class Equipments extends \yii\db\ActiveRecord
             'discount' => 'Discount',
             'status' => 'Status',
             'count' => 'Count',
+            'selling' => 'Selling',
             'selling_price' => 'Selling Price',
             'price_per_day' => 'Price Per Day',
             'rentals' => 'Rentals',

@@ -706,6 +706,7 @@ class EquipmentsClass
             'discount' => $equipment->discount,
             'new_status' => $equipment->status,
             'old_status' => $equipment->status,
+            'selling' => $equipment->selling,
             'selling_price' => $equipment->selling_price,
             'price_per_day' => $equipment->price_per_day,
             'rentals' => $equipment->rentals,
@@ -945,6 +946,7 @@ class EquipmentsClass
      * @param $equipmentsType
      * @param $equipmentsCategory
      * @param $tool_number
+     * @param $selling
      * @param $selling_price
      * @param $price_per_day
      * @param $revenue
@@ -967,7 +969,7 @@ class EquipmentsClass
      * @param $count
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $confirmed, $count)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $confirmed, $count)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1035,6 +1037,7 @@ class EquipmentsClass
             $newEquipment->type = $equipmentsType;
             $newEquipment->category_id = $equipmentsCategory;
             $newEquipment->tool_number = $tool_number;
+            $newEquipment->selling = $selling;
             $newEquipment->selling_price = $selling_price;
             $newEquipment->price_per_day = $price_per_day;
             $newEquipment->revenue = $revenue;
