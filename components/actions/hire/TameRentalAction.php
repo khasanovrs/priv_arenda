@@ -1,6 +1,6 @@
 <?php
 /**
- * Продление проката
+ * Уменьшение срока проката
  */
 
 namespace app\components\actions\hire;
@@ -9,11 +9,11 @@ use app\components\hire\HireClass;
 use Yii;
 use yii\base\Action;
 
-class ExtendRentalAction extends Action
+class TameRentalAction extends Action
 {
     public function run()
     {
-        Yii::info('Запуск функции продления проката', __METHOD__);
+        Yii::info('Запуск функции уменьшения проката', __METHOD__);
 
         $request = Yii::$app->request;
 
@@ -21,10 +21,10 @@ class ExtendRentalAction extends Action
         $app_eq_id = $request->getBodyParam('app_eq_id');
         $count = $request->getBodyParam('count');
 
-        $result = HireClass::ExtendRental($app_eq_id, $app_id, $count);
+        $result = HireClass::TameRental($app_eq_id, $app_id, $count);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при продлении проката', __METHOD__);
+            Yii::error('Ошибка при уменьшении проката', __METHOD__);
 
             if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
                 return $result;
@@ -32,7 +32,7 @@ class ExtendRentalAction extends Action
 
             return [
                 'status' => 'ERROR',
-                'msg' => 'Ошибка при продлении контракта',
+                'msg' => 'Ошибка при уменьшении проката',
             ];
         }
 

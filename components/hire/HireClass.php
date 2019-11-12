@@ -702,6 +702,7 @@ class HireClass
     }
 
     /**
+     * Продление проката
      * @param $app_eq_id
      * @param $app_id
      * @param $count
@@ -808,6 +809,176 @@ class HireClass
         $app_eq->sum = round($price);
         $app_eq->hire_state_id = 4;
         $app_eq->renewals_date = date('Y-m-d H:i:s');
+
+        Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
+
+        try {
+            if (!$app_eq->save(false)) {
+                Yii::error('Ошибка при сохранении новой суммы: ' . serialize($app_eq->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        $extension = new Extension();
+        $extension->count = $count;
+        $extension->date_create = date('Y-m-d H:i:s');
+        $extension->user_id = $session->user_id;
+        $extension->type = $app_eq->application->type_lease_id;
+        $extension->application_equipment_id = $app_eq->id;
+
+        try {
+            if (!$extension->save(false)) {
+                Yii::error('Ошибка при сохранении продления: ' . serialize($extension->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении продления: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        $check = self::checkHire($app_eq_id);
+
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении состояния',
+            ];
+        }
+
+        Yii::info('Заявка успешно изменена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно изменена'
+        ];
+    }
+
+    /**
+     * Сокращение проката
+     * @param $app_eq_id
+     * @param $app_id
+     * @param $count
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function TameRental($app_eq_id, $app_id, $count)
+    {
+        Yii::info('Запуск функции TameRental', __METHOD__);
+
+        if ($app_id === '') {
+            Yii::error('Не передан идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор заявки',
+            ];
+        }
+
+        if ($count === '') {
+            Yii::error('Не передано поличество', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано поличество',
+            ];
+        }
+
+        Yii::info('Получаем заявку', __METHOD__);
+
+        /**
+         * @var Applications $applications
+         */
+        $applications = Applications::find()->where('id=:id', [':id' => $app_id])->one();
+
+        if (!is_object($applications)) {
+            Yii::info('Ошибка при получении заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении заявки'
+            ];
+        }
+
+        if ($applications->type_lease_id === 1) {
+            $date = date("Y-m-d H:i:s", strtotime($applications->rent_end . " -" . $count . " days"));
+        } else {
+            $date = date("Y-m-d H:i:s", strtotime($applications->rent_end . " -" . $count . " month"));
+        }
+
+        $applications->rent_end = $date;
+
+        Yii::info('Сохраняем заявку', __METHOD__);
+
+        try {
+            if (!$applications->save(false)) {
+                Yii::error('Ошибка при изменении даты: ' . serialize($applications->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при изменении даты: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Получаем информацию заявки с оборудованием', __METHOD__);
+
+        /**
+         * @var ApplicationEquipment $app_eq
+         */
+        $app_eq = ApplicationEquipment::find()->where('id=:id', ['id' => $app_eq_id])->one();
+
+        if (!is_object($app_eq)) {
+            Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении заявки с оборудованием'
+            ];
+        }
+
+        Yii::info('Получаем оборудование', __METHOD__);
+
+        /**
+         * @var Equipments $equipments
+         */
+        $equipments = Equipments::find()->where('id=:id', [':id' => $app_eq->equipments_id])->one();
+
+        if (!is_object($equipments)) {
+            Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении оборудования'
+            ];
+        }
+
+        $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
+        $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
+
+        if ((int)$applications->discount->code !== 0) {
+            $price = $price - ($price * $applications->discount->code / 100);
+        }
+
+        $app_eq->sum = round($price);
 
         Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
 

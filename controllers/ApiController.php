@@ -363,6 +363,9 @@ class ApiController extends Controller
             'extend-rental' => [
                 'class' => 'app\components\actions\hire\ExtendRentalAction',
             ],
+            'tame-rental' => [
+                'class' => 'app\components\actions\hire\TameRentalAction',
+            ],
             'equipment-return' => [
                 'class' => 'app\components\actions\hire\EquipmentReturnAction',
             ],
