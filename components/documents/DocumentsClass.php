@@ -75,16 +75,16 @@ class DocumentsClass
 
         $document->saveAs('uploads/doc/eq_hire.docx');
 
-        $file = '/uploads/doc/eq_hire.docx';
+        /*$file = '/uploads/doc/eq_hire.docx';
         header('X-Accel-Redirect: ' . $file);
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename=' . basename($file));
+        header('Content-Disposition: attachment; filename=' . basename($file));*/
 
         Yii::info('Список типов оборудования получен', __METHOD__);
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список типов оборудования получен',
-            'data' => 'file.docx'
+            'data' => 'eq_hire.docx'
         ];
     }
 }

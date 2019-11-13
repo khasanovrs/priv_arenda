@@ -15,7 +15,12 @@ class GetDocumentsAction extends Action
     {
         Yii::info('Запуск функции получения документов', __METHOD__);
 
-        $result = DocumentsClass::getDocuments(1);
+
+        $request = Yii::$app->request;
+
+        $hireInfoId = $request->getBodyParam('hireInfoId');
+
+        $result = DocumentsClass::getDocuments($hireInfoId);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка документов', __METHOD__);
