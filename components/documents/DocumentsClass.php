@@ -18,7 +18,24 @@ class DocumentsClass
     {
         Yii::info('Запуск функции getDocuments', __METHOD__);
         $document = new \PhpOffice\PhpWord\TemplateProcessor('eq_hire.docx'); //шаблон
-        //$document->setValue('name_v', '555'); //номер договора
+
+
+        $document->setValue('id_app_eq', '');
+        $document->setValue('telephone', '');
+        $document->setValue('telephone2', '');
+        $document->setValue('branch', '');
+        $document->setValue('date_create_app', '');
+        $document->setValue('fio', '');
+        $document->setValue('birth', '');
+        $document->setValue('eq', '');
+        $document->setValue('eq_sum_per_day', '');
+        $document->setValue('count_day', '');
+        $document->setValue('hire_start', '');
+        $document->setValue('hire_end', '');
+        $document->setValue('sum_pay', '');
+        $document->setValue('sum_eq', '');
+
+
         $document->saveAs('uploads/doc/eq_hire.docx');
 
 
