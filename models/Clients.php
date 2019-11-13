@@ -17,6 +17,7 @@ use Yii;
  * @property string $date_create дата создания записи
  * @property string $is_not_active 0-активный,1-не активный
  *
+ * @property Applications[] $applications
  * @property ClientStatusChange[] $clientStatusChanges
  * @property Branch $branch
  * @property ClientStatus $status0
@@ -65,6 +66,14 @@ class Clients extends \yii\db\ActiveRecord
             'date_create' => 'Date Create',
             'is_not_active' => 'Is Not Active',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplications()
+    {
+        return $this->hasMany(Applications::className(), ['client_id' => 'id']);
     }
 
     /**

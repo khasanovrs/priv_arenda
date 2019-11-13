@@ -29,6 +29,7 @@ use Yii;
  * @property ApplicationsTypeLease $typeLease
  * @property Users $user
  * @property Branch $branch
+ * @property Clients $client
  */
 class Applications extends \yii\db\ActiveRecord
 {
@@ -57,6 +58,7 @@ class Applications extends \yii\db\ActiveRecord
             [['type_lease_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsTypeLease::className(), 'targetAttribute' => ['type_lease_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -137,5 +139,13 @@ class Applications extends \yii\db\ActiveRecord
     public function getBranch()
     {
         return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClient()
+    {
+        return $this->hasOne(Clients::className(), ['id' => 'client_id']);
     }
 }
