@@ -44,16 +44,19 @@ class InsertEqController extends Controller
             $branch = $Excel->getActiveSheet()->getCell('R' . $i)->getValue(); // Филиал
             $arenda = $Excel->getActiveSheet()->getCell('T' . $i)->getValue(); // В аренде
 
+
+            if ($name === null) continue;
+
             //ищем марку
             $checkMark = '';
-            $r = $markArr = explode(" ", $name);
+            $r = explode(" ", $name);
 
             foreach ($r as $value) {
                 if ($value === '') continue;
                 /**
                  * @var EquipmentsMark $checkMark
                  */
-                $checkMark = EquipmentsMark::find()->where(['in', 'name', $value])->one();
+                $checkMark = EquipmentsMark::find()->where(['in', 'lower(name)', mb_strtolower($value)])->one();
 
                 if (is_object($checkMark)) {
                     break;
@@ -62,7 +65,7 @@ class InsertEqController extends Controller
 
             if (is_object($checkMark) && $branch !== null && $state !== null) {
 
-                $ll = explode(' ' . $checkMark->name . ' ', $name);
+                $ll = explode(' ' . mb_strtolower($checkMark->name) . ' ', mb_strtolower($name));
                 $category = trim($category);
 
                 if (isset($ll[0]) && isset($ll[1])) {
@@ -89,7 +92,7 @@ class InsertEqController extends Controller
                     }
 
                     // ищем тип
-                    $checkType = EquipmentsType::find()->where('name=:name and category_id=:category_id', [':name' => strtolower($type), ':category_id' => $checkCategory->id])->one();
+                    $checkType = EquipmentsType::find()->where('name=:name and category_id=:category_id', [':name' => ucfirst(strtolower($type)), ':category_id' => $checkCategory->id])->one();
 
                     if (!is_object($checkType)) {
                         // добавляем категорию
@@ -151,13 +154,15 @@ class InsertEqController extends Controller
                         'mark=:mark and model=:model and stock_id=:stock_id and category_id=:category_id and type=:type', [':mark' => $checkMark->id, ':model' => $model, ':stock_id' => $checkStock[0]->id, ':category_id' => $checkCategory->id, ':type' => $checkType->id])->one();
 
                     if (is_object($checkEq)) {
+                        $Excel->getActiveSheet()->removeRow($i,1);
+                        $i--;
                         continue;
                     }
 
                     $newEq = new Equipments();
                     $newEq->status = $checkState->id;
                     $newEq->mark = $checkMark->id;
-                    $newEq->model = $model;
+                    $newEq->model = ucfirst(strtolower($model));
                     $newEq->stock_id = $checkStock[0]->id;
                     $newEq->type = $checkType->id;
                     $newEq->category_id = $checkCategory->id;
@@ -207,7 +212,11 @@ class InsertEqController extends Controller
                         Yii::error('Поймали Exception при добавлении дополнительной информации об оборудовании: ' . serialize($e->getMessage()), __METHOD__);
                         return false;
                     }
+
+                    $Excel->getActiveSheet()->removeRow($i,1);
+                    $i--;
                 } else {
+                    Yii::error('ololo ' . serialize($ll), __METHOD__);
                     if (!isset($ll[0])) {
                         $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет типа оборудования');
                     } else {
@@ -225,21 +234,27 @@ class InsertEqController extends Controller
             }
         }
 
+        /*$ch = 0;
 
-        $Start = 2;
+        for ($j = 2; $j <= 2000; ++$j) {
+            Yii::info('zzzzz: ' . serialize($j), __METHOD__);
 
-        for ($i = $Start; $i <= 5000; $i++) {
-            $check = $Excel->getActiveSheet()->getCell('U' . $i)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
+            $check = $Excel->getActiveSheet()->getCell('U' . $j)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
+            $checkName = $Excel->getActiveSheet()->getCell('A' . $j)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
 
-            if ($check === null) {
-                $Excel->getActiveSheet()->removeRow($i);
-                $i --;
+
+            if ($checkName != null && $check === null && $ch<200) {
+                Yii::info('ololo: ' . serialize($j), __METHOD__);
+                $Excel->getActiveSheet()->removeRow($j,1);
+                $ch++;
+                --$j;
             }
-        }
+        }*/
 
         $fileType = 'Excel5';
         $objWriter = \PHPExcel_IOFactory::createWriter($Excel, $fileType);
         $objWriter->save('eq2.xlsx');
+
         return true;
     }
 
@@ -249,7 +264,7 @@ class InsertEqController extends Controller
      */
     public function actionInsertMark()
     {
-        $markList = 'Makita,Karcher,Hitachi,Master,Champion,Extra,Ballu,Elitech,Huter,Endress,Hyundai,Etalon,Prorab,Ronix,Тепломаш,Doncheng,Remington,Sturm,Daire,Timberk,Калибр,Akvilon,Stihl,Husqvarna,Союз,МАКАР,Wagner,Forza,Wacker,Patriot,ADA,Сплитстоун,Grost,Tsunami,Энергомаш,Красный маяк,Профмаш,Dewalt,Hammer,Wester,Dexter,Rebir,SWL,Jet,Пионер,Умелец,Desa,Sial,ЛРСП,Настил,Bosch,ВСРП,ТСДЗ,RedVerg,Bau,Арсенал,Generac,Инстар,ЛШМ,Garret,Diam Vega,Quattro,ТСС,СТРОЙМАШ,Metabo,Aztec,Saad,Eco,Вихрь,GLANZEN,САИ,СПЕЦ,СФО,Hilti,Тропик,Daewoo,Grinda,ВСП,Griff,Zitrek,SDS-Max,SDS-Plus,TSS,Gesan,Fubag,OTTO KURTBACH,STANLEY,Diam,Carver,ПСРВ,KOLNER,ПАРМА,Kerona,МИCOM,ТТ,ТВ,Циклон,Tor,Elektric,Интерсколл,СИБРТЕХРОС,КЭВ,Kress,Kacher,Профтепло,VEK,Black&Decker,GEOBOX,Sarayli-M,Ryobi,Вагнер,RGK,Cedima,Rothenberger,Sali,Helmut,Marina-Speroni,ПЛЭ,Minelab,Прораб,СПБ,nterra,Печенег,Brait,ELEKON POWER,БРИГ,ГВ,Арктос,Шнек,ТПЦ,Koshin,Valtec,Aurora Pro ORMAN,Equation,Rothenberger,ПСМ,PIT,WIT,Gemini,Testo,Дастпром,КТПТО,Forward,Rolinset,Wet&Dry Vacuum Cleaner,орвет,Biber,ИНСТАН,ПГР,АБП,Sot,ПГУ,V-Cut,Schwamborn,Эйфель,AEG,Standers,Kronwer,Gigant,General,Tesla,Gibli,Grundfos,Honda,Tiger-King,Matrix,Wert,СО,ADA';
+        $markList = 'Makita,Karcher,Hitachi,Master,Champion,Extra,Ballu,Elitech,Huter,Endress,Hyundai,Etalon,Prorab,Ronix,Тепломаш,Doncheng,Remington,Sturm,Daire,Timberk,Калибр,Akvilon,Stihl,Husqvarna,Союз,МАКАР,Wagner,Forza,Wacker,Patriot,ADA,Сплитстоун,Grost,Tsunami,Энергомаш,Красный маяк,Профмаш,Dewalt,Hammer,Wester,Dexter,Rebir,SWL,Jet,Пионер,Умелец,Desa,Sial,ЛРСП,Настил,Bosch,ВСРП,ТСДЗ,RedVerg,Bau,Арсенал,Generac,Инстар,ЛШМ,Garret,Diam Vega,Quattro,ТСС,СТРОЙМАШ,Metabo,Aztec,Saad,Eco,Вихрь,GLANZEN,САИ,СПЕЦ,СФО,Hilti,Тропик,Daewoo,Grinda,ВСП,Griff,Zitrek,SDS-Max,SDS-Plus,TSS,Gesan,Fubag,OTTO KURTBACH,STANLEY,Diam,Carver,ПСРВ,KOLNER,ПАРМА,Kerona,МИCOM,ТТ,ТВ,Циклон,Tor,Elektric,Интерсколл,СИБРТЕХРОС,КЭВ,Kress,Kacher,Профтепло,VEK,Black&Decker,GEOBOX,Sarayli-M,Ryobi,Вагнер,RGK,Cedima,Rothenberger,Sali,Helmut,Marina-Speroni,ПЛЭ,Minelab,Прораб,СПБ,nterra,Печенег,Brait,ELEKON POWER,БРИГ,ГВ,Арктос,Шнек,ТПЦ,Koshin,Valtec,Aurora Pro ORMAN,Equation,Rothenberger,ПСМ,PIT,WIT,Gemini,Testo,Дастпром,КТПТО,Forward,Rolinset,Wet&Dry Vacuum Cleaner,орвет,Biber,ИНСТАН,ПГР,АБП,Sot,ПГУ,V-Cut,Schwamborn,Эйфель,AEG,Standers,Kronwer,Gigant,General,Tesla,Gibli,Grundfos,Honda,Tiger-King,Matrix,Wert,СО,ADA,Леса,Berger,«ВСРП-19900»';
 
         $markArr = explode(",", $markList);
 
