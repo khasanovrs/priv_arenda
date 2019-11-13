@@ -20,8 +20,9 @@
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "linslin/yii2-curl": "*",
         "phpoffice/phpword": "^0.17.0",
+        "phpoffice/phpexcel": "^1.8",
         "moonlandsoft/yii2-phpexcel": "*",
-        "phpoffice/phpexcel": "^1.8"
+        "phpexcel/phpexcel": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
