@@ -594,10 +594,7 @@ class EquipmentsClass
                 if (!is_object($ap_eq)) {
                     Yii::error('Оборудования в данном филиале нет', __METHOD__);
 
-                    return [
-                        'status' => 'SUCCESS',
-                        'data' => []
-                    ];
+                    continue;
                 }
 
                 $rent_end = date('d.m.Y H:i', strtotime($ap_eq->application->rent_end));
