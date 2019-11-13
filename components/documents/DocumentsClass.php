@@ -17,7 +17,7 @@ class DocumentsClass
     public static function getDocuments()
     {
         Yii::info('Запуск функции getDocuments', __METHOD__);
-        $document = new \PhpOffice\PhpWord\TemplateProcessor('test.docx'); //шаблон
+        $document = new \PhpOffice\PhpWord\TemplateProcessor('eq_hire.docx'); //шаблон
         //$document->setValue('name_v', '555'); //номер договора
         $document->saveAs('uploads/doc/eq_hire.docx');
 

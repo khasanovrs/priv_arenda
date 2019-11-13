@@ -47,16 +47,22 @@ class InsertEqController extends Controller
 
             if ($name === null) continue;
 
-            //ищем марку
             $checkMark = '';
-            $r = explode(" ", $name);
+
+            //ищем марку
+            if (strripos(mb_strtolower($name), 'pro lift')) {
+                $r[] = 'Pro Lift';
+            } else {
+                $r = explode(" ", $name);
+            }
 
             foreach ($r as $value) {
                 if ($value === '') continue;
                 /**
                  * @var EquipmentsMark $checkMark
                  */
-                $checkMark = EquipmentsMark::find()->where(['in', 'lower(name)', mb_strtolower($value)])->one();
+
+                $checkMark = EquipmentsMark::find()->where(['like', 'lower(name)', mb_strtolower($value)])->one();
 
                 if (is_object($checkMark)) {
                     break;
@@ -220,7 +226,7 @@ class InsertEqController extends Controller
                     if (!isset($ll[0])) {
                         $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет типа оборудования');
                     } else {
-                        $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет марки оборудования');
+                        $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет модели оборудования');
                     }
                 }
             } else {
@@ -233,23 +239,6 @@ class InsertEqController extends Controller
                 }
             }
         }
-
-        /*$ch = 0;
-
-        for ($j = 2; $j <= 2000; ++$j) {
-            Yii::info('zzzzz: ' . serialize($j), __METHOD__);
-
-            $check = $Excel->getActiveSheet()->getCell('U' . $j)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
-            $checkName = $Excel->getActiveSheet()->getCell('A' . $j)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
-
-
-            if ($checkName != null && $check === null && $ch<200) {
-                Yii::info('ololo: ' . serialize($j), __METHOD__);
-                $Excel->getActiveSheet()->removeRow($j,1);
-                $ch++;
-                --$j;
-            }
-        }*/
 
         $fileType = 'Excel5';
         $objWriter = \PHPExcel_IOFactory::createWriter($Excel, $fileType);
@@ -264,14 +253,14 @@ class InsertEqController extends Controller
      */
     public function actionInsertMark()
     {
-        $markList = 'Makita,Karcher,Hitachi,Master,Champion,Extra,Ballu,Elitech,Huter,Endress,Hyundai,Etalon,Prorab,Ronix,Тепломаш,Doncheng,Remington,Sturm,Daire,Timberk,Калибр,Akvilon,Stihl,Husqvarna,Союз,МАКАР,Wagner,Forza,Wacker,Patriot,ADA,Сплитстоун,Grost,Tsunami,Энергомаш,Красный маяк,Профмаш,Dewalt,Hammer,Wester,Dexter,Rebir,SWL,Jet,Пионер,Умелец,Desa,Sial,ЛРСП,Настил,Bosch,ВСРП,ТСДЗ,RedVerg,Bau,Арсенал,Generac,Инстар,ЛШМ,Garret,Diam Vega,Quattro,ТСС,СТРОЙМАШ,Metabo,Aztec,Saad,Eco,Вихрь,GLANZEN,САИ,СПЕЦ,СФО,Hilti,Тропик,Daewoo,Grinda,ВСП,Griff,Zitrek,SDS-Max,SDS-Plus,TSS,Gesan,Fubag,OTTO KURTBACH,STANLEY,Diam,Carver,ПСРВ,KOLNER,ПАРМА,Kerona,МИCOM,ТТ,ТВ,Циклон,Tor,Elektric,Интерсколл,СИБРТЕХРОС,КЭВ,Kress,Kacher,Профтепло,VEK,Black&Decker,GEOBOX,Sarayli-M,Ryobi,Вагнер,RGK,Cedima,Rothenberger,Sali,Helmut,Marina-Speroni,ПЛЭ,Minelab,Прораб,СПБ,nterra,Печенег,Brait,ELEKON POWER,БРИГ,ГВ,Арктос,Шнек,ТПЦ,Koshin,Valtec,Aurora Pro ORMAN,Equation,Rothenberger,ПСМ,PIT,WIT,Gemini,Testo,Дастпром,КТПТО,Forward,Rolinset,Wet&Dry Vacuum Cleaner,орвет,Biber,ИНСТАН,ПГР,АБП,Sot,ПГУ,V-Cut,Schwamborn,Эйфель,AEG,Standers,Kronwer,Gigant,General,Tesla,Gibli,Grundfos,Honda,Tiger-King,Matrix,Wert,СО,ADA,Леса,Berger,«ВСРП-19900»';
+        $markList = 'Makita,Karcher,Hitachi,Master,Champion,Extra,Ballu,Elitech,Huter,Endress,Hyundai,Etalon,Prorab,Ronix,Тепломаш,Doncheng,Remington,Sturm,Daire,Timberk,Калибр,Akvilon,Stihl,Husqvarna,Союз,МАКАР,Wagner,Forza,Wacker,Patriot,ADA,Сплитстоун,Grost,Tsunami,Энергомаш,Красный маяк,Профмаш,Dewalt,Hammer,Wester,Dexter,Rebir,SWL,Jet,Пионер,Умелец,Desa,Sial,ЛРСП,Настил,Bosch,ВСРП,ТСДЗ,RedVerg,Bau,Арсенал,Generac,Инстар,ЛШМ,Garret,Diam Vega,Quattro,ТСС,СТРОЙМАШ,Metabo,Aztec,Saad,Eco,Вихрь,GLANZEN,САИ,СПЕЦ,СФО,Hilti,Тропик,Daewoo,Grinda,ВСП,Griff,Zitrek,SDS-Max,SDS-Plus,TSS,Gesan,Fubag,OTTO KURTBACH,STANLEY,Diam,Carver,ПСРВ,KOLNER,ПАРМА,Kerona,МИCOM,ТТ,ТВ,Циклон,Tor,Elektric,Интерсколл,СИБРТЕХРОС,КЭВ,Kress,Kacher,Профтепло,VEK,Black&Decker,GEOBOX,Sarayli-M,Ryobi,Вагнер,RGK,Cedima,Rothenberger,Sali,Helmut,Marina-Speroni,ПЛЭ,Minelab,Прораб,СПБ,nterra,Печенег,Brait,ELEKON POWER,БРИГ,ГВ,Арктос,Шнек,ТПЦ,Koshin,Valtec,Aurora Pro ORMAN,Equation,Rothenberger,ПСМ,PIT,WIT,Gemini,Testo,Дастпром,КТПТО,Forward,Rolinset,Wet&Dry Vacuum Cleaner,орвет,Biber,ИНСТАН,ПГР,АБП,Sot,ПГУ,V-Cut,Schwamborn,Эйфель,AEG,Standers,Kronwer,Gigant,General,Tesla,Gibli,Grundfos,Honda,Tiger-King,Matrix,Wert,СО,ADA,Леса,Berger,«ВСРП-19900»,Echo,ELEKON POWER,КВТ,Standers,МИСОМ,Archimed,Dongcheng,Ресанта,Ресанта,Etari,Glanzen,Hitachi,IGC,Grinda,МИСОМ,СПЕЦ,Ресанта,Etari,Glanzen,Sturm,Patriot,Стин,Dexter,Красный Маяк,AL-KO,Красный Маяк,ДВ,RedVerg,КВТ,X-Line,КВТ,Stayer,МИСОМ,МИСОМ,Dexell,Stayer,Depo,Ресанта,СПБ,Xintest,КТПТО,Kaskad,Glanzen,Venterra,Бархан,Специалист,Специалист,MLT,Stalex,НЗГА,НЗГА,Вепрь,Dexter,Dexter,ВСРП,УГВКР,BRIMA,КВТ,Красный Маяк,Энергомаш,Makita,RedVerg,Aurora,Ресанта,Grinda,КВТ,Ergus,X-Line,Stayer,Sturm,Сплитстоун,ОКА,Союз,Champion,Patriot,МИСОМ,Wet&Dry,Dongcheng,Wet&Dry,Soteco,ADA,Калибр,СПЕЦ,Ресанта,Ресанта,Ресанта,Ресанта,Ресанта,Ресанта,Aurora,СПБ,СПБ,Сибин,Redverg,Tsunami,Etari,Энкор,КТПТО,КТПТО,Glanzen,Glanzen,Glanzen,Glanzen,Glanzen,ADA,Makita,BauMaster,Dexter,Специалист,Daire,Daire,Daire,Тропик,Профтепло,Профтепло,Профтепло,HammerFlex,Sturm,НОВЭЛ,Конаково,ТСС,ТСС,ТСС,ELEKON POWER,ELEKON POWER,Grinda,МИСОМ,МИСОМ,ECHO,Ресанта,Ресанта,Etari,ECHO,Glanzen,Inforce,SDMO,Техпром,Grinda,REDTRACE,МИСОМ,GeoBox,МИСОМ,Ресанта,Fiorentini,Etari,Glanzen,НЗГА,Сварис,Ресанта,Grinda,REDTRACE,Stayer,МИСОМ,GeoBox,МИСОМ,Archimed,Pro Lift,Ресанта,Ресанта,Xintest,Etari,ТСДЗ,ТСДЗ,Glanzen,Ресанта,ЭРДО,НЗГА,НЗГА,Mur-Cell,Moller,Moller,ELEKON POWER,Фиолент,СЛОН,Stayer,Wira,Фиолент,МИСОМ,НЕВА,МИСОМ,MLT,Dexell,Etari,Profit,Ударник,Hitachi,Зубр,Gardena,Поправил,Grinda,Интерскол,REDTRACE,МИСОМ,GeoBox,МИСОМ,Forapress,Pro Lift,Ресанта,Ресанта,Etari,Простор,Dexter,ELEKON POWER,ELEKON POWER,Stayer,МИСОМ,МИСОМ,МИСОМ,Ресанта,Xintest,Etari,КТПТО,Glanzen,ADA,НОВЭЛ,Специалист,Специалист,СПЕЦ,Ресанта,Glanzen,ELEKON POWER,ELEKON POWER,VEKTOR,CONDTROL,CONDTROL,Автостоп,Автостоп,Stayer,МИСОМ,CONDTROL,МИСОМ,Archimed,Dongcheng,Pro Lift,Pro Lift,Ресанта,Ресанта,Ресанта,Xintest,Etari,КАВИК,Glanzen,REDTRACE,Inforce,Кратон,НЗГА,НЗГА,Сварис,Grinda,Stayer,МИСОМ,МИСОМ,Griff,OTTO KURTBACH,Ресанта,Ресанта,НОВЭЛ,Etari,UNIVersal,Простор,Grinda,МИСОМ,МИСОМ,Griff,Pro Lift,СПЕЦ,Ресанта,Etari,UNIVersal,ЭРДО,ЭРДО,Прораб,НИЗ,Grinda,Ресанта,CONDTROL,МИСОМ,Радио-Сервис,Радио-Сервис,МИСОМ,Ресанта,UNIVersal,Grinda,МИСОМ,МИСОМ,СПЕЦ,Ресанта,Etari,Edon,Glanzen,ЭРДО,ЭРДО';
 
         $markArr = explode(",", $markList);
 
         asort($markArr);
 
         foreach ($markArr as $value) {
-            $checkMark = EquipmentsMark::find()->where('lower(name)=:name', [':name' => strtolower($value)])->one();
+            $checkMark = EquipmentsMark::find()->where('lower(name)=:name', [':name' => mb_strtolower($value)])->one();
 
             if (is_object($checkMark)) {
                 continue;
