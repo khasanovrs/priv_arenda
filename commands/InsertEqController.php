@@ -119,6 +119,7 @@ class InsertEqController extends Controller
 
                     // поиск филиала
                     $branch = $branch === 'Казань (ММ)' ? 'Казань' : $branch;
+                    $branch = $branch === 'Казань (Михаила Миля)' ? 'Казань' : $branch;
 
                     /**
                      * @var Branch $checkBranch

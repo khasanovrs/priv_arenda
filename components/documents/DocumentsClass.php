@@ -14,16 +14,12 @@ class DocumentsClass
      * @throws \PhpOffice\PhpWord\Exception\CopyFileException
      * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
      */
-    public static function getDocuments()
+    public static function getDocuments($id)
     {
         Yii::info('Запуск функции getDocuments', __METHOD__);
         $document = new \PhpOffice\PhpWord\TemplateProcessor('eq_hire.docx'); //шаблон
 
-
-
-        return false;
-
-        $document->setValue('id_app_eq', '');
+        $document->setValue('id_app_eq', $id);
         $document->setValue('telephone', '');
         $document->setValue('telephone2', '');
         $document->setValue('branch', '');
