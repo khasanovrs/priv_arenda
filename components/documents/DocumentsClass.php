@@ -20,6 +20,9 @@ class DocumentsClass
         $document = new \PhpOffice\PhpWord\TemplateProcessor('eq_hire.docx'); //шаблон
 
 
+
+        return false;
+
         $document->setValue('id_app_eq', '');
         $document->setValue('telephone', '');
         $document->setValue('telephone2', '');
