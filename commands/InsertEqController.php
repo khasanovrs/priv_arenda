@@ -22,7 +22,7 @@ class InsertEqController extends Controller
     {
         Yii::info('Запуск функции actionIndex', __METHOD__);
 
-        $File = "eq.xlsx";
+        $File = "eq1.xlsx";
         $Excel = \PHPExcel_IOFactory::load($File);
         # С какой строки начинаются данные
         $Start = 2;
@@ -45,8 +45,8 @@ class InsertEqController extends Controller
             $branch = $Excel->getActiveSheet()->getCell('R' . $i)->getValue(); // Филиал
             $arenda = $Excel->getActiveSheet()->getCell('T' . $i)->getValue(); // В аренде
 
-            if ($name == 'Рохля OTTO KURTBACH OK 25-115') {
-                Yii::error('olololo', __METHOD__);
+            if ($name == 'Шнек ADA 150 мм') {
+                Yii::error('olololo1', __METHOD__);
             }
 
             if ($name === null) continue;
@@ -60,9 +60,17 @@ class InsertEqController extends Controller
                 $r[] = 'ELEKON POWER';
             } elseif (strripos(mb_strtolower($name), 'otto kurtbach')) {
                 $r[] = 'OTTO KURTBACH';
+            } elseif (strripos(mb_strtolower($name), 'красный маяк')) {
+                $r[] = 'Красный Маяк';
+            } elseif (strripos(mb_strtolower($name), 'лшм sturm bs8580')) {
+                $r[] = 'Sturm';
+            } elseif (strripos(mb_strtolower($name), 'шнек ada 150 мм') || strripos(mb_strtolower($name), 'шнек ada 150-300 мм')) {
+                $r[] = 'ADA';
             } else {
                 $r = explode(" ", $name);
             }
+
+            Yii::error('olololo' . serialize($r), __METHOD__);
 
             foreach ($r as $value) {
                 if ($value === '') continue;

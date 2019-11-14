@@ -252,6 +252,11 @@ class m191008_062704_fix_eq_mark extends Migration
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('237', 'Энкор');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('238', 'орвет');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('240', 'Kadet');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('241', 'ТСДЗ');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('242', 'Профильный');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('243', 'Редиус');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('244', 'Сплистоун');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('245', 'Archimedes');");
     }
 
     /**
