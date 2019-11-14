@@ -63,6 +63,7 @@ class DocumentsClass
         $document->setValue('telephone2', $client->clientsInfos[0]->phone_second);
         $document->setValue('branch', $app->branch->name);
         $document->setValue('date_create_app', date('d.m.Y H:i:s', strtotime($app->date_create)));
+        $document->setValue('date_create_app_2', date('d.m.Y', strtotime($app->date_create)));
         $document->setValue('fio', $client->name);
         $document->setValue('birth', $client->clientsInfos[0]->date_birth);
         $document->setValue('eq', $type . ' ' . $mark . ' ' . $model);
