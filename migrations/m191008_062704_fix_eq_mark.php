@@ -137,7 +137,7 @@ class m191008_062704_fix_eq_mark extends Migration
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('123', 'Stayer');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('124', 'Stihl');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('125', 'Sturm');");
-        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('126', 'Tss');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('126', 'TSS');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('127', 'Tesla');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('128', 'Testo');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('129', 'Tiger-king');");
@@ -184,6 +184,7 @@ class m191008_062704_fix_eq_mark extends Migration
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('170', 'Интерсколл');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('171', 'КАВИК');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('172', 'КВТ');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('239', 'КМШ');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('173', 'КТПТО');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('174', 'КЭВ');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('175', 'Калибр');");
@@ -227,7 +228,7 @@ class m191008_062704_fix_eq_mark extends Migration
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('213', 'СФО');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('214', 'Сварис');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('215', 'Сибин');");
-        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('216', 'Союз');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('216', 'СОЮЗ');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('217', 'Специалист');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('218', 'Сплитстоун');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('219', 'Стин');");
@@ -250,6 +251,7 @@ class m191008_062704_fix_eq_mark extends Migration
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('236', 'Энергомаш');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('237', 'Энкор');");
         $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('238', 'орвет');");
+        $this->execute("INSERT INTO `equipments_mark` (`id`, `name`) VALUES ('240', 'Kadet');");
     }
 
     /**

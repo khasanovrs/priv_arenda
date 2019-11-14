@@ -15,7 +15,7 @@ class m190531_134432_equipments extends Migration
         $this->execute("CREATE TABLE `equipments` (
           `id` int(11) NOT NULL AUTO_INCREMENT,
           `mark` int(11) NOT NULL,
-          `model` varchar(150) COLLATE utf8_bin NOT NULL,
+          `model` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
           `category_id` int(10) NOT NULL COMMENT 'идентификатор категории',
           `stock_id` int(11) NOT NULL,
           `type` int(11) NOT NULL COMMENT 'тип инструмента',
@@ -47,7 +47,7 @@ class m190531_134432_equipments extends Migration
           CONSTRAINT `fk_equipments_5` FOREIGN KEY (`status`) REFERENCES `equipments_status` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
           CONSTRAINT `fk_equipments_6` FOREIGN KEY (`mark`) REFERENCES `equipments_mark` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
           CONSTRAINT `fk_equipments_7` FOREIGN KEY (`discount`) REFERENCES `discount` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
         ");
     }
 

@@ -44,6 +44,9 @@ class InsertEqController extends Controller
             $branch = $Excel->getActiveSheet()->getCell('R' . $i)->getValue(); // Филиал
             $arenda = $Excel->getActiveSheet()->getCell('T' . $i)->getValue(); // В аренде
 
+            if ($name=='Станок камнерезный Hammer PLR 900 Hammerflex') {
+                Yii::error('olololo', __METHOD__);
+            }
 
             if ($name === null) continue;
 
@@ -52,6 +55,10 @@ class InsertEqController extends Controller
             //ищем марку
             if (strripos(mb_strtolower($name), 'pro lift')) {
                 $r[] = 'Pro Lift';
+            } elseif (strripos(mb_strtolower($name), 'elekon power')) {
+                $r[] = 'ELEKON POWER';
+            }  elseif (strripos(mb_strtolower($name), 'otto kurtbach')) {
+                $r[] = 'OTTO KURTBACH ';
             } else {
                 $r = explode(" ", $name);
             }
@@ -62,7 +69,28 @@ class InsertEqController extends Controller
                  * @var EquipmentsMark $checkMark
                  */
 
-                $checkMark = EquipmentsMark::find()->where(['like', 'lower(name)', mb_strtolower($value)])->one();
+                $checkMarkArr = EquipmentsMark::find()->where(['like', 'lower(name)', mb_strtolower($value)])->all();
+
+                if (empty($checkMarkArr)) {
+                    continue;
+                }
+
+                if (count($checkMarkArr) > 1) {
+                    /**
+                     * @var EquipmentsMark $item
+                     */
+                    foreach ($checkMarkArr as $item) {
+                        if (mb_strtolower($item->name) == mb_strtolower($value)) {
+                            $checkMark = $item;
+                            break;
+                        }
+                    }
+                } else {
+                    if (mb_strtolower($checkMarkArr[0]->name) == mb_strtolower($value)) {
+                        $checkMark = $checkMarkArr[0];
+                        break;
+                    }
+                }
 
                 if (is_object($checkMark)) {
                     break;
@@ -70,21 +98,20 @@ class InsertEqController extends Controller
             }
 
             if (is_object($checkMark) && $branch !== null && $state !== null) {
-
-                $ll = explode(' ' . mb_strtolower($checkMark->name) . ' ', mb_strtolower($name));
                 $category = trim($category);
+                $type = trim(stristr($name, $checkMark->name, true));
 
-                if (isset($ll[0]) && isset($ll[1])) {
-                    $type = $ll[0];
-                    $model = $ll[1];
+                $l = stristr($name, $checkMark->name);
+                $model = trim(str_ireplace($checkMark->name, ' ', $l));
 
+                if ($model != '' && $type != '') {
                     // ищем категорию
-                    $checkCategory = EquipmentsCategory::find()->where('name=:name', [':name' => strtolower($category)])->one();
+                    $checkCategory = EquipmentsCategory::find()->where('name=:name', [':name' => mb_strtolower($category)])->one();
 
                     if (!is_object($checkCategory)) {
                         // добавляем категорию
                         $checkCategory = new EquipmentsCategory();
-                        $checkCategory->name = ucfirst(strtolower($category));
+                        $checkCategory->name = ucfirst(mb_strtolower($category));
 
                         try {
                             if (!$checkCategory->save(false)) {
@@ -98,12 +125,12 @@ class InsertEqController extends Controller
                     }
 
                     // ищем тип
-                    $checkType = EquipmentsType::find()->where('name=:name and category_id=:category_id', [':name' => ucfirst(strtolower($type)), ':category_id' => $checkCategory->id])->one();
+                    $checkType = EquipmentsType::find()->where('lower(name)=:name and category_id=:category_id', [':name' => mb_strtolower($type), ':category_id' => $checkCategory->id])->one();
 
                     if (!is_object($checkType)) {
                         // добавляем категорию
                         $checkType = new EquipmentsType();
-                        $checkType->name = ucfirst(strtolower($type));
+                        $checkType->name = $type;
                         $checkType->category_id = $checkCategory->id;
 
                         try {
@@ -147,7 +174,7 @@ class InsertEqController extends Controller
                     $state = $state === 'Списано' ? 'Списан' : $state;
                     $state = $state === 'В наличии' ? 'Доступен' : $state;
                     $state = $state === 'Просрочен' ? 'В аренде' : $state;
-                    $checkState = EquipmentsStatus::find()->where('name=:name', [':name' => strtolower($state)])->one();
+                    $checkState = EquipmentsStatus::find()->where('lower(name)=:name', [':name' => mb_strtolower($state)])->one();
                     if (!is_object($checkState)) {
                         Yii::error('Состояние не найдено: ' . serialize($state), __METHOD__);
                         return false;
@@ -161,7 +188,7 @@ class InsertEqController extends Controller
                         'mark=:mark and model=:model and stock_id=:stock_id and category_id=:category_id and type=:type', [':mark' => $checkMark->id, ':model' => $model, ':stock_id' => $checkStock[0]->id, ':category_id' => $checkCategory->id, ':type' => $checkType->id])->one();
 
                     if (is_object($checkEq)) {
-                        $Excel->getActiveSheet()->removeRow($i,1);
+                        $Excel->getActiveSheet()->removeRow($i, 1);
                         $i--;
                         continue;
                     }
@@ -169,7 +196,7 @@ class InsertEqController extends Controller
                     $newEq = new Equipments();
                     $newEq->status = $checkState->id;
                     $newEq->mark = $checkMark->id;
-                    $newEq->model = ucfirst(strtolower($model));
+                    $newEq->model = $model;
                     $newEq->stock_id = $checkStock[0]->id;
                     $newEq->type = $checkType->id;
                     $newEq->category_id = $checkCategory->id;
@@ -220,11 +247,15 @@ class InsertEqController extends Controller
                         return false;
                     }
 
-                    $Excel->getActiveSheet()->removeRow($i,1);
+                    $Excel->getActiveSheet()->removeRow($i, 1);
                     $i--;
                 } else {
-                    Yii::error('ololo ' . serialize($ll), __METHOD__);
-                    if (!isset($ll[0])) {
+                    if ($type === '') {
+
+                        Yii::error('type: ' . serialize($type), __METHOD__);
+                        Yii::error('model: ' . serialize($model), __METHOD__);
+                        Yii::error('name: ' . serialize($checkMark->name), __METHOD__);
+
                         $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет типа оборудования');
                     } else {
                         $Excel->getActiveSheet()->setCellValue('U' . $i, 'Нет модели оборудования');
@@ -268,7 +299,7 @@ class InsertEqController extends Controller
             }
 
             $newMark = new EquipmentsMark();
-            $newMark->name = ucfirst(strtolower($value));
+            $newMark->name = ucfirst(mb_strtolower($value));
 
             try {
                 if (!$newMark->save(false)) {

@@ -425,7 +425,7 @@ class EquipmentsClass
                 'dop_status' => $value->dop_status,
                 'color' => $value->status0->color,
                 'selling_price' => +$value->selling_price,
-                'price_per_day' => $value->price_per_day,
+                'price_per_day' => +$value->price_per_day,
                 'rentals' => $value->rentals,
                 'repairs' => $value->repairs,
                 'repairs_sum' => $value->repairs_sum,
