@@ -22,7 +22,7 @@ class InsertEqController extends Controller
     {
         Yii::info('Запуск функции actionIndex', __METHOD__);
 
-        $File = "eq1.xlsx";
+        $File = "eq.xlsx";
         $Excel = \PHPExcel_IOFactory::load($File);
         # С какой строки начинаются данные
         $Start = 2;
