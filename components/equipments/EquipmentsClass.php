@@ -397,9 +397,9 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category','equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $equipmentsTypeList = Equipments::find()->orderBy('id desc')->where(implode(" and ", $listFilter))->all();
+            $equipmentsTypeList = Equipments::find()->joinWith(['equipmentsInfos'])->orderBy('id desc')->where(implode(" and ", $listFilter))->all();
         }
 
         if (!is_array($equipmentsTypeList)) {
