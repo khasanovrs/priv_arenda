@@ -62,9 +62,9 @@ class InsertEqController extends Controller
                 $r[] = 'OTTO KURTBACH';
             } elseif (strripos(mb_strtolower($name), 'красный маяк')) {
                 $r[] = 'Красный Маяк';
-            } elseif (strripos(mb_strtolower($name), 'лшм sturm bs8580')) {
+            } elseif ($name == 'Шнек ADA 150 мм') {
                 $r[] = 'Sturm';
-            } elseif (strripos(mb_strtolower($name), 'шнек ada 150 мм') || strripos(mb_strtolower($name), 'шнек ada 150-300 мм')) {
+            } elseif ($name ==  'шнек ada 150 мм' || $name == 'шнек ada 150-300 мм') {
                 $r[] = 'ADA';
             } else {
                 $r = explode(" ", $name);
