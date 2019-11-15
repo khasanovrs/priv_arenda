@@ -1135,7 +1135,7 @@ class EquipmentsClass
         Yii::info('Запуск функции GetEquipmentsMark', __METHOD__);
         $result = [];
 
-        $equipmentsMarkList = EquipmentsMark::find()->orderBy('id')->all();
+        $equipmentsMarkList = EquipmentsMark::find()->orderBy('name')->all();
 
         if (!is_array($equipmentsMarkList)) {
             Yii::error('Список марок оборудования пуст', __METHOD__);
