@@ -45,9 +45,7 @@ class InsertEqController extends Controller
             $branch = $Excel->getActiveSheet()->getCell('R' . $i)->getValue(); // Филиал
             $arenda = $Excel->getActiveSheet()->getCell('T' . $i)->getValue(); // В аренде
 
-            if ($name == 'Шнек ADA 150 мм') {
-                Yii::error('olololo1', __METHOD__);
-            }
+            if ($state === 'Бронь') continue;
 
             if ($name === null) continue;
 
@@ -71,8 +69,6 @@ class InsertEqController extends Controller
             } else {
                 $r = explode(" ", $name);
             }
-
-            Yii::error('olololo' . serialize($r), __METHOD__);
 
             foreach ($r as $value) {
                 if ($value === '') continue;
