@@ -34,7 +34,7 @@ class InsertEqController extends Controller
             $tool_number = $Excel->getActiveSheet()->getCell('D' . $i)->getValue(); // серийный номер
             $sum = $Excel->getActiveSheet()->getCell('E' . $i)->getValue(); // Стоимость оборудования 15 000
             $selling_price = $Excel->getActiveSheet()->getCell('F' . $i)->getValue(); // Цена продажи
-            $state = $Excel->getActiveSheet()->getCell('H' . $i)->getValue(); // Состояние Списано
+            $state = $Excel->getActiveSheet()->getCell('G' . $i)->getValue(); // Состояние Списано
             $price_per_day = $Excel->getActiveSheet()->getCell('I' . $i)->getValue(); // Цена за сутки 500
             $date_create = $Excel->getActiveSheet()->getCell('J' . $i)->getValue(); // Дата создания 14.01.2016
             $foto = $Excel->getActiveSheet()->getCell('L' . $i)->getValue(); // Фото 1
@@ -45,9 +45,9 @@ class InsertEqController extends Controller
             $branch = $Excel->getActiveSheet()->getCell('R' . $i)->getValue(); // Филиал
             $arenda = $Excel->getActiveSheet()->getCell('T' . $i)->getValue(); // В аренде
 
-            if ($state === 'Бронь') continue;
-
             if ($name === null) continue;
+
+            if ($state != 'Списано' && $state != 'В наличи' && $state != 'В ремонте') continue;
 
             $checkMark = '';
 
