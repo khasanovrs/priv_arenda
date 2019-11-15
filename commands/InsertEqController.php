@@ -22,7 +22,7 @@ class InsertEqController extends Controller
     {
         Yii::info('Запуск функции actionIndex', __METHOD__);
 
-        $File = "eq1.xlsx";
+        $File = "eq.xlsx";
         $Excel = \PHPExcel_IOFactory::load($File);
         # С какой строки начинаются данные
         $Start = 2;
@@ -62,9 +62,11 @@ class InsertEqController extends Controller
                 $r[] = 'OTTO KURTBACH';
             } elseif (strripos(mb_strtolower($name), 'красный маяк')) {
                 $r[] = 'Красный Маяк';
-            } elseif ($name == 'Шнек ADA 150 мм') {
+            } elseif ($name == 'ЛШМ Sturm BS8580') {
                 $r[] = 'Sturm';
-            } elseif ($name ==  'шнек ada 150 мм' || $name == 'шнек ada 150-300 мм') {
+            } elseif ($name == 'Затирочная машина по бетону Red Verg RD-S80') {
+                $r[] = 'Red Verg';
+            } elseif ($name == 'Шнек ADA 150 мм' || $name == 'Шнек ADA 150-300 мм') {
                 $r[] = 'ADA';
             } else {
                 $r = explode(" ", $name);
@@ -197,10 +199,13 @@ class InsertEqController extends Controller
                         'mark=:mark and model=:model and stock_id=:stock_id and category_id=:category_id and type=:type', [':mark' => $checkMark->id, ':model' => $model, ':stock_id' => $checkStock[0]->id, ':category_id' => $checkCategory->id, ':type' => $checkType->id])->one();
 
                     if (is_object($checkEq)) {
-                        $Excel->getActiveSheet()->removeRow($i, 1);
+                        /*$Excel->getActiveSheet()->removeRow($i, 1);
                         $i--;
-                        continue;
+                        continue;*/
+                        Yii::error('Повтор', __METHOD__);
                     }
+
+                    $date_create = $date_create == null ? date('Y-m-d H:i:s') : date('Y-m-d H:i:s', strtotime($date_create));
 
                     $newEq = new Equipments();
                     $newEq->status = $checkState->id;
@@ -217,7 +222,7 @@ class InsertEqController extends Controller
                     $newEq->degree_wear = 0;
                     $newEq->countHire = $hire_count || 0;
                     $newEq->discount = 1;
-                    $newEq->date_create = date('Y-m-d H:i:s', strtotime($date_create));
+                    $newEq->date_create = $date_create;
                     $newEq->rentals = $arenda;
                     $newEq->repairs = 0;
                     $newEq->repairs_sum = $repairs_sum;
