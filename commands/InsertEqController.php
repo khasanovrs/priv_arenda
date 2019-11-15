@@ -27,7 +27,7 @@ class InsertEqController extends Controller
         # С какой строки начинаются данные
         $Start = 2;
 
-        for ($i = $Start; $i <= 5000; $i++) {
+        for ($i = $Start; $i <= 2700; $i++) {
             $r = [];
             $name = $Excel->getActiveSheet()->getCell('A' . $i)->getValue(); // название Makita HR5201C (Дизельная тепловая пушка Master B 150 CED)
             $category = $Excel->getActiveSheet()->getCell('C' . $i)->getValue(); // вид Отбойные молотки
@@ -261,8 +261,8 @@ class InsertEqController extends Controller
                         return false;
                     }
 
-                    $Excel->getActiveSheet()->removeRow($i, 1);
-                    $i--;
+                    /*$Excel->getActiveSheet()->removeRow($i, 1);
+                    $i--;*/
                 } else {
                     if ($type === '') {
 
