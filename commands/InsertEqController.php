@@ -47,7 +47,8 @@ class InsertEqController extends Controller
 
             if ($name === null) continue;
 
-            if ($state != 'Списано' && $state != 'В наличи' && $state != 'В ремонте') continue;
+            Yii::error('ololo: ' . serialize($state), __METHOD__);
+            if ($state != 'Списано' && $state != 'В наличии' && $state != 'В ремонте') continue;
 
             $checkMark = '';
 
@@ -180,7 +181,6 @@ class InsertEqController extends Controller
                      */
                     $state = $state === 'Списано' ? 'Списан' : $state;
                     $state = $state === 'В наличии' ? 'Доступен' : $state;
-                    $state = $state === 'Просрочен' ? 'В аренде' : $state;
                     $checkState = EquipmentsStatus::find()->where('lower(name)=:name', [':name' => mb_strtolower($state)])->one();
                     if (!is_object($checkState)) {
                         Yii::error('Состояние не найдено: ' . serialize($state), __METHOD__);
