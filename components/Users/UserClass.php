@@ -32,7 +32,7 @@ class UserClass
     {
         Yii::info('Запуск функции обновления персональных данных пользователя', __METHOD__);
 
-        if ($phone === '' || strlen($phone) !== 11) {
+        if (strlen($phone) !== 11) {
             Yii::error('Ошибка при проверке номера телефона, phone:' . serialize($phone), __METHOD__);
 
             return [
