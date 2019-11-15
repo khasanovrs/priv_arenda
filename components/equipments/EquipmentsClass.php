@@ -188,10 +188,11 @@ class EquipmentsClass
      * @param $degree_wear_start
      * @param $degree_wear_end
      * @param $confirmed
+     * @param $lesa
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed)
+    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed, $lesa)
     {
         Yii::info('Запуск функции GetEquipments' . serialize($like), __METHOD__);
 
@@ -390,6 +391,12 @@ class EquipmentsClass
             $params[':like'] = strtolower($like);
         }
 
+        if ($lesa) {
+            $listFilter[] = 'equipments.category_id=37';
+        } else {
+            $listFilter[] = 'equipments.category_id!=37';
+        }
+
         if ($stockUser !== '') {
             $listFilter[] = 'is_not_active=0 and status!=7 and stock_id=' . $stockUser;
         } else {
@@ -397,7 +404,7 @@ class EquipmentsClass
         }
 
         if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category','equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category', 'equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $equipmentsTypeList = Equipments::find()->joinWith(['equipmentsInfos'])->orderBy('id desc')->where(implode(" and ", $listFilter))->all();
         }
@@ -435,7 +442,11 @@ class EquipmentsClass
                 'degree_wear' => $value->degree_wear,
                 'payback_ratio' => $value->payback_ratio,
                 'date_create' => $value->date_create,
-                'comment' => $value->equipmentsInfos[0]->comment
+                'comment' => $value->equipmentsInfos[0]->comment,
+                'count' => $value->count,
+                'count_hire' => $value->count_hire,
+                'count_repairs' => $value->count_repairs,
+                'count_left' => $value->count - $value->count_hire - $value->count_repairs
             ];
         }
 

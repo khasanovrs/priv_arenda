@@ -47,8 +47,9 @@ class InsertEqController extends Controller
 
             if ($name === null) continue;
 
-            Yii::error('ololo: ' . serialize($state), __METHOD__);
             if ($state != 'Списано' && $state != 'В наличии' && $state != 'В ремонте') continue;
+
+            if ($category == 'Леса строительные') continue;
 
             $checkMark = '';
 

@@ -41,8 +41,9 @@ class GetEquipmentAction extends Action
         $degree_wear_start = $request->getBodyParam('degree_wear_start');
         $degree_wear_end = $request->getBodyParam('degree_wear_end');
         $confirmed = $request->getBodyParam('confirmed');
+        $lesa = $request->getBodyParam('lesa');
 
-        $result = EquipmentsClass::GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed);
+        $result = EquipmentsClass::GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed,$lesa);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка оборудования', __METHOD__);
