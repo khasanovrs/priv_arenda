@@ -416,59 +416,126 @@ class HireClass
         /**
          * @var ApplicationEquipment $value
          */
-        foreach ($list as $value) {
-            /**
-             * @var Applications $application
-             */
-            $application = Applications::find()->where('id=:id', [':id' => $value->application_id])->one();
 
-            if (!is_object($application)) {
-                Yii::info('Ошибка при поиске заявления', __METHOD__);
+        if (!$lesa) {
+            foreach ($list as $value) {
+                /**
+                 * @var Applications $application
+                 */
+                $application = $value->application;
 
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при поиске заявления'
+                if (!is_object($application)) {
+                    Yii::info('Ошибка при поиске заявления', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при поиске заявления'
+                    ];
+                }
+
+                $date_cr = date('Y-m-d');
+
+                /**
+                 * @var ApplicationPay $checkPay
+                 */
+                $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
+
+                $mark = $value->equipments->mark0->name;
+                $model = $value->equipments->model;
+                $type = $value->equipments->type0->name;
+
+                $client = ClientsClass::GetClientInfo($application->client_id);
+
+                $result[] = [
+                    'id' => $value->id,
+                    'app_id' => $application->id,
+                    'typeLease_id' => $application->type_lease_id,
+                    'client' => $client->name,
+                    'client_phone' => $client->phone,
+                    'equipments' => $type . ' ' . $mark . ' ' . $model,
+                    'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
+                    'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
+                    'status' => $value->hire_status_id,
+                    'state' => $value->hireState->name,
+                    'color' => $value->hireStatus->color,
+                    'sum' => $value->equipments->price_per_day, // цена оборудования
+                    'sum_hire' => $value->sum, // сумма аренды со скдикой
+                    'sale_sum' => $value->sum_sale, // общая сумма со скидкой
+                    'total_paid' => $value->total_paid, // всего оплачено
+                    'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
+                    'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
+                    'comment' => $application->comment,
+                    'date_end' => $application->date_end,
+                    'branch' => $application->branch->name,
+                    'delivery_sum' => $value->delivery_sum,
+                    'delivery_sum_paid' => $value->delivery_sum_paid,
+                    'current_pay' => (float)$sumCurrentDay
                 ];
             }
+        } else {
+            foreach ($list as $value) {
+                /**
+                 * @var Applications $application
+                 */
+                $application = $value->application;
 
-            $date_cr = date('Y-m-d');
+                if (!is_object($application)) {
+                    Yii::info('Ошибка при поиске заявления', __METHOD__);
 
-            /**
-             * @var ApplicationPay $checkPay
-             */
-            $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при поиске заявления'
+                    ];
+                }
 
-            $mark = $value->equipments->mark0->name;
-            $model = $value->equipments->model;
-            $type = $value->equipments->type0->name;
+                $date_cr = date('Y-m-d');
 
-            $client = ClientsClass::GetClientInfo($application->client_id);
+                /**
+                 * @var ApplicationPay $checkPay
+                 */
+                $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
 
-            $result[] = [
-                'id' => $value->id,
-                'app_id' => $application->id,
-                'typeLease_id' => $application->type_lease_id,
-                'client' => $client->name,
-                'client_phone' => $client->phone,
-                'equipments' => $type . ' ' . $mark . ' ' . $model,
-                'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
-                'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
-                'status' => $value->hire_status_id,
-                'state' => $value->hireState->name,
-                'color' => $value->hireStatus->color,
-                'sum' => $value->equipments->price_per_day, // цена оборудования
-                'sum_hire' => $value->sum, // сумма аренды со скдикой
-                'sale_sum' => $value->sum_sale, // общая сумма со скидкой
-                'total_paid' => $value->total_paid, // всего оплачено
-                'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
-                'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
-                'comment' => $application->comment,
-                'date_end' => $application->date_end,
-                'branch' => $application->branch->name,
-                'delivery_sum' => $value->delivery_sum,
-                'delivery_sum_paid' => $value->delivery_sum_paid,
-                'current_pay' => (float)$sumCurrentDay
-            ];
+                $mark = $value->equipments->mark0->name;
+                $model = $value->equipments->model;
+                $type = $value->equipments->type0->name;
+
+                $client = ClientsClass::GetClientInfo($application->client_id);
+
+                $keyArr = '';
+                foreach ($result as $key => $item) {
+                    if ($item['app_id'] === $application->id) {
+                        $keyArr = $key;
+                    }
+                }
+
+                if ($keyArr === '') {
+                    $result[] = [
+                        'id' => $value->id,
+                        'app_id' => $application->id,
+                        'typeLease_id' => $application->type_lease_id,
+                        'client' => $client->name,
+                        'client_phone' => $client->phone,
+                        'equipments' => 'Леса',
+                        'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
+                        'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
+                        'status' => $value->hire_status_id,
+                        'state' => $value->hireState->name,
+                        'color' => $value->hireStatus->color,
+                        'sum' => $value->equipments->price_per_day, // цена оборудования
+                        'sum_hire' => $value->sum, // сумма аренды со скдикой
+                        'sale_sum' => $value->sum_sale, // общая сумма со скидкой
+                        'total_paid' => $value->total_paid, // всего оплачено
+                        'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
+                        'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
+                        'comment' => $application->comment,
+                        'date_end' => $application->date_end,
+                        'branch' => $application->branch->name,
+                        'delivery_sum' => $value->delivery_sum,
+                        'delivery_sum_paid' => $value->delivery_sum_paid,
+                        'current_pay' => (float)$sumCurrentDay
+                    ];
+                }
+            }
         }
 
         Yii::info('Список прокатов получен' . serialize($result), __METHOD__);
