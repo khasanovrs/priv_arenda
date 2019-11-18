@@ -735,7 +735,11 @@ class EquipmentsClass
             'comment' => $equipment->equipmentsInfos[0]->comment,
             'change_history' => $change_history,
             'confirmed' => $equipment->confirmed,
-            'change_history_status' => $change_history_status
+            'change_history_status' => $change_history_status,
+            'count' => +$equipment->count,
+            'count_hire' => +$equipment->count_hire,
+            'count_repairs' => +$equipment->count_repairs,
+            'count_left' => +$equipment->count - +$equipment->count_hire - +$equipment->count_repairs,
         ];
 
         Yii::info('Информация об оборудовании получено', __METHOD__);
