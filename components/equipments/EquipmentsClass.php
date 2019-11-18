@@ -531,17 +531,13 @@ class EquipmentsClass
      * @param $branch
      * @param $filter
      * @param $applicationStatus
+     * @param $lesa
      * @return array
      */
-    public static function GetAllEquipmentsBranch($filter, $branch, $applicationStatus)
+    public static function GetAllEquipmentsBranch($filter, $branch, $applicationStatus, $lesa)
     {
         Yii::info('Запуск функции GetEquipmentsSearch', __METHOD__);
         $result = [];
-
-        //if ($filter !== '') {
-        $filter = strtolower($filter);
-        $filter = '%' . $filter . '%';
-        //}
 
         if ($branch === '') {
             Yii::error('Филиал не передан', __METHOD__);
@@ -572,7 +568,11 @@ class EquipmentsClass
         }
 
         // показываем или нет оборудование со спросом
-        $secondFilter = $applicationStatus !== 3 ? ' and status!=7' : '';
+        $secondFilter = $lesa ? ' and equipments.category_id=37' : ' and equipments.category_id!=37';
+        $secondFilter .= $applicationStatus !== 3 ? ' and status!=7' : '';
+
+        $filter = strtolower($filter);
+        $filter = '%' . $filter . '%';
 
         $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
         where(['in', 'stock_id', $arr])->
