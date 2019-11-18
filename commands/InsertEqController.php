@@ -283,9 +283,9 @@ class InsertEqController extends Controller
             }
         }
 
-        $fileType = 'Excel5';
+        /*$fileType = 'Excel5';
         $objWriter = \PHPExcel_IOFactory::createWriter($Excel, $fileType);
-        $objWriter->save('eq2.xlsx');
+        $objWriter->save('eq2.xlsx');*/
 
         return true;
     }
