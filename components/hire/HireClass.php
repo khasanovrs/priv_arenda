@@ -289,10 +289,11 @@ class HireClass
      * @param $date_start
      * @param $date_end
      * @param $show_close_hire
+     * @param $lesa
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function GetHire($status, $like, $branch, $date_start, $date_end, $show_close_hire)
+    public static function GetHire($status, $like, $branch, $date_start, $date_end, $show_close_hire, $lesa)
     {
         Yii::info('Запуск функции GetHire', __METHOD__);
         $result = [];
@@ -393,13 +394,14 @@ class HireClass
             $listFilter[] = 'applications.is_not_active=0 and status_id in (1,2)';
         }
 
+        $listFilter[] = $lesa ? 'applications.lesa=1' : 'applications.lesa=0';
+
 
         if (!empty($listFilter)) {
             $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
             $list = ApplicationEquipment::find()->joinWith(['application'])->where(implode(" and ", $listFilter))->orderBy('id desc')->all();
         }
-
 
         if (empty($list)) {
             Yii::info('Список прокатов пуст', __METHOD__);
