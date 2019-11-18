@@ -568,7 +568,7 @@ class EquipmentsClass
         }
 
         // показываем или нет оборудование со спросом
-        $secondFilter = $lesa ? ' and equipments.category_id=37' : ' and equipments.category_id!=37';
+        $secondFilter = $lesa ? ' and equipments.category_id=33' : ' and equipments.category_id!=33';
         $secondFilter .= $applicationStatus !== 3 ? ' and status!=7' : '';
 
         $filter = strtolower($filter);
