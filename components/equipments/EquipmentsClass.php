@@ -445,8 +445,7 @@ class EquipmentsClass
                 'comment' => $value->equipmentsInfos[0]->comment,
                 'count' => +$value->count,
                 'count_hire' => +$value->count_hire,
-                'count_repairs' => +$value->count_repairs,
-                'count_left' => +$value->count - +$value->count_hire - +$value->count_repairs
+                'count_left' => +$value->count - +$value->count_hire
             ];
         }
 
@@ -738,8 +737,7 @@ class EquipmentsClass
             'change_history_status' => $change_history_status,
             'count' => +$equipment->count,
             'count_hire' => +$equipment->count_hire,
-            'count_repairs' => +$equipment->count_repairs,
-            'count_left' => +$equipment->count - +$equipment->count_hire - +$equipment->count_repairs,
+            'count_left' => +$equipment->count - +$equipment->count_hire,
         ];
 
         Yii::info('Информация об оборудовании получено', __METHOD__);
