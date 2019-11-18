@@ -532,9 +532,16 @@ class HireClass
                         'branch' => $application->branch->name,
                         'delivery_sum' => $value->delivery_sum,
                         'delivery_sum_paid' => $value->delivery_sum_paid,
-                        'current_pay' => (float)$sumCurrentDay
+                        'current_pay' => (float)$sumCurrentDay,
+                        'eq' => []
+                    ];
+                } else {
+                    $result[$keyArr]['eq'][] = [
+                        'name' => $type . ' ' . $mark . ' ' . $model,
+                        'count' => $value->equipments_count
                     ];
                 }
+
             }
         }
 
