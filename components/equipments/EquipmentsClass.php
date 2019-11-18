@@ -443,10 +443,10 @@ class EquipmentsClass
                 'payback_ratio' => $value->payback_ratio,
                 'date_create' => $value->date_create,
                 'comment' => $value->equipmentsInfos[0]->comment,
-                'count' => $value->count,
-                'count_hire' => $value->count_hire,
-                'count_repairs' => $value->count_repairs,
-                'count_left' => $value->count - $value->count_hire - $value->count_repairs
+                'count' => +$value->count,
+                'count_hire' => +$value->count_hire,
+                'count_repairs' => +$value->count_repairs,
+                'count_left' => +$value->count - +$value->count_hire - +$value->count_repairs
             ];
         }
 
