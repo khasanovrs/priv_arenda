@@ -49,7 +49,7 @@ class InsertEqController extends Controller
 
             if ($state != 'Списано' && $state != 'В наличии' && $state != 'В ремонте') continue;
 
-            if ($category == 'Леса строительные') continue;
+            //if ($category == 'Леса строительные') continue;
 
             $checkMark = '';
 

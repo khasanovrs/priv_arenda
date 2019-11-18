@@ -392,9 +392,9 @@ class EquipmentsClass
         }
 
         if ($lesa) {
-            $listFilter[] = 'equipments.category_id=37';
+            $listFilter[] = 'equipments.category_id=33';
         } else {
-            $listFilter[] = 'equipments.category_id!=37';
+            $listFilter[] = 'equipments.category_id!=33';
         }
 
         if ($stockUser !== '') {
