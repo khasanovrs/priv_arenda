@@ -694,6 +694,9 @@ class HireClass
                     $result[$keyArr]['gorizontalnaya_svyaz'] = $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : $result[$keyArr]['gorizontalnaya_svyaz'];
                     $result[$keyArr]['rigel'] = $rigel != 0 ? $rigel : $result[$keyArr]['rigel'];
                     $result[$keyArr]['nastil'] = $nastil != 0 ? $nastil : $result[$keyArr]['nastil'];
+                    $result[$keyArr]['sum_hire'] = $result[$keyArr]['sum_hire'] + $value->sum; // цена оборудования
+                    $result[$keyArr]['total_paid'] = $result[$keyArr]['total_paid'] + $value->total_paid; // всего оплачено
+                    $result[$keyArr]['remainder'] = $result[$keyArr]['sum_hire'] - $result[$keyArr]['total_paid']; // остаток
                 }
             }
         }
@@ -1315,7 +1318,7 @@ class HireClass
      */
     public static function equipmentReturn($app_id)
     {
-        Yii::info('Запуск функции closeHire', __METHOD__);
+        Yii::info('Запуск функции equipmentReturn', __METHOD__);
 
         if ($app_id === '') {
             Yii::error('Не передан идентификатор заявки', __METHOD__);

@@ -623,6 +623,7 @@ class EquipmentsClass
                 'price_per_day' => $value->price_per_day,
                 'status' => $status,
                 'check_click' => $checkClick,
+                'count' => $value->count,
 
                 //'count' => $value->count,
                 //'photo' => $value->photo

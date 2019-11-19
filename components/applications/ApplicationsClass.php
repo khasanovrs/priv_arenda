@@ -647,7 +647,7 @@ class ApplicationsClass
             }
 
             $datediff = strtotime($rent_end) - strtotime($rent_start);
-            $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day;
+            $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
             $sale_sum = $equipment->price_per_day;
 
             if ((int)$disc->code !== 0) {
