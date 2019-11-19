@@ -1316,7 +1316,7 @@ class HireClass
     }
 
     /**
-     * Функция возврата товара на склад
+     * Функция возврата оборудования на склад
      * @param $app_id
      * @return array|bool
      */
@@ -1376,6 +1376,103 @@ class HireClass
             } catch (\Exception $e) {
                 Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
+            }
+        }
+
+        Yii::info('Оборудование успешно вернули', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно вернули'
+        ];
+    }
+
+    /**
+     * Функция возврата лесов на склад
+     * @param $app_id
+     * @return array|bool
+     */
+    public static function lesaReturn($app_id)
+    {
+        Yii::info('Запуск функции equipmentReturn', __METHOD__);
+
+        if ($app_id === '') {
+            Yii::error('Не передан идентификатор заявки', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор заявки',
+            ];
+        }
+
+        /**
+         * @var Applications $app
+         */
+        $app = Applications::find()->where('id=:id', [':id' => $app_id])->one();
+
+        if (!is_object($app)) {
+            Yii::info('Информация по заявке не найдена', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена'
+            ];
+        }
+
+        $app_eq = ApplicationEquipment::find()->where('application_id=:id', [':id' => $app->id])->all();
+
+        if (!empty($app_eq)) {
+
+            /**
+             * @var ApplicationEquipment $value
+             */
+            foreach ($app_eq as $value) {
+                $checkChangeStatus = EquipmentsClass::changeStatus($value->equipments_id, 4);
+
+                if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при изменении статуса', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при изменении статуса',
+                    ];
+                }
+
+                $hire_state_id = '';
+
+                // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
+                if ($value->sum > $value->total_paid && $value->equipments->status === 4) {
+                    $hire_state_id = 5;
+                }
+
+                if ($hire_state_id !== '') {
+                    $value->hire_state_id = $hire_state_id;
+
+                    try {
+                        if (!$value->save(false)) {
+                            Yii::error('Ошибка при закрытии проката: ' . serialize($value->getErrors()), __METHOD__);
+                            return false;
+                        }
+                    } catch (\Exception $e) {
+                        Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
+                        return false;
+                    }
+                }
+
+                Yii::info('Увеличиваем количество оборудования', __METHOD__);
+
+                $eq = $value->equipments;
+                $eq->count_hire -= $value->equipments_count;
+
+                try {
+                    if (!$eq->save(false)) {
+                        Yii::error('Ошибка при сохранении количества проката: ' . serialize($eq->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
             }
         }
 

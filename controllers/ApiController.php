@@ -375,6 +375,9 @@ class ApiController extends Controller
             'equipment-return' => [
                 'class' => 'app\components\actions\hire\EquipmentReturnAction',
             ],
+            'equipment-lesa-return' => [
+                'class' => 'app\components\actions\hire\EquipmentLesaReturnAction',
+            ],
             'delete-hire' => [
                 'class' => 'app\components\actions\hire\DeleteHireAction',
             ],
