@@ -1528,6 +1528,33 @@ class HireClass
             return false;
         }
 
+        $app_eq = $applications->applicationEquipments;
+
+        if (!empty($app_eq)) {
+            /**
+             * @var ApplicationEquipment $value
+             */
+            foreach ($app_eq as $value) {
+                $eq = $value->equipments;
+
+                $eq->status = 4;
+
+                if ($applications->lesa === '1') {
+                    $eq->count_hire -= $value->equipments_count;
+                }
+
+                try {
+                    if (!$eq->save(false)) {
+                        Yii::error('Ошибка при изменении статуса проката: ' . serialize($eq->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception изменении статуса проката: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+            }
+        }
+
         Yii::info('Прокат успешно удален', __METHOD__);
 
         return [
