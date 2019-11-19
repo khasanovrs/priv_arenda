@@ -7,6 +7,7 @@ namespace app\components\main;
 
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
+use app\models\Applications;
 use app\models\Branch;
 use Yii;
 
@@ -58,10 +59,10 @@ class MainClass
         $date_start .= ' 00:00:00';
         $date_end .= ' 23:59:59';
 
-        $applicationEquipmentHire = ApplicationEquipment::find()
-            ->joinWith('application')
-            ->where('status_id in (1,2) and applications.branch_id=:branch and (applications.rent_start < :date_start || applications.rent_end > :date_end)', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
-            ->count();
+        $applicationEquipmentHire = Applications::find()
+            ->joinWith('applicationEquipments')
+            ->where('application_equipment.status_id in (1,2) and branch_id=:branch and (rent_start < :date_start || rent_end > :date_end)', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->count('DISTINCT applications.id');
 
         $applicationEquipmentRenewals = ApplicationEquipment::find()
             ->joinWith('application')
