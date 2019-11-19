@@ -675,6 +675,24 @@ class ApplicationsClass
                 return false;
             }
 
+
+            if ($lesa) {
+                Yii::info('Прокат лесов, уменьшаем количество', __METHOD__);
+
+                $equipment->count_hire = (int)$equipment->count_hire + (int)$value->count;
+
+                try {
+                    if (!$equipment->save(false)) {
+                        Yii::error('Ошибка при сохранении количества оборудования: ' . serialize($equipment->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при сохранении количества оборудования: ' . serialize($e->getMessage()), __METHOD__);
+                    Yii::error('Поймали Exception при сохранении количества оборудования: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+            }
+
             Yii::info('Опраделеяем статус для оборудования', __METHOD__);
 
             if ($status === 1 || $status === 2) {
