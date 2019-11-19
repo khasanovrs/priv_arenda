@@ -688,7 +688,6 @@ class ApplicationsClass
                     }
                 } catch (\Exception $e) {
                     Yii::error('Поймали Exception при сохранении количества оборудования: ' . serialize($e->getMessage()), __METHOD__);
-                    Yii::error('Поймали Exception при сохранении количества оборудования: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
             }
