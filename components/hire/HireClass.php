@@ -1041,12 +1041,9 @@ class HireClass
 
         Yii::info('Получаем информацию заявки с оборудованием', __METHOD__);
 
-        /**
-         * @var ApplicationEquipment $app_eq
-         */
-        $app_eq = ApplicationEquipment::find()->where('id=:id', ['id' => $app_eq_id])->one();
+        $app_eq = $applications->applicationEquipments;
 
-        if (!is_object($app_eq)) {
+        if (empty($app_eq)) {
             Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
 
             return [
@@ -1055,44 +1052,61 @@ class HireClass
             ];
         }
 
-        Yii::info('Получаем оборудование', __METHOD__);
-
         /**
-         * @var Equipments $equipments
+         * @var ApplicationEquipment $value
          */
-        $equipments = Equipments::find()->where('id=:id', [':id' => $app_eq->equipments_id])->one();
+        foreach ($app_eq as $value) {
+            Yii::info('Получаем оборудование', __METHOD__);
 
-        if (!is_object($equipments)) {
-            Yii::info('Ошибка при получении оборудования', __METHOD__);
+            /**
+             * @var Equipments $equipments
+             */
+            $equipments = $value->equipments;
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при получении оборудования'
-            ];
-        }
+            if (!is_object($equipments)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
 
-        $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
-        $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day * $app_eq->equipments_count;
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
 
-        if ((int)$applications->discount->code !== 0) {
-            $price = $price - ($price * $applications->discount->code / 100);
-        }
+            $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
+            $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day * $value->equipments_count;
 
-        $app_eq->sum = round($price);
-        $app_eq->hire_state_id = 4;
-        $app_eq->renewals_date = date('Y-m-d H:i:s');
+            if ((int)$applications->discount->code !== 0) {
+                $price = $price - ($price * $applications->discount->code / 100);
+            }
 
-        Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
+            $value->sum = round($price);
+            $value->hire_state_id = 4;
+            $value->renewals_date = date('Y-m-d H:i:s');
 
-        try {
-            if (!$app_eq->save(false)) {
-                Yii::error('Ошибка при сохранении новой суммы: ' . serialize($app_eq->getErrors()), __METHOD__);
+            Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
+
+            try {
+                if (!$value->save(false)) {
+                    Yii::error('Ошибка при сохранении новой суммы: ' . serialize($value->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
+
+            $check = self::checkHire($value->id);
+
+            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении состояния',
+                ];
+            }
         }
+
 
         /**
          * @var Sessions $Sessions
@@ -1113,8 +1127,8 @@ class HireClass
         $extension->count = $count;
         $extension->date_create = date('Y-m-d H:i:s');
         $extension->user_id = $session->user_id;
-        $extension->type = $app_eq->application->type_lease_id;
-        $extension->application_equipment_id = $app_eq->id;
+        $extension->type = $applications->type_lease_id;
+        $extension->application_equipment_id = $value->id;
 
         try {
             if (!$extension->save(false)) {
@@ -1124,17 +1138,6 @@ class HireClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении продления: ' . serialize($e->getMessage()), __METHOD__);
             return false;
-        }
-
-        $check = self::checkHire($app_eq_id);
-
-        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при продлении контракта', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при изменении состояния',
-            ];
         }
 
         Yii::info('Заявка успешно изменена', __METHOD__);
@@ -1213,12 +1216,10 @@ class HireClass
 
         Yii::info('Получаем информацию заявки с оборудованием', __METHOD__);
 
-        /**
-         * @var ApplicationEquipment $app_eq
-         */
-        $app_eq = ApplicationEquipment::find()->where('id=:id', ['id' => $app_eq_id])->one();
 
-        if (!is_object($app_eq)) {
+        $app_eq = $applications->applicationEquipments;
+
+        if (empty($app_eq)) {
             Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
 
             return [
@@ -1227,42 +1228,59 @@ class HireClass
             ];
         }
 
-        Yii::info('Получаем оборудование', __METHOD__);
-
         /**
-         * @var Equipments $equipments
+         * @var ApplicationEquipment $value
          */
-        $equipments = Equipments::find()->where('id=:id', [':id' => $app_eq->equipments_id])->one();
+        foreach ($app_eq as $value) {
+            Yii::info('Получаем оборудование', __METHOD__);
 
-        if (!is_object($equipments)) {
-            Yii::info('Ошибка при получении оборудования', __METHOD__);
+            /**
+             * @var Equipments $equipments
+             */
+            $equipments = $value->equipments;
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при получении оборудования'
-            ];
-        }
+            if (!is_object($equipments)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
 
-        $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
-        $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
 
-        if ((int)$applications->discount->code !== 0) {
-            $price = $price - ($price * $applications->discount->code / 100);
-        }
+            $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
+            $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day * $value->equipments_count;
 
-        $app_eq->sum = round($price);
+            if ((int)$applications->discount->code !== 0) {
+                $price = $price - ($price * $applications->discount->code / 100);
+            }
 
-        Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
+            $value->sum = round($price);
 
-        try {
-            if (!$app_eq->save(false)) {
-                Yii::error('Ошибка при сохранении новой суммы: ' . serialize($app_eq->getErrors()), __METHOD__);
+            Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
+
+            try {
+                if (!$value->save(false)) {
+                    Yii::error('Ошибка при сохранении новой суммы: ' . serialize($value->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
+
+            $check = self::checkHire($value->id);
+
+            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении состояния',
+                ];
+            }
         }
+
 
         /**
          * @var Sessions $Sessions
@@ -1283,8 +1301,8 @@ class HireClass
         $extension->count = $count;
         $extension->date_create = date('Y-m-d H:i:s');
         $extension->user_id = $session->user_id;
-        $extension->type = $app_eq->application->type_lease_id;
-        $extension->application_equipment_id = $app_eq->id;
+        $extension->type = $applications->type_lease_id;
+        $extension->application_equipment_id = $value->id;
 
         try {
             if (!$extension->save(false)) {
@@ -1294,17 +1312,6 @@ class HireClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении продления: ' . serialize($e->getMessage()), __METHOD__);
             return false;
-        }
-
-        $check = self::checkHire($app_eq_id);
-
-        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при продлении контракта', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при изменении состояния',
-            ];
         }
 
         Yii::info('Заявка успешно изменена', __METHOD__);
