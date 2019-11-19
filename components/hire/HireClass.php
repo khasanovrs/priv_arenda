@@ -601,6 +601,13 @@ class HireClass
             }
         } else {
             foreach ($list as $value) {
+                $rama_prokhodnaya = 0;
+                $rama_letsnitsey = 0;
+                $diagonalnaya_svyaz = 0;
+                $gorizontalnaya_svyaz = 0;
+                $rigel = 0;
+                $nastil = 0;
+
                 /**
                  * @var Applications $application
                  */
@@ -631,6 +638,23 @@ class HireClass
                     }
                 }
 
+                Yii::info('Определяем тип', __METHOD__);
+                $type = $value->equipments->type0->name;
+
+                if ($type == 'Рама проходная') {
+                    $rama_prokhodnaya = $value->equipments_count;
+                } elseif ($type == 'Рама с летсницей') {
+                    $rama_letsnitsey = $value->equipments_count;
+                } elseif ($type == 'Диагональная связь') {
+                    $diagonalnaya_svyaz = $value->equipments_count;
+                } elseif ($type == 'Горизонтальная связь') {
+                    $gorizontalnaya_svyaz = $value->equipments_count;
+                } elseif ($type == 'Ригель') {
+                    $rigel = $value->equipments_count;
+                } elseif ($type == 'Настил') {
+                    $nastil = $value->equipments_count;
+                }
+
                 if ($keyArr === '') {
                     $result[] = [
                         'id' => $value->id,
@@ -656,21 +680,21 @@ class HireClass
                         'delivery_sum' => $value->delivery_sum,
                         'delivery_sum_paid' => $value->delivery_sum_paid,
                         'current_pay' => (float)$sumCurrentDay,
-                        'rama_prokhodnaya' => '',
-                        'rama_letsnitsey' => '',
-                        'diagonalnaya_svyaz' => '',
-                        'gorizontalnaya_svyaz' => '',
-                        'rigel' => '',
-                        'nastil' => ''
+                        'rama_prokhodnaya' => $rama_prokhodnaya != 0 ? $rama_prokhodnaya : 0,
+                        'rama_letsnitsey' => $rama_letsnitsey != 0 ? $rama_letsnitsey : 0,
+                        'diagonalnaya_svyaz' => $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : 0,
+                        'gorizontalnaya_svyaz' => $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : 0,
+                        'rigel' => $rigel != 0 ? $rigel : 0,
+                        'nastil' => $nastil != 0 ? $nastil : 0
                     ];
+                } else {
+                    $result[$keyArr]['rama_prokhodnaya'] = $rama_prokhodnaya != 0 ? $rama_prokhodnaya : $result[$keyArr]['rama_prokhodnaya'];
+                    $result[$keyArr]['rama_letsnitsey'] = $rama_letsnitsey != 0 ? $rama_letsnitsey : $result[$keyArr]['rama_letsnitsey'];
+                    $result[$keyArr]['diagonalnaya_svyaz'] = $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : $result[$keyArr]['diagonalnaya_svyaz'];
+                    $result[$keyArr]['gorizontalnaya_svyaz'] = $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : $result[$keyArr]['gorizontalnaya_svyaz'];
+                    $result[$keyArr]['rigel'] = $rigel != 0 ? $rigel : $result[$keyArr]['rigel'];
+                    $result[$keyArr]['nastil'] = $nastil != 0 ? $nastil : $result[$keyArr]['nastil'];
                 }
-
-                /* $result[$keyArr]['rama_prokhodnaya'] ='' ;
-                 $result[$keyArr]['rama_letsnitsey'] ='' ;
-                 $result[$keyArr]['diagonalnaya_svyaz'] ='' ;
-                 $result[$keyArr]['gorizontalnaya_svyaz'] ='' ;
-                 $result[$keyArr]['rigel'] ='' ;
-                 $result[$keyArr]['nastil'] ='';*/
             }
         }
 

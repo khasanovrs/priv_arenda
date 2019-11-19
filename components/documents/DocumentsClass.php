@@ -58,7 +58,7 @@ class DocumentsClass
         $datediff = strtotime($app->rent_end) - strtotime($app->rent_start);
         $days = ($datediff / (60 * 60 * 24));
 
-        $document->setValue('id_app_eq', $id);
+        $document->setValue('id_app_eq', $app->id);
         $document->setValue('telephone', $client->phone);
         $document->setValue('telephone2', $client->clientsInfos[0]->phone_second);
         $document->setValue('branch', $app->branch->name);
