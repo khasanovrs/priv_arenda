@@ -1548,6 +1548,7 @@ class HireClass
 
                 if ($applications->lesa === '1') {
                     $eq->count_hire -= $value->equipments_count;
+                    $eq->count_hire = $eq->count_hire < 0 ? 0 : $eq->count_hire;
                 }
 
                 try {
