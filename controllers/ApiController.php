@@ -339,8 +339,14 @@ class ApiController extends Controller
             'get-hire-field' => [
                 'class' => 'app\components\actions\hire\GetHireFieldAction',
             ],
+            'get-hire-lesa-field' => [
+                'class' => 'app\components\actions\hire\GetHireLesaFieldAction',
+            ],
             'change-hire-field' => [
                 'class' => 'app\components\actions\hire\ChangeHireFieldAction',
+            ],
+            'change-hire-lesa-field' => [
+                'class' => 'app\components\actions\hire\ChangeHireLesaFieldAction',
             ],
             'get-hire-status' => [
                 'class' => 'app\components\actions\hire\GetHireStatusAction',

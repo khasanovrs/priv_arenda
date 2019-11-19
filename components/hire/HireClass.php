@@ -15,6 +15,8 @@ use app\models\Applications;
 use app\models\Equipments;
 use app\models\Extension;
 use app\models\HireField;
+use app\models\HireLesaField;
+use app\models\HireLesaShowField;
 use app\models\HireShowField;
 use app\models\HireState;
 use app\models\HireStatus;
@@ -24,6 +26,7 @@ use Yii;
 class HireClass
 {
     /**
+     * Получение активныйх полей проката
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
@@ -84,7 +87,68 @@ class HireClass
     }
 
     /**
-     * Изменение полей
+     * Получение активныйх полей проката лесов
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function GetHireLesaFields()
+    {
+        Yii::info('Запуск функции GetHireLesaFields', __METHOD__);
+        $result = [];
+
+        $applicationsFieldList = HireLesaField::find()->orderBy('id')->all();
+
+        if (!is_array($applicationsFieldList)) {
+            Yii::error('Список полей пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список полей оборудования пуст'
+            ];
+        }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var HireField $value
+         */
+        foreach ($applicationsFieldList as $value) {
+            $check_flag = HireLesaShowField::find()->where('hire_field_id=:hire_field_id and user_id=:user_id', [':hire_field_id' => $value->id, ':user_id' => $session->user_id])->orderBy('id')->one();
+
+            $flag = is_object($check_flag) ? 0 : 1;
+
+            $result[] = [
+                'id' => $value->id,
+                'code' => $value->code,
+                'name' => $value->name,
+                'flag' => $flag
+            ];
+        }
+
+        Yii::info('Список полей получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список полей получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Изменение активных полей для проката
      * @param $params
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
@@ -123,6 +187,69 @@ class HireClass
             if ($value->flag === 0) {
 
                 $newVal = new HireShowField();
+                $newVal->user_id = $session->user_id;
+                $newVal->hire_field_id = $value->id;
+
+                try {
+                    if (!$newVal->save(false)) {
+                        Yii::error('Ошибка при изменене отображения поля: ' . serialize($newVal->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при изменене отображения поля: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+            }
+        }
+
+        Yii::info('Поля успешно изменены', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Поля успешно изменены'
+        ];
+    }
+
+    /**
+     * Изменение активных полей для проката лесов
+     * @param $params
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function ChangeHireLesaFields($params)
+    {
+        Yii::info('Запуск функции ChangeHireFields', __METHOD__);
+
+        if (!is_array($params) || empty($params)) {
+            Yii::error('Не пришли параметры для изменения', __METHOD__);
+        }
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        try {
+            HireLesaShowField::deleteAll('user_id=:user_id', [':user_id' => $session->user_id]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при очистке списка скрытых полей : ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        foreach ($params as $value) {
+            if ($value->flag === 0) {
+
+                $newVal = new HireLesaShowField();
                 $newVal->user_id = $session->user_id;
                 $newVal->hire_field_id = $value->id;
 
@@ -508,6 +635,20 @@ class HireClass
                     }
                 }
 
+                /*Рама проходная
+                Рама с летсницей
+                Диагональная связь
+                Горизонтальная связь
+                Ригель
+                Настил*/
+
+                /*Rama prokhodnaya
+                Rama s letsnitsey
+                Diagonal'naya svyaz
+                Gorizontal'naya svyaz
+                Rigel
+                Nastil*/
+
                 if ($keyArr === '') {
                     $result[] = [
                         'id' => $value->id,
@@ -533,15 +674,23 @@ class HireClass
                         'delivery_sum' => $value->delivery_sum,
                         'delivery_sum_paid' => $value->delivery_sum_paid,
                         'current_pay' => (float)$sumCurrentDay,
-                        'eq' => []
-                    ];
-                } else {
-                    $result[$keyArr]['eq'][] = [
-                        'name' => $type . ' ' . $mark . ' ' . $model,
-                        'count' => $value->equipments_count
+                        ''
                     ];
                 }
 
+                /*Rama prokhodnaya
+                Rama s letsnitsey
+                Diagonal'naya svyaz
+                Gorizontal'naya svyaz
+                Rigel
+                Nastil*/
+
+                $result[$keyArr]['rama_prokhodnaya'] ='' ;
+                $result[$keyArr]['rama_letsnitsey'] ='' ;
+                $result[$keyArr]['diagonalnaya_svyaz'] ='' ;
+                $result[$keyArr]['gorizontalnaya_svyaz'] ='' ;
+                $result[$keyArr]['rigel'] ='' ;
+                $result[$keyArr]['nastil'] ='';
             }
         }
 
