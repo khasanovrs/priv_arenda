@@ -810,10 +810,10 @@ class HireClass
             'client_fio' => $client->name,
             'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
-            'sum' => $applicationEq->sum,
-            'total_paid' => $applicationEq->total_paid,
-            'remainder' => $applicationEq->sum - (float)$applicationEq->total_paid,
-            'count' => $applicationEq->equipments_count,
+            'sum' => 0,
+            'total_paid' => 0,
+            'remainder' => 0,
+            'count' => 0,
             'equipments' =>
                 [
                     'equipments_id' => $applicationEq->equipments_id,
@@ -860,6 +860,10 @@ class HireClass
                     } elseif ($type == 'Настил') {
                         $result['nastil'] = $value->equipments_count;
                     }
+
+                    $result['sum'] += (float)$value->sum; // цена оборудования
+                    $result['total_paid'] += (float)$value->total_paid; // всего оплачено
+                    $result['remainder'] = $result['sum'] - $result['total_paid']; // остаток
                 }
             }
         }
