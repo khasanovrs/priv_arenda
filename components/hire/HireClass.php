@@ -842,35 +842,21 @@ class HireClass
                  * @var ApplicationEquipment $value
                  */
                 foreach ($list as $value) {
-                    $rama_prokhodnaya = 0;
-                    $rama_letsnitsey = 0;
-                    $diagonalnaya_svyaz = 0;
-                    $gorizontalnaya_svyaz = 0;
-                    $rigel = 0;
-                    $nastil = 0;
-
                     $type = $value->equipments->type0->name;
 
                     if ($type == 'Рама проходная') {
-                        $rama_prokhodnaya = $value->equipments_count;
+                        $result['rama_prokhodnaya'] = $value->equipments_count;
                     } elseif ($type == 'Рама с летсницей') {
-                        $rama_letsnitsey = $value->equipments_count;
+                        $result['rama_letsnitsey'] = $value->equipments_count;
                     } elseif ($type == 'Диагональная связь') {
-                        $diagonalnaya_svyaz = $value->equipments_count;
+                        $result['diagonalnaya_svyaz'] = $value->equipments_count;
                     } elseif ($type == 'Горизонтальная связь') {
-                        $gorizontalnaya_svyaz = $value->equipments_count;
+                        $result['gorizontalnaya_svyaz'] = $value->equipments_count;
                     } elseif ($type == 'Ригель') {
-                        $rigel = $value->equipments_count;
+                        $result['rigel'] = $value->equipments_count;
                     } elseif ($type == 'Настил') {
-                        $nastil = $value->equipments_count;
+                        $result['nastil'] = $value->equipments_count;
                     }
-
-                    $result['rama_prokhodnaya'] = $rama_prokhodnaya != 0 ? $rama_prokhodnaya : 0;
-                    $result['rama_letsnitsey'] = $rama_letsnitsey != 0 ? $rama_letsnitsey : 0;
-                    $result['diagonalnaya_svyaz'] = $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : 0;
-                    $result['gorizontalnaya_svyaz'] = $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : 0;
-                    $result['rigel'] = $rigel != 0 ? $rigel : 0;
-                    $result['nastil'] = $nastil != 0 ? $nastil : 0;
                 }
             }
         }
