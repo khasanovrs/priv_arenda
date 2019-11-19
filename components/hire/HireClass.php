@@ -622,10 +622,6 @@ class HireClass
                  */
                 $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
 
-                $mark = $value->equipments->mark0->name;
-                $model = $value->equipments->model;
-                $type = $value->equipments->type0->name;
-
                 $client = ClientsClass::GetClientInfo($application->client_id);
 
                 $keyArr = '';
@@ -634,20 +630,6 @@ class HireClass
                         $keyArr = $key;
                     }
                 }
-
-                /*Рама проходная
-                Рама с летсницей
-                Диагональная связь
-                Горизонтальная связь
-                Ригель
-                Настил*/
-
-                /*Rama prokhodnaya
-                Rama s letsnitsey
-                Diagonal'naya svyaz
-                Gorizontal'naya svyaz
-                Rigel
-                Nastil*/
 
                 if ($keyArr === '') {
                     $result[] = [
@@ -674,23 +656,21 @@ class HireClass
                         'delivery_sum' => $value->delivery_sum,
                         'delivery_sum_paid' => $value->delivery_sum_paid,
                         'current_pay' => (float)$sumCurrentDay,
-                        ''
+                        'rama_prokhodnaya' => '',
+                        'rama_letsnitsey' => '',
+                        'diagonalnaya_svyaz' => '',
+                        'gorizontalnaya_svyaz' => '',
+                        'rigel' => '',
+                        'nastil' => ''
                     ];
                 }
 
-                /*Rama prokhodnaya
-                Rama s letsnitsey
-                Diagonal'naya svyaz
-                Gorizontal'naya svyaz
-                Rigel
-                Nastil*/
-
-                $result[$keyArr]['rama_prokhodnaya'] ='' ;
-                $result[$keyArr]['rama_letsnitsey'] ='' ;
-                $result[$keyArr]['diagonalnaya_svyaz'] ='' ;
-                $result[$keyArr]['gorizontalnaya_svyaz'] ='' ;
-                $result[$keyArr]['rigel'] ='' ;
-                $result[$keyArr]['nastil'] ='';
+                /* $result[$keyArr]['rama_prokhodnaya'] ='' ;
+                 $result[$keyArr]['rama_letsnitsey'] ='' ;
+                 $result[$keyArr]['diagonalnaya_svyaz'] ='' ;
+                 $result[$keyArr]['gorizontalnaya_svyaz'] ='' ;
+                 $result[$keyArr]['rigel'] ='' ;
+                 $result[$keyArr]['nastil'] ='';*/
             }
         }
 
