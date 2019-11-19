@@ -64,10 +64,10 @@ class MainClass
             ->where('application_equipment.status_id in (1,2) and branch_id=:branch and (rent_start < :date_start || rent_end > :date_end)', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count('DISTINCT applications.id');
 
-        $applicationEquipmentRenewals = ApplicationEquipment::find()
-            ->joinWith('application')
-            ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
-            ->count();
+        $applicationEquipmentRenewals = Applications::find()
+            ->joinWith('applicationEquipments')
+            ->where('branch_id=:branch and application_equipment.renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->count('DISTINCT applications.id');
 
         $applicationEquipment = ApplicationEquipment::find()
             ->joinWith('application')
