@@ -1072,7 +1072,7 @@ class HireClass
         }
 
         $datediff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
-        $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day;
+        $price = ($datediff / (60 * 60 * 24)) * $equipments->price_per_day * $app_eq->equipments_count;
 
         if ((int)$applications->discount->code !== 0) {
             $price = $price - ($price * $applications->discount->code / 100);
