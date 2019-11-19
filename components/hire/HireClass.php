@@ -821,9 +821,59 @@ class HireClass
                     'photo_alias' => $applicationEq->equipments->photo_alias
                 ],
             'extensions' => $extensions_list['data'],
-            'pay_list' => $pay_list['data']
+            'pay_list' => $pay_list['data'],
+            'lesa' => $application->lesa,
+            'rama_prokhodnaya' => 0,
+            'rama_letsnitsey' => 0,
+            'diagonalnaya_svyaz' => 0,
+            'gorizontalnaya_svyaz' => 0,
+            'rigel' => 0,
+            'nastil' => 0
         ];
 
+        if ($application->lesa === '1') {
+            $result['equipments']['name'] = 'Леса';
+
+            $list = ApplicationEquipment::find()->joinWith(['application'])->where('application_id=:application_id', [':application_id' => $application->id])->orderBy('id desc')->all();
+
+            if (!empty($list)) {
+
+                /**
+                 * @var ApplicationEquipment $value
+                 */
+                foreach ($list as $value) {
+                    $rama_prokhodnaya = 0;
+                    $rama_letsnitsey = 0;
+                    $diagonalnaya_svyaz = 0;
+                    $gorizontalnaya_svyaz = 0;
+                    $rigel = 0;
+                    $nastil = 0;
+
+                    $type = $value->equipments->type0->name;
+
+                    if ($type == 'Рама проходная') {
+                        $rama_prokhodnaya = $value->equipments_count;
+                    } elseif ($type == 'Рама с летсницей') {
+                        $rama_letsnitsey = $value->equipments_count;
+                    } elseif ($type == 'Диагональная связь') {
+                        $diagonalnaya_svyaz = $value->equipments_count;
+                    } elseif ($type == 'Горизонтальная связь') {
+                        $gorizontalnaya_svyaz = $value->equipments_count;
+                    } elseif ($type == 'Ригель') {
+                        $rigel = $value->equipments_count;
+                    } elseif ($type == 'Настил') {
+                        $nastil = $value->equipments_count;
+                    }
+
+                    $result['rama_prokhodnaya'] = $rama_prokhodnaya != 0 ? $rama_prokhodnaya : 0;
+                    $result['rama_letsnitsey'] = $rama_letsnitsey != 0 ? $rama_letsnitsey : 0;
+                    $result['diagonalnaya_svyaz'] = $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : 0;
+                    $result['gorizontalnaya_svyaz'] = $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : 0;
+                    $result['rigel'] = $rigel != 0 ? $rigel : 0;
+                    $result['nastil'] = $nastil != 0 ? $nastil : 0;
+                }
+            }
+        }
 
         Yii::info('Заявка успешно получена', __METHOD__);
 
