@@ -27,6 +27,7 @@ use Yii;
  * @property string $address
  *
  * @property ApplicationEquipment[] $applicationEquipments
+ * @property ApplicationPay[] $applicationPays
  * @property Source $source
  * @property Discount $discount
  * @property ApplicationsDelivery $delivery
@@ -100,6 +101,14 @@ class Applications extends \yii\db\ActiveRecord
     public function getApplicationEquipments()
     {
         return $this->hasMany(ApplicationEquipment::className(), ['application_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationPays()
+    {
+        return $this->hasMany(ApplicationPay::className(), ['application_id' => 'id']);
     }
 
     /**
