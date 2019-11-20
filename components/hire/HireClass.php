@@ -695,7 +695,6 @@ class HireClass
                     $result[$keyArr]['gorizontalnaya_svyaz'] = $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : $result[$keyArr]['gorizontalnaya_svyaz'];
                     $result[$keyArr]['rigel'] = $rigel != 0 ? $rigel : $result[$keyArr]['rigel'];
                     $result[$keyArr]['nastil'] = $nastil != 0 ? $nastil : $result[$keyArr]['nastil'];
-                    $result[$keyArr]['sum_hire'] = $result[$keyArr]['sum_hire'] + $value->sum; // цена оборудования
                     $result[$keyArr]['total_paid'] = $result[$keyArr]['total_paid'] + $value->total_paid; // всего оплачено
                     $result[$keyArr]['remainder'] = $result[$keyArr]['sum_hire'] - $result[$keyArr]['total_paid']; // остаток
                 }
@@ -811,7 +810,7 @@ class HireClass
             'client_fio' => $client->name,
             'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
-            'sum' => 0,
+            'sum' => $applicationEq->sum,
             'total_paid' => 0,
             'remainder' => 0,
             'count' => 0,
@@ -865,7 +864,6 @@ class HireClass
                         $result['nastil'] = $value->equipments_count;
                     }
 
-                    $result['sum'] += (float)$value->sum; // цена оборудования
                     $result['total_paid'] += (float)$value->total_paid; // всего оплачено
                     $result['remainder'] = $result['sum'] - $result['total_paid']; // остаток
                 }
