@@ -833,7 +833,10 @@ class HireClass
             'diagonalnaya_svyaz' => 0,
             'gorizontalnaya_svyaz' => 0,
             'rigel' => 0,
-            'nastil' => 0
+            'nastil' => 0,
+            'month_sum' => $application->month_sum,
+            'square' => $application->square,
+            'address' => $application->address,
         ];
 
         if ($application->lesa === '1') {
