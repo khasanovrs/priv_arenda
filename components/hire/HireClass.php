@@ -685,7 +685,9 @@ class HireClass
                         'diagonalnaya_svyaz' => $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : 0,
                         'gorizontalnaya_svyaz' => $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : 0,
                         'rigel' => $rigel != 0 ? $rigel : 0,
-                        'nastil' => $nastil != 0 ? $nastil : 0
+                        'nastil' => $nastil != 0 ? $nastil : 0,
+                        'month_sum' => $application->month_sum,
+                        'square' => $application->square,
                     ];
                 } else {
                     $result[$keyArr]['rama_prokhodnaya'] = $rama_prokhodnaya != 0 ? $rama_prokhodnaya : $result[$keyArr]['rama_prokhodnaya'];
