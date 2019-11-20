@@ -1643,56 +1643,102 @@ class HireClass
             ];
         }
 
-        $hire_state_id = $app_eq->hire_state_id;
+        $app = $app_eq->application;
 
-        $date = date('Y-m-d H:i:s');
-        $rent_end = $app_eq->application->rent_end;
-        $rent_start = $app_eq->application->rent_start;
+        if (!is_object($app)) {
+            Yii::info('Информация о заявке не найдена', __METHOD__);
 
-        $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
-
-        Yii::info('Текущее время: ' . serialize($date), __METHOD__);
-        Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
-
-        Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
-
-        $msg = 'Состояние успешно изменено';
-        // статус заявки в прокате
-        if ($rent_start < $date && $date < $rent_end) {
-            $hire_state_id = 4;
-        };
-
-        // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
-        if ($app_eq->sum <= $app_eq->total_paid && $dateDiff < 3 && $app_eq->equipments->status === 4) {
-            $hire_state_id = 3;
-            $msg = 'Прокат успешно закрыт';
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Заявка не найдена'
+            ];
         }
 
-        // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
-        if ($date > $rent_end && $app_eq->equipments->status === 1) {
-            $hire_state_id = 2;
-            $msg = 'Невозможно закрыть. Оборудование у клиента';
+        if ($app->lesa === '1') {
+            $app_eq = ApplicationEquipment::find()->where('application_id=:id', [':id' => $app->id])->all();
+            if (empty($app_eq)) {
+                Yii::info('Оборудования у лесов не найдены', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Оборудования у лесов не найдены'
+                ];
+            }
+
+            /**
+             * @var ApplicationEquipment $value
+             */
+
+            $allSum = 0;
+            $allTotalPaid = 0;
+            foreach ($app_eq as $value) {
+                $allSum += (float)$value->sum;
+                $allTotalPaid += (float)$value->total_paid;
+            }
+
+            $allSum = $allSum / count($app_eq);
+            $arr = $app_eq;
+        } else {
+            $arr[] = $app_eq;
+            $allSum = $app_eq->sum;
+            $allTotalPaid = $app_eq->total_paid;
         }
 
-        // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if ($app_eq->sum > $app_eq->total_paid && $app_eq->equipments->status === 4) {
-            $hire_state_id = 5;
-            $msg = 'Невозможно закрыть. Есть долг';
-        }
+        /**
+         * @var ApplicationEquipment $value
+         */
+        foreach ($arr as $value) {
+            $hire_state_id = $value->hire_state_id;
 
-        $app_eq->hire_state_id = $hire_state_id;
+            $date = date('Y-m-d H:i:s');
+            $rent_end = $value->application->rent_end;
+            $rent_start = $value->application->rent_start;
 
-        try {
-            if (!$app_eq->save(false)) {
-                Yii::error('Ошибка при закрытии проката: ' . serialize($app_eq->getErrors()), __METHOD__);
+            $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
+
+            Yii::info('Текущее время: ' . serialize($date), __METHOD__);
+            Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
+
+            Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
+
+            $msg = 'Состояние успешно изменено';
+            // статус заявки в прокате
+            if ($rent_start < $date && $date < $rent_end) {
+                $hire_state_id = 4;
+            };
+
+            // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
+            if ($allSum <= $allTotalPaid && $dateDiff < 3 && $value->equipments->status === 4) {
+                $hire_state_id = 3;
+                $msg = 'Прокат успешно закрыт';
+            }
+
+            // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
+            if ($date > $rent_end && $value->equipments->status === 1) {
+                $hire_state_id = 2;
+                $msg = 'Невозможно закрыть. Оборудование у клиента';
+            }
+
+            // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
+            if ($allSum > $allTotalPaid && $value->equipments->status === 4) {
+                $hire_state_id = 5;
+                $msg = 'Невозможно закрыть. Есть долг';
+            }
+
+            $value->hire_state_id = $hire_state_id;
+
+            try {
+                if (!$value->save(false)) {
+                    Yii::error('Ошибка при закрытии проката: ' . serialize($value->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
 
-        Yii::info('Заявка успешно изменена', __METHOD__);
+            Yii::info('Заявка успешно изменена', __METHOD__);
+        }
 
         return [
             'status' => 'SUCCESS',
