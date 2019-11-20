@@ -643,7 +643,7 @@ class HireClass
 
                 if ($type == 'Рама проходная') {
                     $rama_prokhodnaya = $value->equipments_count;
-                } elseif ($type == 'Рама с летсницей') {
+                } elseif ($type == 'Рама с лестницей') {
                     $rama_letsnitsey = $value->equipments_count;
                 } elseif ($type == 'Диагональная связь') {
                     $diagonalnaya_svyaz = $value->equipments_count;
