@@ -617,6 +617,11 @@ class EquipmentsClass
                 $checkClick = '1';
             }
 
+            if ($lesa && $value->count - $value->count_hire > 0) {
+                $status = 'Доступен';
+                $checkClick = '1';
+            }
+
             $result[] = [
                 'id' => $value->id,
                 'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
