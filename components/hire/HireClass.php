@@ -655,12 +655,6 @@ class HireClass
                     $nastil = $value->equipments_count;
                 }
 
-                $disc = $value->application->discount->code;
-                $price = $value->sum;
-                if ((int)$disc !== 0) {
-                    $price = round(($price * 100 / (100 - $disc)));
-                }
-
                 if ($keyArr === '') {
                     $result[] = [
                         'id' => $value->id,
@@ -674,7 +668,7 @@ class HireClass
                         'status' => $value->hire_status_id,
                         'state' => $value->hireState->name,
                         'color' => $value->hireStatus->color,
-                        'sum' => $price, // цена оборудования
+                        'sum' => $application->month_sum, // цена оборудования
                         'sum_hire' => $value->sum, // сумма аренды со скдикой
                         'sale_sum' => $value->sum_sale, // общая сумма со скидкой
                         'total_paid' => $value->total_paid, // всего оплачено
@@ -692,7 +686,6 @@ class HireClass
                         'gorizontalnaya_svyaz' => $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : 0,
                         'rigel' => $rigel != 0 ? $rigel : 0,
                         'nastil' => $nastil != 0 ? $nastil : 0,
-                        'month_sum' => $application->month_sum,
                         'square' => $application->square,
                     ];
                 } else {

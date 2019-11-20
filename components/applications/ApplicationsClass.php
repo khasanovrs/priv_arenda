@@ -654,7 +654,7 @@ class ApplicationsClass
 
             if ($lesa) {
                 $datediff = strtotime($rent_end) - strtotime($rent_start);
-                $price = ($datediff / (60 * 60 * 24)) * ($month_sum / 30) * (int)$value->count;
+                $price = ($datediff / (60 * 60 * 24)) * ($month_sum / 30);
                 $sale_sum = $month_sum / 30;
 
                 if ((int)$disc->code !== 0) {
