@@ -652,13 +652,24 @@ class ApplicationsClass
                 ];
             }
 
-            $datediff = strtotime($rent_end) - strtotime($rent_start);
-            $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
-            $sale_sum = $equipment->price_per_day;
+            if ($lesa) {
+                $datediff = strtotime($rent_end) - strtotime($rent_start);
+                $price = ($datediff / (60 * 60 * 24)) * ($month_sum / 30) * (int)$value->count;
+                $sale_sum = $month_sum / 30;
 
-            if ((int)$disc->code !== 0) {
-                $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
-                $price = $price - ($price * $disc->code / 100);
+                if ((int)$disc->code !== 0) {
+                    $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
+                    $price = $price - ($price * $disc->code / 100);
+                }
+            } else {
+                $datediff = strtotime($rent_end) - strtotime($rent_start);
+                $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
+                $sale_sum = $equipment->price_per_day;
+
+                if ((int)$disc->code !== 0) {
+                    $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
+                    $price = $price - ($price * $disc->code / 100);
+                }
             }
 
             $newApplicationEquipment = new ApplicationEquipment();
