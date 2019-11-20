@@ -1435,6 +1435,16 @@ class HireClass
             /**
              * @var ApplicationEquipment $value
              */
+
+            $allSum = 0;
+            $allTotalPaid = 0;
+            foreach ($app_eq as $value) {
+                $allSum += (float)$value->sum;
+                $allTotalPaid += (float)$value->total_paid;
+            }
+
+            $allSum = $allSum / count($app_eq);
+
             foreach ($app_eq as $value) {
                 $checkChangeStatus = EquipmentsClass::changeStatus($value->equipments_id, 4);
 
@@ -1450,7 +1460,7 @@ class HireClass
                 $hire_state_id = '';
 
                 // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-                if ($value->sum > $value->total_paid && $value->equipments->status === 4) {
+                if ($allSum > $allTotalPaid && $value->equipments->status === 4) {
                     $hire_state_id = 5;
                 }
 
