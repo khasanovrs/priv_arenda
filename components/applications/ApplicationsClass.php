@@ -373,10 +373,13 @@ class ApplicationsClass
      * @param $source
      * @param $payList
      * @param $lesa
+     * @param $month_sum
+     * @param $square
+     * @param $address
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch, $source, $payList, $lesa)
+    public static function AddApplication($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch, $source, $payList, $lesa, $month_sum, $square, $address)
     {
         Yii::info('Запуск функции AddApplication', __METHOD__);
 
@@ -606,6 +609,9 @@ class ApplicationsClass
         $newApplications->rent_end = $rent_end;
         $newApplications->lesa = +$lesa;
         $newApplications->date_create = date('Y-m-d H:i:s');
+        $newApplications->month_sum = $month_sum;
+        $newApplications->square = $square;
+        $newApplications->address = $address;
 
         try {
             if (!$newApplications->save(false)) {
