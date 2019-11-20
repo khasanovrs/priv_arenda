@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $application_equipment_id
+ * @property int $application_id
  * @property int $user_id
  * @property string $date_create
  * @property int $cashBox
@@ -35,8 +36,8 @@ class ApplicationPay extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['application_equipment_id', 'user_id', 'sum', 'client_id'], 'required'],
-            [['application_equipment_id', 'user_id', 'cashBox', 'client_id'], 'integer'],
+            [['application_equipment_id', 'application_id', 'user_id', 'sum', 'client_id'], 'required'],
+            [['application_equipment_id', 'application_id', 'user_id', 'cashBox', 'client_id'], 'integer'],
             [['date_create'], 'safe'],
             [['sum'], 'number'],
             [['application_equipment_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationEquipment::className(), 'targetAttribute' => ['application_equipment_id' => 'id']],
@@ -53,6 +54,7 @@ class ApplicationPay extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'application_equipment_id' => 'Application Equipment ID',
+            'application_id' => 'Application ID',
             'user_id' => 'User ID',
             'date_create' => 'Date Create',
             'cashBox' => 'Cash Box',
