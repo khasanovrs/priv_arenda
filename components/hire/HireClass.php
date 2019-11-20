@@ -811,8 +811,8 @@ class HireClass
             'client_phone' => $client->phone,
             'delivery_sum' => $applicationEq->delivery_sum,
             'sum' => $applicationEq->sum,
-            'total_paid' => 0,
-            'remainder' => 0,
+            'total_paid' => $application->lesa === '1' ? 0 : $applicationEq->total_paid,
+            'remainder' => $application->lesa === '1' ? 0 : $applicationEq->sum - $applicationEq->total_paid,
             'count' => 0,
             'equipments' =>
                 [
