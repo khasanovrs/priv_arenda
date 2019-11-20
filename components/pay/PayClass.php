@@ -9,7 +9,6 @@ use app\components\Clients\ClientsClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
-use app\models\Applications;
 use app\models\Extension;
 use app\models\FinanceCashbox;
 use Yii;
@@ -157,6 +156,15 @@ class PayClass
                     return false;
                 }
 
+                if ((int)$eq->selling_price === 0) {
+                    Yii::info('Необходимо указать сумму за сутки у оборудования', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Необходимо указать сумму за сутки у оборудования'
+                    ];
+                }
+
                 Yii::info('Работа с полем "выручка"', __METHOD__);
 
                 if ($revertSum) {
@@ -267,7 +275,7 @@ class PayClass
              * @var ApplicationEquipment $value
              */
             foreach ($app_eq as $value) {
-                $arr[] =   $value->id;
+                $arr[] = $value->id;
             }
 
             $pay_list_arr = ApplicationPay::find()->where(['in', 'application_equipment_id', $arr])->orderBy('id desc')->all();
