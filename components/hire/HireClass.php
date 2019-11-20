@@ -655,6 +655,12 @@ class HireClass
                     $nastil = $value->equipments_count;
                 }
 
+                $disc = $value->application->discount->code;
+                $price = $value->sum;
+                if ((int)$disc !== 0) {
+                    $price = round(($price * 100 / (100 - $disc)));
+                }
+
                 if ($keyArr === '') {
                     $result[] = [
                         'id' => $value->id,
@@ -668,7 +674,7 @@ class HireClass
                         'status' => $value->hire_status_id,
                         'state' => $value->hireState->name,
                         'color' => $value->hireStatus->color,
-                        'sum' => $value->equipments->price_per_day, // цена оборудования
+                        'sum' => $price, // цена оборудования
                         'sum_hire' => $value->sum, // сумма аренды со скдикой
                         'sale_sum' => $value->sum_sale, // общая сумма со скидкой
                         'total_paid' => $value->total_paid, // всего оплачено
