@@ -9,6 +9,7 @@ use app\components\Clients\ClientsClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
+use app\models\Applications;
 use app\models\Extension;
 use app\models\FinanceCashbox;
 use Yii;
@@ -228,10 +229,12 @@ class PayClass
 
     /**
      * Получение списка платежей
+     * @param $application_id
+     * @param $lesa
      * @param $application_equipment_id
      * @return array
      */
-    public static function getPayList($application_equipment_id)
+    public static function getPayList($application_id, $lesa, $application_equipment_id)
     {
         Yii::info('Запуск функции getPayList', __METHOD__);
 
@@ -246,7 +249,32 @@ class PayClass
 
         $pay_list = [];
 
-        $pay_list_arr = ApplicationPay::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->orderBy('id desc')->all();
+        if ($lesa === '1') {
+            $app_eq = ApplicationEquipment::find()->where('application_id=:id', [':id' => $application_id])->all();
+
+            if (empty($app_eq)) {
+                Yii::error('Оборудования у заявки не найдены', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Оборудования у заявки не найдены'
+                ];
+            }
+
+            $arr = [];
+
+            /**
+             * @var ApplicationEquipment $value
+             */
+            foreach ($app_eq as $value) {
+                $arr[] =   $value->id;
+            }
+
+            $pay_list_arr = ApplicationPay::find()->where(['in', 'application_equipment_id', $arr])->orderBy('id desc')->all();
+        } else {
+            $pay_list_arr = ApplicationPay::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->orderBy('id desc')->all();
+        }
+
 
         if (empty($pay_list_arr)) {
             Yii::info('Платежей нет', __METHOD__);

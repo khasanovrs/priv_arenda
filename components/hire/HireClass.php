@@ -765,7 +765,7 @@ class HireClass
         $model = $applicationEq->equipments->model;
         $category = $applicationEq->equipments->category->name;
 
-        $pay_list = PayClass::getPayList($applicationEq->id);
+        $pay_list = PayClass::getPayList($application->id, $application->lesa, $applicationEq->id);
 
         if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении платежей', __METHOD__);
