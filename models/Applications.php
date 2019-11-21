@@ -25,6 +25,11 @@ use Yii;
  * @property string $month_sum
  * @property string $square
  * @property string $address
+ * @property string $delivery_sum сумма доставки
+ * @property string $delivery_sum_paid сумма оплаты доставки
+ * @property string $sum сумма
+ * @property string $sum_sale сумма со скидкой
+ * @property string $total_paid оплочено за прокат
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property ApplicationPay[] $applicationPays
@@ -53,10 +58,10 @@ class Applications extends \yii\db\ActiveRecord
     {
         return [
             [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'integer'],
-            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
+            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'sum'], 'required'],
             [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment', 'address'], 'string', 'max' => 500],
-            [['is_not_active', 'lesa', 'square'], 'string', 'max' => 45],
+            [['is_not_active', 'lesa', 'square', 'delivery_sum', 'delivery_sum_paid', 'sum', 'sum_sale', 'total_paid'], 'string', 'max' => 45],
             [['month_sum'], 'string', 'max' => 150],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
@@ -92,6 +97,11 @@ class Applications extends \yii\db\ActiveRecord
             'month_sum' => 'Month Sum',
             'square' => 'Square',
             'address' => 'Address',
+            'delivery_sum' => 'Delivery Sum',
+            'delivery_sum_paid' => 'Delivery Sum Paid',
+            'sum' => 'Sum',
+            'sum_sale' => 'Sum Sale',
+            'total_paid' => 'Total Paid',
         ];
     }
 
