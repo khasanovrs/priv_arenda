@@ -108,7 +108,7 @@ class PayClass
 
         // делим сумму на количество оборудования
         $sum = round($sum / count($arr));
-
+        $group_pay = '';
         foreach ($arr as $value) {
             /**
              * @var ApplicationEquipment $app_eq
@@ -120,6 +120,8 @@ class PayClass
                 return false;
             }
 
+            $group_pay = $group_pay === '' ? date('mdHis') : $group_pay;
+
             $newPay = new ApplicationPay();
             $newPay->user_id = $session->user_id;
             $newPay->sum = ($revertSum ? '-' : '') . $sum;
@@ -128,6 +130,7 @@ class PayClass
             $newPay->application_id = $app_eq->application->id;
             $newPay->client_id = $app_eq->application->client_id;
             $newPay->date_create = date('Y-m-d H:i:s');
+            $newPay->group_pay = $group_pay;
 
             try {
                 if (!$newPay->save(false)) {
@@ -291,14 +294,19 @@ class PayClass
              * @var ApplicationPay $value
              */
             foreach ($pay_list_arr as $value) {
-                $arr = [
-                    'date' => date('d.m.Y H:i', strtotime($value->date_create)),
-                    'user_id' => $value->user->fio,
-                    'sum' => $value->sum,
-                    'cash_box' => $value->cashBox0->name
-                ];
 
-                array_push($pay_list, $arr);
+                if (array_key_exists($value->group_pay, $pay_list)) {
+                    $pay_list[$value->group_pay]['sum'] += $value->sum;
+                } else {
+                    $arr = [
+                        'date' => date('d.m.Y H:i', strtotime($value->date_create)),
+                        'user_id' => $value->user->fio,
+                        'sum' => $value->sum,
+                        'cash_box' => $value->cashBox0->name
+                    ];
+
+                    $pay_list[$value->group_pay] = $arr;
+                }
             }
         }
 

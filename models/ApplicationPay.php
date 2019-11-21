@@ -15,6 +15,7 @@ use Yii;
  * @property int $cashBox
  * @property double $sum
  * @property int $client_id
+ * @property string $group_pay группировка платежей для лесов
  *
  * @property ApplicationEquipment $applicationEquipment
  * @property Users $user
@@ -37,10 +38,11 @@ class ApplicationPay extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['application_equipment_id', 'application_id', 'user_id', 'sum', 'client_id'], 'required'],
+            [['application_equipment_id', 'application_id', 'user_id', 'sum', 'client_id', 'group_pay'], 'required'],
             [['application_equipment_id', 'application_id', 'user_id', 'cashBox', 'client_id'], 'integer'],
             [['date_create'], 'safe'],
             [['sum'], 'number'],
+            [['group_pay'], 'string', 'max' => 45],
             [['application_equipment_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationEquipment::className(), 'targetAttribute' => ['application_equipment_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['cashBox'], 'exist', 'skipOnError' => true, 'targetClass' => FinanceCashbox::className(), 'targetAttribute' => ['cashBox' => 'id']],
@@ -62,6 +64,7 @@ class ApplicationPay extends \yii\db\ActiveRecord
             'cashBox' => 'Cash Box',
             'sum' => 'Sum',
             'client_id' => 'Client ID',
+            'group_pay' => 'Group Pay',
         ];
     }
 
