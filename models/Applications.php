@@ -25,6 +25,7 @@ use Yii;
  * @property string $month_sum
  * @property string $square
  * @property string $address
+ * @property int $delivery_sum_id
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property ApplicationPay[] $applicationPays
@@ -36,6 +37,7 @@ use Yii;
  * @property Users $user
  * @property Branch $branch
  * @property Clients $client
+ * @property ApplicationSumDelivery $deliverySum
  */
 class Applications extends \yii\db\ActiveRecord
 {
@@ -53,8 +55,8 @@ class Applications extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'integer'],
-            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id'], 'required'],
+            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id'], 'integer'],
+            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id'], 'required'],
             [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment', 'address'], 'string', 'max' => 500],
             [['is_not_active', 'lesa', 'square'], 'string', 'max' => 45],
@@ -66,6 +68,7 @@ class Applications extends \yii\db\ActiveRecord
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['delivery_sum_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationSumDelivery::className(), 'targetAttribute' => ['delivery_sum_id' => 'id']],
         ];
     }
 
@@ -93,6 +96,7 @@ class Applications extends \yii\db\ActiveRecord
             'month_sum' => 'Month Sum',
             'square' => 'Square',
             'address' => 'Address',
+            'delivery_sum_id' => 'Delivery Sum ID',
         ];
     }
 
@@ -174,5 +178,13 @@ class Applications extends \yii\db\ActiveRecord
     public function getClient()
     {
         return $this->hasOne(Clients::className(), ['id' => 'client_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliverySum()
+    {
+        return $this->hasOne(ApplicationSumDelivery::className(), ['id' => 'delivery_sum_id']);
     }
 }

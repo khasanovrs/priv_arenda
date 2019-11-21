@@ -6,6 +6,7 @@
 namespace app\components\applications;
 
 use app\components\Clients\ClientsClass;
+use app\components\discount\DeliveryClass;
 use app\components\equipments\EquipmentsClass;
 use app\components\hire\HireClass;
 use app\components\pay\PayClass;
@@ -18,12 +19,15 @@ use app\models\ApplicationsField;
 use app\models\ApplicationsShowField;
 use app\models\ApplicationsStatus;
 use app\models\ApplicationsTypeLease;
+use app\models\ApplicationSum;
 use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
 use app\models\Equipments;
+use app\models\FinanceCashbox;
 use app\models\Source;
 use app\models\Users;
+use Codeception\Application;
 use Yii;
 
 class ApplicationsClass
@@ -549,8 +553,11 @@ class ApplicationsClass
             ];
         }
 
-        $check = Discount::find()->where('id=:id', [':id' => $sale])->one();
-        if (!is_object($check)) {
+        /**
+         * @var Discount $disc
+         */
+        $disc = Discount::find()->where('id=:id', [':id' => $sale])->one();
+        if (!is_object($disc)) {
             Yii::error('Тип скидки не найден, sale: ' . serialize($sale), __METHOD__);
 
             return [
@@ -590,87 +597,41 @@ class ApplicationsClass
             ];
         }
 
-        /**
-         * @var Sessions $Sessions
-         */
-        $Sessions = Yii::$app->get('Sessions');
-        $session = $Sessions->getSession();
+        $app_arr = [];
 
-        $newApplications = new Applications();
-        $newApplications->client_id = $client_id !== '' ? $client_id : 0;
-        $newApplications->user_id = $session->user_id;
-        $newApplications->source_id = $source;
-        $newApplications->discount_id = $sale;
-        $newApplications->delivery_id = $delivery;
-        $newApplications->type_lease_id = $typeLease;
-        $newApplications->branch_id = $branch;
-        $newApplications->comment = $comment;
-        $newApplications->rent_start = $rent_start;
-        $newApplications->rent_end = $rent_end;
-        $newApplications->lesa = +$lesa;
-        $newApplications->date_create = date('Y-m-d H:i:s');
-        $newApplications->month_sum = $month_sum;
-        $newApplications->square = $square;
-        $newApplications->address = $address;
-
-        try {
-            if (!$newApplications->save(false)) {
-                Yii::error('Ошибка при добавлении заявки: ' . serialize($newApplications->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при добавлении заявки: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
-
-        $newApplicationEquipment = '';
         foreach ($equipments as $value) {
             /**
-             * @var Discount $disc
+             * @var Sessions $Sessions
              */
-            $disc = Discount::find()->where('id=:id', [':id' => $sale])->one();
+            $Sessions = Yii::$app->get('Sessions');
+            $session = $Sessions->getSession();
 
-            if (!is_object($disc)) {
-                Yii::info('Ошибка при получении скидки', __METHOD__);
+            $newApplications = new Applications();
+            $newApplications->client_id = $client_id !== '' ? $client_id : 0;
+            $newApplications->user_id = $session->user_id;
+            $newApplications->source_id = $source;
+            $newApplications->discount_id = $sale;
+            $newApplications->delivery_id = $delivery;
+            $newApplications->type_lease_id = $typeLease;
+            $newApplications->branch_id = $branch;
+            $newApplications->comment = $comment;
+            $newApplications->rent_start = $rent_start;
+            $newApplications->rent_end = $rent_end;
+            $newApplications->lesa = +$lesa;
+            $newApplications->date_create = date('Y-m-d H:i:s');
+            $newApplications->month_sum = $month_sum;
+            $newApplications->square = $square;
+            $newApplications->address = $address;
+            $newApplications->delivery_sum_id = 1;
 
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при получении скидки'
-                ];
-            }
-
-            /**
-             * @var Equipments $equipment
-             */
-            $equipment = Equipments::find()->where('id=:id', [':id' => $value->id])->one();
-
-            if (!is_object($equipment)) {
-                Yii::info('Ошибка при получении оборудования', __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при получении оборудования'
-                ];
-            }
-
-            if ($lesa) {
-                $datediff = strtotime($rent_end) - strtotime($rent_start);
-                $price = ($datediff / (60 * 60 * 24)) * ($month_sum / 30);
-                $sale_sum = $month_sum / 30;
-
-                if ((int)$disc->code !== 0) {
-                    $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
-                    $price = $price - ($price * $disc->code / 100);
+            try {
+                if (!$newApplications->save(false)) {
+                    Yii::error('Ошибка при добавлении заявки: ' . serialize($newApplications->getErrors()), __METHOD__);
+                    return false;
                 }
-            } else {
-                $datediff = strtotime($rent_end) - strtotime($rent_start);
-                $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
-                $sale_sum = $equipment->price_per_day;
-
-                if ((int)$disc->code !== 0) {
-                    $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
-                    $price = $price - ($price * $disc->code / 100);
-                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении заявки: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
             }
 
             $newApplicationEquipment = new ApplicationEquipment();
@@ -679,9 +640,6 @@ class ApplicationsClass
             $newApplicationEquipment->status_id = $status;
             $newApplicationEquipment->hire_state_id = $status === 1 ? 4 : 1;
             $newApplicationEquipment->equipments_count = $value->count;
-            $newApplicationEquipment->sum = round($price);
-            $newApplicationEquipment->sum_sale = round($sale_sum);
-            $newApplicationEquipment->delivery_sum = $delivery_sum;
 
             try {
                 if (!$newApplicationEquipment->save(false)) {
@@ -693,12 +651,24 @@ class ApplicationsClass
                 return false;
             }
 
+            /**
+             * @var Equipments $equipment
+             */
+            $equipment = $newApplicationEquipment->equipments;
+
+            if (!is_object($equipment)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
 
             if ($lesa) {
                 Yii::info('Прокат лесов, уменьшаем количество', __METHOD__);
 
                 $equipment->count_hire = (int)$equipment->count_hire + (int)$value->count;
-
                 try {
                     if (!$equipment->save(false)) {
                         Yii::error('Ошибка при сохранении количества оборудования: ' . serialize($equipment->getErrors()), __METHOD__);
@@ -724,13 +694,45 @@ class ApplicationsClass
                     ];
                 }
             }
+
+            $datediff = strtotime($rent_end) - strtotime($rent_start);
+            if ($lesa) {
+                $price = ($datediff / (60 * 60 * 24)) * ($month_sum / 30);
+                $sale_sum = $month_sum / 30;
+            } else {
+                $price = ($datediff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
+                $sale_sum = $equipment->price_per_day;
+            }
+
+            if ((int)$disc->code !== 0) {
+                $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
+                $price = $price - ($price * $disc->code / 100);
+            }
+
+            $newApplicationSum = new ApplicationSum();
+            $newApplicationSum->application_id = $newApplications->id;
+            $newApplicationSum->sum = $price;
+            $newApplicationSum->sum_sale = $sale_sum;
+            $newApplicationSum->total_paid = 0;
+
+            try {
+                if (!$newApplicationSum->save(false)) {
+                    Yii::error('Ошибка при сохранении цены и суммы: ' . serialize($newApplicationSum->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении цены и суммы: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
+            array_push($app_arr,$newApplications->id);
         }
 
-        if (count($payList) !== 0 && is_object($newApplicationEquipment)) {
+        if (count($payList) !== 0) {
             Yii::info('Добавляем платежи', __METHOD__);
 
             foreach ($payList as $valueSecond) {
-                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
+                $checkApp = PayClass::AddPay($app_arr, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
 
                 if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при добавлении платежа', __METHOD__);
@@ -743,17 +745,14 @@ class ApplicationsClass
             }
         }
 
-
         Yii::info('Правим статусы у прокатов', __METHOD__);
 
-        $app_eq = $newApplications->applicationEquipments;
-
-        if (!empty($app_eq)) {
+        if (!empty($app)) {
             /**
              * @var ApplicationEquipment $value
              */
-            foreach ($app_eq as $value) {
-                $check = HireClass::checkHire($value->id);
+            foreach ($app_arr as $key => $value) {
+                $check = HireClass::checkHire($key);
 
                 if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
                     Yii::error('Ошибка при определии статуса', __METHOD__);
