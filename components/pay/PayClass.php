@@ -295,8 +295,8 @@ class PayClass
              */
             foreach ($pay_list_arr as $value) {
 
-                if (array_key_exists($value->group_pay, $pay_list)) {
-                    $pay_list[$value->group_pay]['sum'] += $value->sum;
+                if (array_key_exists($value->group_pay . $value->cashBox, $pay_list)) {
+                    $pay_list[$value->group_pay. $value->cashBox]['sum'] += $value->sum;
                 } else {
                     $arr = [
                         'date' => date('d.m.Y H:i', strtotime($value->date_create)),
@@ -305,7 +305,7 @@ class PayClass
                         'cash_box' => $value->cashBox0->name
                     ];
 
-                    $pay_list[$value->group_pay] = $arr;
+                    $pay_list[$value->group_pay . $value->cashBox] = $arr;
                 }
             }
         }

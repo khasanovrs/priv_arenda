@@ -623,6 +623,7 @@ class ApplicationsClass
             return false;
         }
 
+        $newApplicationEquipment = '';
         foreach ($equipments as $value) {
             /**
              * @var Discount $disc
@@ -723,32 +724,45 @@ class ApplicationsClass
                     ];
                 }
             }
+        }
 
-            if (count($payList) !== 0) {
-                foreach ($payList as $valueSecond) {
-                    $checkApp = PayClass::AddPay($newApplicationEquipment->id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
+        if (count($payList) !== 0 && is_object($newApplicationEquipment)) {
+            Yii::info('Добавляем платежи', __METHOD__);
 
-                    if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
-                        Yii::error('Ошибка при добавлении платежа', __METHOD__);
+            foreach ($payList as $valueSecond) {
+                $checkApp = PayClass::AddPay($newApplicationEquipment->id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
 
-                        return [
-                            'status' => 'ERROR',
-                            'msg' => 'Ошибка при добавлении платежа',
-                        ];
-                    }
+                if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при добавлении платежа', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при добавлении платежа',
+                    ];
                 }
-
             }
+        }
 
-            $check = HireClass::checkHire($newApplicationEquipment->id);
 
-            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-                Yii::error('Ошибка при определии статуса', __METHOD__);
+        Yii::info('Правим статусы у прокатов', __METHOD__);
 
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при изменении состояния',
-                ];
+        $app_eq = $newApplications->applicationEquipments;
+
+        if (!empty($app_eq)) {
+            /**
+             * @var ApplicationEquipment $value
+             */
+            foreach ($app_eq as $value) {
+                $check = HireClass::checkHire($value->id);
+
+                if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+                    Yii::error('Ошибка при определии статуса', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Ошибка при изменении состояния',
+                    ];
+                }
             }
         }
 
