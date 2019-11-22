@@ -19,7 +19,6 @@ use app\models\HireLesaField;
 use app\models\HireLesaShowField;
 use app\models\HireShowField;
 use app\models\HireState;
-use app\models\HireStatus;
 use app\models\Users;
 use Yii;
 
@@ -294,7 +293,7 @@ class HireClass
         }
 
         /**
-         * @var HireStatus $value
+         * @var HireState $value
          */
         foreach ($list as $value) {
             $result[] = [
