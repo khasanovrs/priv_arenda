@@ -1017,8 +1017,8 @@ class HireClass
                 $price = $price - ($price * $applications->discount->code / 100);
             }
 
-            $value->sum = round($price);
-            $value->hire_state_id = 4;
+            $applications->sum = round($price);
+            $applications->hire_state_id = 4;
             $value->renewals_date = date('Y-m-d H:i:s');
 
             Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
@@ -1033,16 +1033,26 @@ class HireClass
                 return false;
             }
 
-            $check = self::checkHire($value->id);
-
-            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-                Yii::error('Ошибка при продлении контракта', __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при изменении состояния',
-                ];
+            try {
+                if (!$applications->save(false)) {
+                    Yii::error('Ошибка при сохранении новой суммы: ' . serialize($applications->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
             }
+        }
+
+        $check = self::checkHire($applications->id);
+
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении состояния',
+            ];
         }
 
 
@@ -1066,7 +1076,7 @@ class HireClass
         $extension->date_create = date('Y-m-d H:i:s');
         $extension->user_id = $session->user_id;
         $extension->type = $applications->type_lease_id;
-        $extension->application_equipment_id = $value->id;
+        $extension->application_id = $applications->id;
 
         try {
             if (!$extension->save(false)) {
@@ -1153,9 +1163,7 @@ class HireClass
 
         Yii::info('Получаем информацию заявки с оборудованием', __METHOD__);
 
-
         $app_eq = $applications->applicationEquipments;
-
         if (empty($app_eq)) {
             Yii::info('Ошибка при получении заявки с оборудованием', __METHOD__);
 
@@ -1192,7 +1200,7 @@ class HireClass
                 $price = $price - ($price * $applications->discount->code / 100);
             }
 
-            $value->sum = round($price);
+            $applications->sum = round($price);
 
             Yii::info('Сохраняем сумму, сумма: ' . serialize($price), __METHOD__);
 
@@ -1205,19 +1213,17 @@ class HireClass
                 Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
-
-            $check = self::checkHire($value->id);
-
-            if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
-                Yii::error('Ошибка при продлении контракта', __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при изменении состояния',
-                ];
-            }
         }
 
+        $check = self::checkHire($applications->id);
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при продлении контракта', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении состояния',
+            ];
+        }
 
         /**
          * @var Sessions $Sessions
@@ -1239,7 +1245,7 @@ class HireClass
         $extension->date_create = date('Y-m-d H:i:s');
         $extension->user_id = $session->user_id;
         $extension->type = $applications->type_lease_id;
-        $extension->application_equipment_id = $value->id;
+        $extension->application_id = $applications->id;
 
         try {
             if (!$extension->save(false)) {
