@@ -1661,9 +1661,10 @@ class HireClass
         };
 
         $eq_status = $app->applicationEquipments[0]->equipments->status;
+        $msg = 'Состояние успешно изменено';
 
         // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
-        if ($app->sum <= $app->total_paid && $dateDiff < 3 &&  $eq_status=== 4) {
+        if ($app->sum <= $app->total_paid && $dateDiff < 3 && $eq_status === 4) {
             $hire_state_id = 3;
             $msg = 'Прокат успешно закрыт';
         }
@@ -1696,7 +1697,7 @@ class HireClass
 
         return [
             'status' => 'SUCCESS',
-            'msg' => $msg || 'Состояние успешно изменено'
+            'msg' => $msg
         ];
     }
 }

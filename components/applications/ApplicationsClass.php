@@ -651,6 +651,8 @@ class ApplicationsClass
             $newApplications->sum = $price;
             $newApplications->sum_sale = $sale_sum;
             $newApplications->total_paid = 0;
+            $newApplications->status_id = $status;
+            $newApplications->hire_state_id = $status === 1 ? 4 : 1;
 
             try {
                 if (!$newApplications->save(false)) {
@@ -665,8 +667,6 @@ class ApplicationsClass
             $newApplicationEquipment = new ApplicationEquipment();
             $newApplicationEquipment->application_id = $newApplications->id;
             $newApplicationEquipment->equipments_id = $value->id;
-            $newApplicationEquipment->status_id = $status;
-            $newApplicationEquipment->hire_state_id = $status === 1 ? 4 : 1;
             $newApplicationEquipment->equipments_count = $value->count;
 
             try {
@@ -694,14 +694,20 @@ class ApplicationsClass
                 }
             }
 
-            if (count($value['payList']) !== 0) {
+            Yii::info('Добавляем платежи', __METHOD__);
+
+            if (count($value->payList) !== 0) {
                 Yii::info('Добавляем платежи', __METHOD__);
 
-                foreach ($value['payList'] as $valueSecond) {
+                foreach ($value->payList as $valueSecond) {
                     $checkApp = PayClass::AddPay($newApplications->id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
 
                     if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                         Yii::error('Ошибка при добавлении платежа', __METHOD__);
+
+                        if (is_array($checkApp) && isset($checkApp['status']) && $checkApp['status'] === 'ERROR') {
+                            return $checkApp;
+                        }
 
                         return [
                             'status' => 'ERROR',
