@@ -44,6 +44,7 @@ use Yii;
  * @property ApplicationSumDelivery $deliverySum
  * @property ApplicationsStatus $status
  * @property HireState $hireState
+ * @property Extension[] $extensions
  */
 class Applications extends \yii\db\ActiveRecord
 {
@@ -207,5 +208,13 @@ class Applications extends \yii\db\ActiveRecord
     public function getHireState()
     {
         return $this->hasOne(HireState::className(), ['id' => 'hire_state_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExtensions()
+    {
+        return $this->hasMany(Extension::className(), ['application_id' => 'id']);
     }
 }

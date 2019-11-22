@@ -190,52 +190,16 @@ class PayClass
 
     /**
      * Получение списка платежей
-     * @param $application_id
-     * @param $lesa
-     * @param $application_equipment_id
+     * @param $app_id
      * @return array
      */
-    public static function getPayList($application_id, $lesa, $application_equipment_id)
+    public static function getPayList($app_id)
     {
         Yii::info('Запуск функции getPayList', __METHOD__);
 
-        if ($application_equipment_id === '') {
-            Yii::error('Не указана идентификатор заявки', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не указана идентификатор заявки'
-            ];
-        }
-
         $pay_list = [];
 
-        if ($lesa === '1') {
-            $app_eq = ApplicationEquipment::find()->where('application_id=:id', [':id' => $application_id])->all();
-
-            if (empty($app_eq)) {
-                Yii::error('Оборудования у заявки не найдены', __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Оборудования у заявки не найдены'
-                ];
-            }
-
-            $arr = [];
-
-            /**
-             * @var ApplicationEquipment $value
-             */
-            foreach ($app_eq as $value) {
-                $arr[] = $value->id;
-            }
-
-            $pay_list_arr = ApplicationPay::find()->where(['in', 'application_equipment_id', $arr])->orderBy('id desc')->all();
-        } else {
-            $pay_list_arr = ApplicationPay::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->orderBy('id desc')->all();
-        }
-
+        $pay_list_arr = ApplicationPay::find()->where('application_id=:application_id', [':application_id' => $app_id])->orderBy('id desc')->all();
 
         if (empty($pay_list_arr)) {
             Yii::info('Платежей нет', __METHOD__);
@@ -244,19 +208,13 @@ class PayClass
              * @var ApplicationPay $value
              */
             foreach ($pay_list_arr as $value) {
+                $pay_list[] = [
+                    'date' => date('d.m.Y H:i', strtotime($value->date_create)),
+                    'user_id' => $value->user->fio,
+                    'sum' => $value->sum,
+                    'cash_box' => $value->cashBox0->name
+                ];
 
-                if (array_key_exists($value->group_pay . $value->cashBox, $pay_list)) {
-                    $pay_list[$value->group_pay . $value->cashBox]['sum'] += $value->sum;
-                } else {
-                    $arr = [
-                        'date' => date('d.m.Y H:i', strtotime($value->date_create)),
-                        'user_id' => $value->user->fio,
-                        'sum' => $value->sum,
-                        'cash_box' => $value->cashBox0->name
-                    ];
-
-                    $pay_list[$value->group_pay . $value->cashBox] = $arr;
-                }
             }
         }
 
@@ -271,14 +229,14 @@ class PayClass
 
     /**
      * Получение списка продлений
-     * @param $application_equipment_id
+     * @param $app_id
      * @return array
      */
-    public static function getExtensions($application_equipment_id)
+    public static function getExtensions($app_id)
     {
         Yii::info('Запуск функции getExtensions', __METHOD__);
 
-        if ($application_equipment_id === '') {
+        if ($app_id === '') {
             Yii::error('Не указана идентификатор заявки', __METHOD__);
 
             return [
@@ -289,7 +247,7 @@ class PayClass
 
         $extension_list = [];
 
-        $extensions_arr = Extension::find()->where('application_equipment_id=:id', ['id' => $application_equipment_id])->orderBy('id desc')->all();
+        $extensions_arr = Extension::find()->where('application_id=:id', ['id' => $app_id])->orderBy('id desc')->all();
 
         if (empty($extensions_arr)) {
             Yii::info('Платежей нет', __METHOD__);

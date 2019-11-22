@@ -548,7 +548,7 @@ class HireClass
         foreach ($list as $value) {
             $date_cr = date('Y-m-d');
 
-            if (count($value->applicationEquipments)===0) {
+            if (count($value->applicationEquipments) === 0) {
                 Yii::info('Список пуст', __METHOD__);
                 continue;
             }
@@ -671,23 +671,11 @@ class HireClass
         }
 
         /**
-         * @var ApplicationEquipment $applicationEq
+         * @var Applications $app
          */
-        $applicationEq = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
+        $app = Applications::find()->where('id=:id', [':id' => $id])->one();
 
-        if (!is_object($applicationEq)) {
-            Yii::info('Ошибка при получении оборудования у заявки', __METHOD__);
-
-            return [
-                'status' => 'SUCCESS',
-                'msg' => 'Ошибка при получении заявки'
-            ];
-        }
-
-
-        $application = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
-
-        if (!is_object($application)) {
+        if (!is_object($app)) {
             Yii::info('Ошибка при получении заявки', __METHOD__);
 
             return [
@@ -696,17 +684,29 @@ class HireClass
             ];
         }
 
-        /**
-         * @var Applications $application
-         */
+        $client = ClientsClass::GetClientInfo($app->client_id);
 
-        $client = ClientsClass::GetClientInfo($application->client_id);
+        if ($app->lesa === '0') {
+            $eq = $app->applicationEquipments[0]->equipments;
+            $mark = $eq->mark0->name;
+            $model = $eq->model;
+            $category = $eq->category->name;
+            $nameEq = $category . ' ' . $mark . ' ' . $model;
+            $stateEq = $eq->status0->name;
+            $statusEq = $eq->status;
+            $photoEq = $eq->photo;
+            $photo_aliasEq = $eq->photo_alias;
+        } else {
+            $eq = $app->applicationEquipments[0]->equipments;
 
-        $mark = $applicationEq->equipments->mark0->name;
-        $model = $applicationEq->equipments->model;
-        $category = $applicationEq->equipments->category->name;
+            $nameEq = 'Леса';
+            $stateEq = $eq->status0->name;
+            $statusEq = $eq->status;
+            $photoEq = '';
+            $photo_aliasEq = '';
+        }
 
-        $pay_list = PayClass::getPayList($application->id, $application->lesa, $applicationEq->id);
+        $pay_list = PayClass::getPayList($app->id);
 
         if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении платежей', __METHOD__);
@@ -721,7 +721,7 @@ class HireClass
             ];
         }
 
-        $extensions_list = PayClass::getExtensions($applicationEq->id);
+        $extensions_list = PayClass::getExtensions($app->id);
 
         if (!is_array($extensions_list) || !isset($extensions_list['status']) || $extensions_list['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении продлений', __METHOD__);
@@ -737,53 +737,50 @@ class HireClass
         }
 
         $result = [
-            'id' => $applicationEq->id,
-            'branch' => $application->branch->name,
-            'app_id' => $application->id,
-            'delivery' => $application->delivery_id,
-            'typeLease' => $application->typeLease->name,
-            'typeLease_id' => $application->type_lease_id,
-            'sale' => $application->discount_id,
-            'hire_state_id' => $applicationEq->hire_state_id,
-            'hire_state' => $applicationEq->hireState->name,
-            'source' => $application->source->name,
-            'comment' => $application->comment,
-            'rent_start' => $application->rent_start,
-            'rent_end' => $application->rent_end,
+            'id' => $app->id,
+            'branch' => $app->branch->name,
+            'app_id' => $app->id,
+            'delivery' => $app->delivery_id,
+            'typeLease' => $app->typeLease->name,
+            'typeLease_id' => $app->type_lease_id,
+            'sale' => $app->discount_id,
+            'hire_state_id' => $app->hire_state_id,
+            'hire_state' => $app->hireState->name,
+            'source' => $app->source->name,
+            'comment' => $app->comment,
+            'rent_start' => $app->rent_start,
+            'rent_end' => $app->rent_end,
             'client_fio' => $client->name,
             'client_phone' => $client->phone,
-            'delivery_sum' => $applicationEq->delivery_sum,
-            'sum' => $applicationEq->sum,
-            'total_paid' => $application->lesa === '1' ? 0 : $applicationEq->total_paid,
-            'remainder' => $application->lesa === '1' ? 0 : $applicationEq->sum - $applicationEq->total_paid,
+            //'delivery_sum' => $app->delivery_sum, //@todo сделать
+            'sum' => $app->sum,
+            'total_paid' => $app->total_paid,
+            'remainder' => $app->sum - $app->total_paid,
             'count' => 0,
             'equipments' =>
                 [
-                    'equipments_id' => $applicationEq->equipments_id,
-                    'name' => $category . ' ' . $mark . ' ' . $model,
-                    'state' => $applicationEq->equipments->status0->name,
-                    'state_id' => $applicationEq->equipments->status,
-                    'photo' => $applicationEq->equipments->photo,
-                    'photo_alias' => $applicationEq->equipments->photo_alias
+                    'name' => $nameEq,
+                    'state' => $stateEq,
+                    'state_id' => $statusEq,
+                    'photo' => $photoEq,
+                    'photo_alias' => $photo_aliasEq
                 ],
             'extensions' => $extensions_list['data'],
             'pay_list' => $pay_list['data'],
-            'lesa' => $application->lesa,
+            'lesa' => $app->lesa,
             'rama_prokhodnaya' => 0,
             'rama_letsnitsey' => 0,
             'diagonalnaya_svyaz' => 0,
             'gorizontalnaya_svyaz' => 0,
             'rigel' => 0,
             'nastil' => 0,
-            'month_sum' => $application->month_sum,
-            'square' => $application->square,
-            'address' => $application->address,
+            'month_sum' => $app->month_sum,
+            'square' => $app->square,
+            'address' => $app->address,
         ];
 
-        if ($application->lesa === '1') {
-            $result['equipments']['name'] = 'Леса';
-
-            $list = ApplicationEquipment::find()->joinWith(['application'])->where('application_id=:application_id', [':application_id' => $application->id])->orderBy('id desc')->all();
+        if ($app->lesa === '1') {
+            $list = $app->applicationEquipments;
 
             if (!empty($list)) {
 
@@ -806,9 +803,6 @@ class HireClass
                     } elseif ($type == 'Настил') {
                         $result['nastil'] = $value->equipments_count;
                     }
-
-                    $result['total_paid'] += (float)$value->total_paid; // всего оплачено
-                    $result['remainder'] = $result['sum'] - $result['total_paid']; // остаток
                 }
             }
         }
