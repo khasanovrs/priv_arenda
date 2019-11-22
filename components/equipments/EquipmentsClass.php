@@ -403,7 +403,7 @@ class EquipmentsClass
             $listFilter[] = 'is_not_active=0 and status!=7';
         }
 
-        $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category', 'equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+        $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'status0', 'stock', 'type0', 'category', 'equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
         if (!is_array($equipmentsTypeList)) {
             Yii::error('Список категорий оборудования пуст', __METHOD__);
