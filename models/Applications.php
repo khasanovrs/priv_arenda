@@ -26,10 +26,14 @@ use Yii;
  * @property string $square
  * @property string $address
  * @property int $delivery_sum_id
+ * @property string $sum сумма
+ * @property string $sum_sale сумма со скидкой
+ * @property string $total_paid оплочено за прокат
+ * @property int $status_id
+ * @property int $hire_state_id
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property ApplicationPay[] $applicationPays
- * @property ApplicationSum[] $applicationSums
  * @property Source $source
  * @property Discount $discount
  * @property ApplicationsDelivery $delivery
@@ -38,6 +42,8 @@ use Yii;
  * @property Branch $branch
  * @property Clients $client
  * @property ApplicationSumDelivery $deliverySum
+ * @property ApplicationsStatus $status
+ * @property HireState $hireState
  */
 class Applications extends \yii\db\ActiveRecord
 {
@@ -55,11 +61,11 @@ class Applications extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id'], 'integer'],
-            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id'], 'required'],
+            [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id', 'status_id', 'hire_state_id'], 'integer'],
+            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id', 'sum', 'status_id', 'hire_state_id'], 'required'],
             [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment', 'address'], 'string', 'max' => 500],
-            [['is_not_active', 'lesa', 'square'], 'string', 'max' => 45],
+            [['is_not_active', 'lesa', 'square', 'sum', 'sum_sale', 'total_paid'], 'string', 'max' => 45],
             [['month_sum'], 'string', 'max' => 150],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
@@ -69,6 +75,8 @@ class Applications extends \yii\db\ActiveRecord
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
             [['delivery_sum_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationSumDelivery::className(), 'targetAttribute' => ['delivery_sum_id' => 'id']],
+            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ApplicationsStatus::className(), 'targetAttribute' => ['status_id' => 'id']],
+            [['hire_state_id'], 'exist', 'skipOnError' => true, 'targetClass' => HireState::className(), 'targetAttribute' => ['hire_state_id' => 'id']],
         ];
     }
 
@@ -97,6 +105,11 @@ class Applications extends \yii\db\ActiveRecord
             'square' => 'Square',
             'address' => 'Address',
             'delivery_sum_id' => 'Delivery Sum ID',
+            'sum' => 'Sum',
+            'sum_sale' => 'Sum Sale',
+            'total_paid' => 'Total Paid',
+            'status_id' => 'Status ID',
+            'hire_state_id' => 'Hire State ID',
         ];
     }
 
@@ -114,14 +127,6 @@ class Applications extends \yii\db\ActiveRecord
     public function getApplicationPays()
     {
         return $this->hasMany(ApplicationPay::className(), ['application_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getApplicationSums()
-    {
-        return $this->hasMany(ApplicationSum::className(), ['application_id' => 'id']);
     }
 
     /**
@@ -186,5 +191,21 @@ class Applications extends \yii\db\ActiveRecord
     public function getDeliverySum()
     {
         return $this->hasOne(ApplicationSumDelivery::className(), ['id' => 'delivery_sum_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStatus()
+    {
+        return $this->hasOne(ApplicationsStatus::className(), ['id' => 'status_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHireState()
+    {
+        return $this->hasOne(HireState::className(), ['id' => 'hire_state_id']);
     }
 }

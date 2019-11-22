@@ -9,6 +9,7 @@ use app\components\Clients\ClientsClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
+use app\models\Applications;
 use app\models\Extension;
 use app\models\FinanceCashbox;
 use Yii;
@@ -17,13 +18,13 @@ class PayClass
 {
     /**
      * @param $sum
-     * @param $application_equipment_id
+     * @param $application_id
      * @param $cashBox
      * @param $revertSum
      * @return array | bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function AddPay($application_equipment_id, $sum, $cashBox, $revertSum)
+    public static function AddPay($application_id, $sum, $cashBox, $revertSum)
     {
         Yii::info('Запуск функции AddPay', __METHOD__);
 
@@ -36,7 +37,7 @@ class PayClass
             ];
         }
 
-        if ($application_equipment_id === '') {
+        if ($application_id === '') {
             Yii::info('Не указана идентификатор заявки', __METHOD__);
 
             return [
@@ -70,166 +71,115 @@ class PayClass
         }
 
         /**
-         * @var ApplicationEquipment $app_eq
+         * @var Applications $app
          */
-        $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $application_equipment_id])->one();
-
-        if (!is_object($app_eq)) {
-            Yii::error('Заявка на оборудование не найдено: ' . serialize($app_eq), __METHOD__);
-            return false;
-        }
-
-        $app = $app_eq->application;
+        $app = Applications::find()->where('id=:id', [':id' => $application_id])->one();
 
         if (!is_object($app)) {
-            Yii::error('Заявка на оборудование не найдено: ' . serialize($app_eq), __METHOD__);
+            Yii::error('Заявка на оборудование не найдено: ' . serialize($app), __METHOD__);
             return false;
         }
 
-        $arr = [];
-        if ($app->lesa === '1') {
-            $arr_list = ApplicationEquipment::find()->where('application_id=:id', [':id' => $app->id])->all();
+        $eq = $app->applicationEquipments[0]->equipments;
 
-            if (empty($arr_list)) {
-                Yii::error('Оборудования лесов не найдены: ' . serialize($app_eq), __METHOD__);
-                return false;
-            }
-
-            /**
-             * @var ApplicationEquipment $value
-             */
-            foreach ($arr_list as $value) {
-                $arr[] = $value->id;
-            }
-        } else {
-            $arr[] = $application_equipment_id;
+        if (!is_object($eq)) {
+            Yii::error('Оборудование не найдено', __METHOD__);
+            return false;
         }
 
+        if ((int)$eq->selling_price === 0) {
+            Yii::info('Необходимо указать сумму за сутки у оборудования', __METHOD__);
 
-        // делим сумму на количество оборудования
-        $sum = round($sum / count($arr));
-        $group_pay = '';
-        foreach ($arr as $value) {
-            /**
-             * @var ApplicationEquipment $app_eq
-             */
-            $app_eq = ApplicationEquipment::find()->where('id=:id', [':id' => $value])->one();
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Необходимо указать сумму за сутки у оборудования'
+            ];
+        }
 
-            if (!is_object($app_eq)) {
-                Yii::error('Заявка на оборудование не найдено: ' . serialize($app_eq), __METHOD__);
+        $newPay = new ApplicationPay();
+        $newPay->user_id = $session->user_id;
+        $newPay->sum = ($revertSum ? '-' : '') . $sum;
+        $newPay->cashBox = $cashBox;
+        $newPay->application_id = $app->id;
+        $newPay->client_id = $app->client_id;
+        $newPay->date_create = date('Y-m-d H:i:s');
+
+        try {
+            if (!$newPay->save(false)) {
+                Yii::error('Ошибка при добавлении платежа: ' . serialize($newPay->getErrors()), __METHOD__);
                 return false;
             }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении нового платежа: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
 
-            $group_pay = $group_pay === '' ? date('mdHis') : $group_pay;
+        Yii::info('Обновляем общую сумму', __METHOD__);
 
-            $newPay = new ApplicationPay();
-            $newPay->user_id = $session->user_id;
-            $newPay->sum = ($revertSum ? '-' : '') . $sum;
-            $newPay->cashBox = $cashBox;
-            $newPay->application_equipment_id = $value;
-            $newPay->application_id = $app_eq->application->id;
-            $newPay->client_id = $app_eq->application->client_id;
-            $newPay->date_create = date('Y-m-d H:i:s');
-            $newPay->group_pay = $group_pay;
+        if ($newPay->cashBox0->check_zalog === '0' && $newPay->cashBox0->delivery === '0') {
+            Yii::info('Работаем полем "Оплачено всего"', __METHOD__);
+            if ($revertSum) {
+                $app->total_paid = (float)$app->total_paid - (float)$sum;
+            } else {
+                $app->total_paid = (float)$app->total_paid + (float)$sum;
+            }
+
+            Yii::info('Работа с полем "выручка"', __METHOD__);
+
+            if ($revertSum) {
+                $eq->revenue = (float)$eq->revenue - (float)$sum;
+            } else {
+                $eq->revenue = (float)$eq->revenue + (float)$sum;
+            }
+
+            $eq->profit = (float)$eq->revenue - (float)$eq->repairs_sum;
+            $eq->payback_ratio = round($eq->profit == 0 ? 0 : (float)$eq->profit / (float)$eq->selling_price, 2);
 
             try {
-                if (!$newPay->save(false)) {
-                    Yii::error('Ошибка при добавлении платежа: ' . serialize($newPay->getErrors()), __METHOD__);
+                if (!$eq->save(false)) {
+                    Yii::error('Ошибка при сохранении информации по оборудованию: ' . serialize($eq->getErrors()), __METHOD__);
                     return false;
                 }
             } catch (\Exception $e) {
-                Yii::error('Поймали Exception при добавлении нового платежа: ' . serialize($e->getMessage()), __METHOD__);
+                Yii::error('Поймали Exception при сохранении информации по оборудованию: ' . serialize($e->getMessage()), __METHOD__);
                 return false;
             }
 
-            Yii::info('Обновляем общую сумму', __METHOD__);
+            $clientId = $app->client_id;
 
-            if ($newPay->cashBox0->check_zalog === '0' && $newPay->cashBox0->delivery === '0') {
-                Yii::info('Работаем полем "Оплачено всего"', __METHOD__);
-                if ($revertSum) {
-                    $app_eq->total_paid = (float)$app_eq->total_paid - (float)$sum;
-                } else {
-                    $app_eq->total_paid = (float)$app_eq->total_paid + (float)$sum;
-                }
+            $checkChangeBonusAccount = ClientsClass::changeBonusAccountClient($clientId, $sum, $revertSum);
 
-                $eq = $app_eq->equipments;
-
-                if (!is_object($eq)) {
-                    Yii::error('Оборудование не найдено', __METHOD__);
-                    return false;
-                }
-
-                if ((int)$eq->selling_price === 0) {
-                    Yii::info('Необходимо указать сумму за сутки у оборудования', __METHOD__);
-
-                    return [
-                        'status' => 'ERROR',
-                        'msg' => 'Необходимо указать сумму за сутки у оборудования'
-                    ];
-                }
-
-                Yii::info('Работа с полем "выручка"', __METHOD__);
-
-                if ($revertSum) {
-                    $eq->revenue = (float)$eq->revenue - (float)$sum;
-                } else {
-                    $eq->revenue = (float)$eq->revenue + (float)$sum;
-                }
-
-                $eq->profit = (float)$eq->revenue - (float)$eq->repairs_sum;
-                $eq->payback_ratio = round($eq->profit == 0 ? 0 : (float)$eq->profit / (float)$eq->selling_price, 2);
-
-                try {
-                    if (!$eq->save(false)) {
-                        Yii::error('Ошибка при сохранении информации по оборудованию: ' . serialize($eq->getErrors()), __METHOD__);
-                        return false;
-                    }
-                } catch (\Exception $e) {
-                    Yii::error('Поймали Exception при сохранении информации по оборудованию: ' . serialize($e->getMessage()), __METHOD__);
-                    return false;
-                }
-
-                $clientId = $app_eq->application->client_id;
-
-                $checkChangeBonusAccount = ClientsClass::changeBonusAccountClient($clientId, $sum, $revertSum);
-
-                if (!is_array($checkChangeBonusAccount) || !isset($checkChangeBonusAccount['status']) || $checkChangeBonusAccount['status'] != 'SUCCESS') {
-                    Yii::error('Ошибка при изменении бонусного счета клиента', __METHOD__);
-
-                    return [
-                        'status' => 'ERROR',
-                        'msg' => 'Ошибка при изменении бонусного счета клиента',
-                    ];
-                }
-            } elseif ($newPay->cashBox0->delivery === '1') {
-                Yii::info('Работаем полем "оплата доставки"', __METHOD__);
-                if ($revertSum) {
-                    $app_eq->delivery_sum_paid = (float)$app_eq->delivery_sum_paid - (float)$sum;
-                } else {
-                    $app_eq->delivery_sum_paid = (float)$app_eq->delivery_sum_paid + (float)$sum;
-                }
-            }
-
-            try {
-                if (!$app_eq->save(false)) {
-                    Yii::error('Ошибка при сохранении общей суммы платежа: ' . serialize($app_eq->getErrors()), __METHOD__);
-                    return false;
-                }
-            } catch (\Exception $e) {
-                Yii::error('Поймали Exception при сохранении общей суммы платежа: ' . serialize($e->getMessage()), __METHOD__);
-                return false;
-            }
-
-            $check_update = self::updateCashBox($cashBox, $sum, $revertSum);
-
-            if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
-                Yii::error('Ошибка при обновлении кассы', __METHOD__);
+            if (!is_array($checkChangeBonusAccount) || !isset($checkChangeBonusAccount['status']) || $checkChangeBonusAccount['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменении бонусного счета клиента', __METHOD__);
 
                 return [
                     'status' => 'ERROR',
-                    'msg' => 'Ошибка при обновлении кассы',
+                    'msg' => 'Ошибка при изменении бонусного счета клиента',
                 ];
             }
+        } elseif ($newPay->cashBox0->delivery === '1') {
+            //@todo доставка
+        }
+
+        try {
+            if (!$app->save(false)) {
+                Yii::error('Ошибка при сохранении общей суммы платежа: ' . serialize($app->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении общей суммы платежа: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        $check_update = self::updateCashBox($cashBox, $sum, $revertSum);
+
+        if (!is_array($check_update) || !isset($check_update['status']) || $check_update['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при обновлении кассы', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при обновлении кассы',
+            ];
         }
 
         return [
@@ -296,7 +246,7 @@ class PayClass
             foreach ($pay_list_arr as $value) {
 
                 if (array_key_exists($value->group_pay . $value->cashBox, $pay_list)) {
-                    $pay_list[$value->group_pay. $value->cashBox]['sum'] += $value->sum;
+                    $pay_list[$value->group_pay . $value->cashBox]['sum'] += $value->sum;
                 } else {
                     $arr = [
                         'date' => date('d.m.Y H:i', strtotime($value->date_create)),
