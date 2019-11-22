@@ -274,46 +274,6 @@ class HireClass
     }
 
     /**
-     * Получение статусов проката
-     * @return bool|array
-     */
-    public static function GetHireStatus()
-    {
-        Yii::info('Запуск функции GetHireStatus', __METHOD__);
-        $result = [];
-
-        $list = HireStatus::find()->orderBy('id')->all();
-
-        if (!is_array($list)) {
-            Yii::error('Список статусов проката пуст', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список статусов проката пуст'
-            ];
-        }
-
-        /**
-         * @var HireStatus $value
-         */
-        foreach ($list as $value) {
-            $result[] = [
-                'val' => $value->id,
-                'name' => $value->name,
-                'color' => $value->color
-            ];
-        }
-
-        Yii::info('Список статусов проката получен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => 'Список статусов проката получен',
-            'data' => $result
-        ];
-    }
-
-    /**
      * Получение состояний проката
      * @return bool|array
      */
@@ -349,62 +309,6 @@ class HireClass
             'status' => 'SUCCESS',
             'msg' => 'Список состояний проката получен',
             'data' => $result
-        ];
-    }
-
-    /**
-     * Добавление нового статуса для проката
-     * @param $name
-     * @param $color
-     * @param $val
-     * @return bool|array
-     */
-    public static function AddStatus($name, $color, $val)
-    {
-        Yii::info('Запуск функции добавления нового статуса для проката', __METHOD__);
-
-        if ($name === '') {
-            Yii::error('Ни передано наименование статуса, name:' . serialize($name), __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ни передано наименование статуса',
-            ];
-        }
-
-        if ($val !== '') {
-            $new_status = HireStatus::find()->where('id=:id', [':id' => $val])->one();
-
-            if (!is_object($new_status)) {
-                Yii::error('Передан некорректный идентификатор, id:' . serialize($val), __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Передан некорректный идентификатор',
-                ];
-            }
-        } else {
-            $new_status = new HireStatus();
-        }
-
-        $new_status->name = $name;
-        $new_status->color = $color;
-
-        try {
-            if (!$new_status->save(false)) {
-                Yii::error('Ошибка при добавлении нового статуса для проката: ' . serialize($new_status->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при добавлении нового статуса для проката: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
-
-        Yii::info('Статус для проката успешно добавлен', __METHOD__);
-
-        return [
-            'status' => 'SUCCESS',
-            'msg' => $val === '' ? 'Статус для проката успешно добавлен' : 'Статус для проката успешно обновлен'
         ];
     }
 
