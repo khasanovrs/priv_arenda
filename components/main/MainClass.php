@@ -165,12 +165,12 @@ class MainClass
             }
 
             $applicationPayArr = ApplicationPay::find()
-                ->joinWith(['applicationEquipment', 'applicationEquipment.application'])
+                ->joinWith(['application', 'application.applicationEquipments'])
                 ->where('applications.branch_id=:branch and application_pay.date_create BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
                 ->all();
         } else {
             $applicationPayArr = ApplicationPay::find()
-                ->joinWith(['applicationEquipment', 'applicationEquipment.application'])
+                ->joinWith(['application', 'application.applicationEquipments'])
                 ->where('application_pay.date_create BETWEEN :date_start and :date_end', [':date_start' => $date_start, ':date_end' => $date_end])
                 ->all();
         }

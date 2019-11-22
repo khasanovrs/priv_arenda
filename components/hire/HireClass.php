@@ -512,22 +512,22 @@ class HireClass
 
         if ($show_close_hire === '0') {
             Yii::info('Параметр show_close_hire: ' . serialize($show_close_hire), __METHOD__);
-            $listFilter[] = 'hire_state_id!=3';
+            $listFilter[] = 'applications.hire_state_id!=3';
         }
 
         if ($stockUser !== '') {
-            $listFilter[] = 'applications.is_not_active=0 and status_id in (1,2) and applications.branch_id=' . $stockUser;
+            $listFilter[] = 'applications.is_not_active=0 and applications.status_id in (1,2) and applications.branch_id=' . $stockUser;
         } else {
-            $listFilter[] = 'applications.is_not_active=0 and status_id in (1,2)';
+            $listFilter[] = 'applications.is_not_active=0 and applications.status_id in (1,2)';
         }
 
         $listFilter[] = $lesa ? 'applications.lesa=1' : 'applications.lesa=0';
 
 
         if (!empty($listFilter)) {
-            $list = ApplicationEquipment::find()->joinWith(['application', 'equipments', 'equipments.mark0', 'equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            $list = Applications::find()->joinWith(['applicationEquipments', 'applicationEquipments.equipments', 'applicationEquipments.equipments.mark0', 'applicationEquipments.equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
         } else {
-            $list = ApplicationEquipment::find()->joinWith(['application'])->where(implode(" and ", $listFilter))->orderBy('id desc')->all();
+            $list = Applications::find()->joinWith(['applicationEquipments'])->where(implode(" and ", $listFilter))->orderBy('id desc')->all();
         }
 
         if (empty($list)) {
@@ -541,61 +541,49 @@ class HireClass
         }
 
         /**
-         * @var ApplicationEquipment $value
+         * @var Applications $value
          */
 
         if (!$lesa) {
             foreach ($list as $value) {
-                /**
-                 * @var Applications $application
-                 */
-                $application = $value->application;
-
-                if (!is_object($application)) {
-                    Yii::info('Ошибка при поиске заявления', __METHOD__);
-
-                    return [
-                        'status' => 'ERROR',
-                        'msg' => 'Ошибка при поиске заявления'
-                    ];
-                }
-
                 $date_cr = date('Y-m-d');
+
+                $app_eq = $value->applicationEquipments[0];
+                $eq = $app_eq->equipments;
 
                 /**
                  * @var ApplicationPay $checkPay
                  */
-                $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
+                $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
 
-                $mark = $value->equipments->mark0->name;
-                $model = $value->equipments->model;
-                $type = $value->equipments->type0->name;
+                $mark = $eq->mark0->name;
+                $model = $eq->model;
+                $type = $eq->type0->name;
 
-                $client = ClientsClass::GetClientInfo($application->client_id);
+                $client = ClientsClass::GetClientInfo($value->client_id);
 
                 $result[] = [
                     'id' => $value->id,
-                    'app_id' => $application->id,
-                    'typeLease_id' => $application->type_lease_id,
+                    'typeLease_id' => $value->type_lease_id,
                     'client' => $client->name,
                     'client_phone' => $client->phone,
                     'equipments' => $type . ' ' . $mark . ' ' . $model,
-                    'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
-                    'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
-                    'status' => $value->hire_status_id,
+                    'start_hire' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
+                    'end_hire' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
+                    'status' => $value->hire_state_id,
                     'state' => $value->hireState->name,
-                    'color' => $value->hireStatus->color,
-                    'sum' => $value->equipments->price_per_day, // цена оборудования
+                    //@todo сделать color 'color' => $value->hireState->color,
+                    'sum' => $eq->price_per_day, // цена оборудования
                     'sum_hire' => $value->sum, // сумма аренды со скдикой
                     'sale_sum' => $value->sum_sale, // общая сумма со скидкой
                     'total_paid' => $value->total_paid, // всего оплачено
                     'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
-                    'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
-                    'comment' => $application->comment,
-                    'date_end' => $application->date_end,
-                    'branch' => $application->branch->name,
-                    'delivery_sum' => $value->delivery_sum,
-                    'delivery_sum_paid' => $value->delivery_sum_paid,
+                    'date_create' => date('d.m.Y H:i:s', strtotime($value->date_create)),
+                    'comment' => $value->comment,
+                    'date_end' => $value->date_end,
+                    'branch' => $value->branch->name,
+                    'delivery_sum' => '',
+                    'delivery_sum_paid' => '',
                     'current_pay' => (float)$sumCurrentDay
                 ];
             }
