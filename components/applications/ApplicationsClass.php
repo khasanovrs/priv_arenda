@@ -705,7 +705,7 @@ class ApplicationsClass
                 Yii::info('Добавляем платежи', __METHOD__);
 
                 foreach ($value->payList as $valueSecond) {
-                    $checkApp = PayClass::AddPay($newApplications->id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
+                    $checkApp = PayClass::AddPay($app_id, $valueSecond->sum, $valueSecond->cashBox, $valueSecond->revertSum);
 
                     if (!is_array($checkApp) || !isset($checkApp['status']) || $checkApp['status'] != 'SUCCESS') {
                         Yii::error('Ошибка при добавлении платежа', __METHOD__);
@@ -739,7 +739,7 @@ class ApplicationsClass
 
             Yii::info('Правим статусы у прокатов', __METHOD__);
 
-            $check = HireClass::checkHire($lesa ? $app_id : $newApplications->id);
+            $check = HireClass::checkHire($app_id);
 
             if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при определии статуса', __METHOD__);
@@ -803,20 +803,21 @@ class ApplicationsClass
             ];
         }
 
-        $payList = ApplicationPay::find()->where('application_equipment_id=:id', [':id' => $applicationEq->id])->all();
+        Yii::info('Получаем платежи', __METHOD__);
 
-        $arrPay = [];
-        if (!empty($payList)) {
+        $pay_list = PayClass::getPayList($application->id);
 
-            /**
-             * @var ApplicationPay $pay
-             */
-            foreach ($payList as $pay) {
-                $date = date('d.m.Y H:i:s', strtotime($pay->date_create));
-                $user = $pay->user->fio;
+        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при получении платежей', __METHOD__);
 
-                array_push($arrPay, ['date' => $date, 'user' => $user, 'sum' => $pay->sum]);
+            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
+                return $pay_list;
             }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при получении платежей',
+            ];
         }
 
         /**
@@ -838,9 +839,9 @@ class ApplicationsClass
             'client_id' => $client->id,
             'client_fio' => $client->name,
             'client_phone' => $client->phone,
-            'delivery_sum' => $applicationEq->delivery_sum,
-            'sum' => $applicationEq->sum,
-            'pay_list' => $arrPay,
+            // 'delivery_sum' => $applicationEq->delivery_sum, @todo сделать
+            'sum' => $application->sum,
+            'pay_list' => $pay_list,
             'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
         ];
 
@@ -853,29 +854,10 @@ class ApplicationsClass
             'equipments_id' => $applicationEq->equipments_id,
             'name' => $category . ' ' . $mark . ' ' . $model,
             'count' => $applicationEq->equipments_count,
-            'status' => $applicationEq->status_id,
+            'status' => $application->status_id,
             'photo' => $applicationEq->equipments->photo,
             'photo_alias' => $applicationEq->equipments->photo_alias
         ];
-
-        Yii::info('Получаем платежи', __METHOD__);
-
-        $pay_list = PayClass::getPayList($application->id, $application->lesa, $applicationEq->id);
-
-        if (!is_array($pay_list) || !isset($pay_list['status']) || $pay_list['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при получении платежей', __METHOD__);
-
-            if (is_array($pay_list) && isset($result['status']) && $pay_list['status'] === 'ERROR') {
-                return $pay_list;
-            }
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при получении платежей',
-            ];
-        }
-
-        $result['pay_list'] = $pay_list['data'];
 
         Yii::info('Заявка успешно получена', __METHOD__);
 
@@ -1006,7 +988,7 @@ class ApplicationsClass
         foreach ($applications as $application) {
             foreach ($application->applicationEquipments as $equipments) {
 
-                if ($status !== '' and $status !== null && $equipments->status_id !== $status) {
+                if ($status !== '' and $status !== null && $application->status_id !== $status) {
                     continue;
                 }
 
@@ -1020,8 +1002,8 @@ class ApplicationsClass
                     'equipments_id' => $equipments->id,
                     'equipments_name' => $type . ' ' . $mark . ' ' . $model,
                     'equipments_count' => $equipments->equipments_count,
-                    'status' => $equipments->status_id,
-                    'color' => $equipments->status->color,
+                    'status' => $application->status_id,
+                    'color' => $application->status->color,
                     'client' => $client->name,
                     'branch' => $application->branch->name,
                     'phone' => $client->phone,
