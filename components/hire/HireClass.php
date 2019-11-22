@@ -523,12 +523,8 @@ class HireClass
 
         $listFilter[] = $lesa ? 'applications.lesa=1' : 'applications.lesa=0';
 
+        $list = Applications::find()->joinWith(['applicationEquipments', 'applicationEquipments.equipments', 'applicationEquipments.equipments.mark0', 'applicationEquipments.equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
-        if (!empty($listFilter)) {
-            $list = Applications::find()->joinWith(['applicationEquipments', 'applicationEquipments.equipments', 'applicationEquipments.equipments.mark0', 'applicationEquipments.equipments.type0'])->leftJoin('clients', '`clients`.`id` = `applications`.`client_id`')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
-        } else {
-            $list = Applications::find()->joinWith(['applicationEquipments'])->where(implode(" and ", $listFilter))->orderBy('id desc')->all();
-        }
 
         if (empty($list)) {
             Yii::info('Список прокатов пуст', __METHOD__);
