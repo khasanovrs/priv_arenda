@@ -697,12 +697,9 @@ class ClientsClass
             $params[':date_end'] = $date_end . ' 23:59:59';
         }
 
-        if (!empty($listFilter)) {
-            $listFilter[] = 'is_not_active=0 and type!=3';
-            $clients = Clients::find()->with('clientsInfos')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
-        } else {
-            $clients = Clients::find()->with('clientsInfos')->where('is_not_active=0 and type!=3')->orderBy('last_contact desc')->all();
-        }
+        $listFilter[] = 'is_not_active=0 and type!=3';
+
+        $clients = Clients::find()->with('clientsInfos','status0')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
 
         if (is_array($clients)) {
             /**
