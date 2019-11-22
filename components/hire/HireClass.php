@@ -739,7 +739,6 @@ class HireClass
         $result = [
             'id' => $app->id,
             'branch' => $app->branch->name,
-            'app_id' => $app->id,
             'delivery' => $app->delivery_id,
             'typeLease' => $app->typeLease->name,
             'typeLease_id' => $app->type_lease_id,
