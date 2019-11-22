@@ -16,7 +16,6 @@ class EquipmentReturnAction extends Action
         Yii::info('Запуск функции возврата оборудования на склад', __METHOD__);
 
         $request = Yii::$app->request;
-
         $id = $request->getBodyParam('id');
 
         $result = HireClass::equipmentReturn($id);
