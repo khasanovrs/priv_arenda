@@ -474,7 +474,7 @@ class EquipmentsClass
         $result = [];
 
         $applicationEquipment = ApplicationEquipment::find()
-            ->select('equipments_id,count(*) as status_id')
+            ->select('equipments_id,count(*) as hire_date')
             ->joinWith('application')
             ->where('applications.branch_id=:branch and applications.date_create between :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->groupBy('equipments_id')
@@ -509,7 +509,7 @@ class EquipmentsClass
 
             $result[] = [
                 'id' => $value->equipments_id,
-                'count' => $value->status_id,
+                'count' => $value->hire_date,
                 'name' => $eq->category->name . ' ' . $eq->mark0->name . ' ' . $eq->model,
                 'price' => $eq->price_per_day,
                 'photo' => $eq->photo,

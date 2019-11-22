@@ -61,7 +61,7 @@ class MainClass
 
         $applicationEquipmentHire = Applications::find()
             ->joinWith('applicationEquipments')
-            ->where('application_equipment.status_id in (1,2) and branch_id=:branch and (rent_start < :date_start || rent_end > :date_end)', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
+            ->where('applications.status_id in (1,2) and branch_id=:branch and (rent_start < :date_start || rent_end > :date_end)', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count('DISTINCT applications.id');
 
         $applicationEquipmentRenewals = Applications::find()
@@ -69,8 +69,8 @@ class MainClass
             ->where('branch_id=:branch and application_equipment.renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count('DISTINCT applications.id');
 
-        $applicationEquipment = ApplicationEquipment::find()
-            ->joinWith('application')
+        $applicationEquipment = Applications::find()
+            ->joinWith('applicationEquipments')
             ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->all();
 
@@ -84,7 +84,7 @@ class MainClass
         }
 
         /**
-         * @var ApplicationEquipment $value
+         * @var Applications $value
          */
 
         foreach ($applicationEquipment as $value) {
@@ -96,7 +96,7 @@ class MainClass
         Yii::info('Получаем средний чек и общая сумма', __METHOD__);
 
         $payList = ApplicationPay::find()
-            ->joinWith(['applicationEquipment','applicationEquipment.application'])
+            ->joinWith(['application','application.applicationEquipments'])
             ->where(['between', 'application_pay.date_create', $date_start, $date_end])
             ->andWhere('applications.branch_id=:branch',[':branch' => $branch])
             ->all();
