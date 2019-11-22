@@ -22,12 +22,12 @@ class CheckStateHireEqController extends Controller
     {
         Yii::info('Запуск функции actionIndex', __METHOD__);
 
-        $app_eq = ApplicationEquipment::find()->where('hire_state_id!=3')->all();
+        $app_eq = Applications::find()->where('hire_state_id!=3')->all();
 
         if (!empty($app_eq)) {
             Yii::info('Есть заявки обрабатываем', __METHOD__);
             /**
-             * @var ApplicationEquipment $item
+             * @var Applications $item
              */
             foreach ($app_eq as $item) {
                 $result = HireClass::checkHire($item->id);
