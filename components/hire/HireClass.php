@@ -544,149 +544,104 @@ class HireClass
          * @var Applications $value
          */
 
-        if (!$lesa) {
-            foreach ($list as $value) {
-                $date_cr = date('Y-m-d');
+        $keyArr = 0;
+        foreach ($list as $value) {
+            $date_cr = date('Y-m-d');
 
-                $app_eq = $value->applicationEquipments[0];
-                $eq = $app_eq->equipments;
+            $app_eq = $value->applicationEquipments[0];
+            $eq = $app_eq->equipments;
 
-                /**
-                 * @var ApplicationPay $checkPay
-                 */
-                $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
+            /**
+             * @var ApplicationPay $checkPay
+             */
+            $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
 
-                $mark = $eq->mark0->name;
-                $model = $eq->model;
-                $type = $eq->type0->name;
+            $mark = $eq->mark0->name;
+            $model = $eq->model;
+            $type = $eq->type0->name;
 
-                $client = ClientsClass::GetClientInfo($value->client_id);
+            $client = ClientsClass::GetClientInfo($value->client_id);
 
-                $result[] = [
-                    'id' => $value->id,
-                    'typeLease_id' => $value->type_lease_id,
-                    'client' => $client->name,
-                    'client_phone' => $client->phone,
-                    'equipments' => $type . ' ' . $mark . ' ' . $model,
-                    'start_hire' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
-                    'end_hire' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
-                    'status' => $value->hire_state_id,
-                    'state' => $value->hireState->name,
-                    //@todo сделать color 'color' => $value->hireState->color,
-                    'sum' => $eq->price_per_day, // цена оборудования
-                    'sum_hire' => $value->sum, // сумма аренды со скдикой
-                    'sale_sum' => $value->sum_sale, // общая сумма со скидкой
-                    'total_paid' => $value->total_paid, // всего оплачено
-                    'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
-                    'date_create' => date('d.m.Y H:i:s', strtotime($value->date_create)),
-                    'comment' => $value->comment,
-                    'date_end' => $value->date_end,
-                    'branch' => $value->branch->name,
-                    'delivery_sum' => '',
-                    'delivery_sum_paid' => '',
-                    'current_pay' => (float)$sumCurrentDay
-                ];
-            }
-        } else {
-            foreach ($list as $value) {
-                $rama_prokhodnaya = 0;
-                $rama_letsnitsey = 0;
-                $diagonalnaya_svyaz = 0;
-                $gorizontalnaya_svyaz = 0;
-                $rigel = 0;
-                $nastil = 0;
+            $result[$keyArr] = [
+                'id' => $value->id,
+                'typeLease_id' => $value->type_lease_id,
+                'client' => $client->name,
+                'client_phone' => $client->phone,
+                'equipments' => $type . ' ' . $mark . ' ' . $model,
+                'start_hire' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
+                'end_hire' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
+                'status' => $value->hire_state_id,
+                'state' => $value->hireState->name,
+                //@todo сделать color 'color' => $value->hireState->color,
+                'sum' => !$lesa ? $eq->price_per_day : $value->month_sum, // цена оборудования
+                'sum_hire' => $value->sum, // сумма аренды со скдикой
+                'sale_sum' => $value->sum_sale, // общая сумма со скидкой
+                'total_paid' => $value->total_paid, // всего оплачено
+                'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
+                'date_create' => date('d.m.Y H:i:s', strtotime($value->date_create)),
+                'comment' => $value->comment,
+                'date_end' => $value->date_end,
+                'branch' => $value->branch->name,
+                'delivery_sum' => '', //@todo сделать
+                'delivery_sum_paid' => '', //@todo сделать
+                'current_pay' => (float)$sumCurrentDay,
+                'rama_prokhodnaya' => 0,
+                'rama_letsnitsey' => 0,
+                'diagonalnaya_svyaz' => 0,
+                'gorizontalnaya_svyaz' => 0,
+                'rigel' => 0,
+                'nastil' => 0,
+                'square' => $value->square,
+            ];
 
-                /**
-                 * @var Applications $application
-                 */
-                $application = $value->application;
+            if ($lesa) {
+                $app_eq = $value->applicationEquipments;
 
-                if (!is_object($application)) {
-                    Yii::info('Ошибка при поиске заявления', __METHOD__);
+                if (empty($app_eq)) {
+                    Yii::info('Список прокатов пуст', __METHOD__);
 
                     return [
-                        'status' => 'ERROR',
-                        'msg' => 'Ошибка при поиске заявления'
+                        'status' => 'SUCCESS',
+                        'msg' => 'Список прокатов пуст',
+                        'data' => $result
                     ];
                 }
 
-                $date_cr = date('Y-m-d');
+                foreach ($app_eq as $item) {
+                    $rama_prokhodnaya = 0;
+                    $rama_letsnitsey = 0;
+                    $diagonalnaya_svyaz = 0;
+                    $gorizontalnaya_svyaz = 0;
+                    $rigel = 0;
+                    $nastil = 0;
 
-                /**
-                 * @var ApplicationPay $checkPay
-                 */
-                $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_equipment_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
+                    Yii::info('Определяем тип', __METHOD__);
+                    $type = $item->equipments->type0->name;
 
-                $client = ClientsClass::GetClientInfo($application->client_id);
-
-                $keyArr = '';
-                foreach ($result as $key => $item) {
-                    if ($item['app_id'] === $application->id) {
-                        $keyArr = $key;
+                    if ($type == 'Рама проходная') {
+                        $rama_prokhodnaya = $item->equipments_count;
+                    } elseif ($type == 'Рама с лестницей') {
+                        $rama_letsnitsey = $item->equipments_count;
+                    } elseif ($type == 'Диагональная связь') {
+                        $diagonalnaya_svyaz = $item->equipments_count;
+                    } elseif ($type == 'Горизонтальная связь') {
+                        $gorizontalnaya_svyaz = $item->equipments_count;
+                    } elseif ($type == 'Ригель') {
+                        $rigel = $item->equipments_count;
+                    } elseif ($type == 'Настил') {
+                        $nastil = $item->equipments_count;
                     }
-                }
 
-                Yii::info('Определяем тип', __METHOD__);
-                $type = $value->equipments->type0->name;
-
-                if ($type == 'Рама проходная') {
-                    $rama_prokhodnaya = $value->equipments_count;
-                } elseif ($type == 'Рама с лестницей') {
-                    $rama_letsnitsey = $value->equipments_count;
-                } elseif ($type == 'Диагональная связь') {
-                    $diagonalnaya_svyaz = $value->equipments_count;
-                } elseif ($type == 'Горизонтальная связь') {
-                    $gorizontalnaya_svyaz = $value->equipments_count;
-                } elseif ($type == 'Ригель') {
-                    $rigel = $value->equipments_count;
-                } elseif ($type == 'Настил') {
-                    $nastil = $value->equipments_count;
-                }
-
-                if ($keyArr === '') {
-                    $result[] = [
-                        'id' => $value->id,
-                        'app_id' => $application->id,
-                        'typeLease_id' => $application->type_lease_id,
-                        'client' => $client->name,
-                        'client_phone' => $client->phone,
-                        'equipments' => 'Леса',
-                        'start_hire' => date('d.m.Y H:i:s', strtotime($application->rent_start)),
-                        'end_hire' => date('d.m.Y H:i:s', strtotime($application->rent_end)),
-                        'status' => $value->hire_status_id,
-                        'state' => $value->hireState->name,
-                        'color' => $value->hireStatus->color,
-                        'sum' => $application->month_sum, // цена оборудования
-                        'sum_hire' => $value->sum, // сумма аренды со скдикой
-                        'sale_sum' => $value->sum_sale, // общая сумма со скидкой
-                        'total_paid' => $value->total_paid, // всего оплачено
-                        'remainder' => (float)$value->sum - (float)$value->total_paid, // остаток
-                        'date_create' => date('d.m.Y H:i:s', strtotime($application->date_create)),
-                        'comment' => $application->comment,
-                        'date_end' => $application->date_end,
-                        'branch' => $application->branch->name,
-                        'delivery_sum' => $value->delivery_sum,
-                        'delivery_sum_paid' => $value->delivery_sum_paid,
-                        'current_pay' => (float)$sumCurrentDay,
-                        'rama_prokhodnaya' => $rama_prokhodnaya != 0 ? $rama_prokhodnaya : 0,
-                        'rama_letsnitsey' => $rama_letsnitsey != 0 ? $rama_letsnitsey : 0,
-                        'diagonalnaya_svyaz' => $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : 0,
-                        'gorizontalnaya_svyaz' => $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : 0,
-                        'rigel' => $rigel != 0 ? $rigel : 0,
-                        'nastil' => $nastil != 0 ? $nastil : 0,
-                        'square' => $application->square,
-                    ];
-                } else {
                     $result[$keyArr]['rama_prokhodnaya'] = $rama_prokhodnaya != 0 ? $rama_prokhodnaya : $result[$keyArr]['rama_prokhodnaya'];
                     $result[$keyArr]['rama_letsnitsey'] = $rama_letsnitsey != 0 ? $rama_letsnitsey : $result[$keyArr]['rama_letsnitsey'];
                     $result[$keyArr]['diagonalnaya_svyaz'] = $diagonalnaya_svyaz != 0 ? $diagonalnaya_svyaz : $result[$keyArr]['diagonalnaya_svyaz'];
                     $result[$keyArr]['gorizontalnaya_svyaz'] = $gorizontalnaya_svyaz != 0 ? $gorizontalnaya_svyaz : $result[$keyArr]['gorizontalnaya_svyaz'];
                     $result[$keyArr]['rigel'] = $rigel != 0 ? $rigel : $result[$keyArr]['rigel'];
                     $result[$keyArr]['nastil'] = $nastil != 0 ? $nastil : $result[$keyArr]['nastil'];
-                    $result[$keyArr]['total_paid'] = $result[$keyArr]['total_paid'] + $value->total_paid; // всего оплачено
-                    $result[$keyArr]['remainder'] = $result[$keyArr]['sum_hire'] - $result[$keyArr]['total_paid']; // остаток
                 }
             }
+
+            $keyArr++;
         }
 
         Yii::info('Список прокатов получен' . serialize($result), __METHOD__);
