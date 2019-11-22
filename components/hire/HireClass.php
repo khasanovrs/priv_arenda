@@ -914,13 +914,12 @@ class HireClass
 
     /**
      * Продление проката
-     * @param $app_eq_id
      * @param $app_id
      * @param $count
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function ExtendRental($app_eq_id, $app_id, $count)
+    public static function ExtendRental($app_id, $count)
     {
         Yii::info('Запуск функции ExtendRental', __METHOD__);
 
@@ -1089,13 +1088,12 @@ class HireClass
 
     /**
      * Сокращение проката
-     * @param $app_eq_id
      * @param $app_id
      * @param $count
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function TameRental($app_eq_id, $app_id, $count)
+    public static function TameRental($app_id, $count)
     {
         Yii::info('Запуск функции TameRental', __METHOD__);
 

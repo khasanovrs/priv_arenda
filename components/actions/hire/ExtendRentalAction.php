@@ -18,10 +18,9 @@ class ExtendRentalAction extends Action
         $request = Yii::$app->request;
 
         $app_id = $request->getBodyParam('app_id');
-        $app_eq_id = $request->getBodyParam('app_eq_id');
         $count = $request->getBodyParam('count');
 
-        $result = HireClass::ExtendRental($app_eq_id, $app_id, $count);
+        $result = HireClass::ExtendRental($app_id, $count);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при продлении проката', __METHOD__);
