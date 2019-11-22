@@ -403,11 +403,7 @@ class EquipmentsClass
             $listFilter[] = 'is_not_active=0 and status!=7';
         }
 
-        if (!empty($listFilter)) {
-            $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category', 'equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
-        } else {
-            $equipmentsTypeList = Equipments::find()->joinWith(['equipmentsInfos'])->orderBy('id desc')->where(implode(" and ", $listFilter))->all();
-        }
+        $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'type0', 'category', 'equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
         if (!is_array($equipmentsTypeList)) {
             Yii::error('Список категорий оборудования пуст', __METHOD__);
@@ -1222,8 +1218,6 @@ class EquipmentsClass
      */
     public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed)
     {
-        Yii::error('ololo: ' . serialize($amount_repair), __METHOD__);
-
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
             return [
@@ -1475,17 +1469,6 @@ class EquipmentsClass
             }
         }
 
-        $checkUpdateEq = self::updateFinanceEquipment($id);
-
-        if (!is_array($checkUpdateEq) || !isset($checkUpdateEq['status']) || $checkUpdateEq['status'] != 'SUCCESS') {
-            Yii::error('Ошибка при изменении оборудования', __METHOD__);
-
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Ошибка при изменении оборудования',
-            ];
-        }
-
         return [
             'status' => 'SUCCESS',
             'msg' => 'Оборудование успешно изменено'
@@ -1586,7 +1569,7 @@ class EquipmentsClass
         $new_records->new_status = $new_status;
         $new_records->reason = $reason_change_status;
         $new_records->user_id = $session->user_id;
-        $new_records->sum = $amount_repair;
+        $new_records->sum = $amount_repair === 0 ? $sale_amount : $amount_repair;
         $new_records->cashBox_id = $cashBox;
         $new_records->date_create = date('Y-m-d H:i:s');
 
@@ -1600,8 +1583,7 @@ class EquipmentsClass
             return false;
         }
 
-
-        if ($amount_repair !== '' || $sale_amount != '') {
+        if ($amount_repair !== 0 || $sale_amount !== 0) {
             if ($amount_repair !== '') {
                 $sum = (float)$amount_repair;
                 $revertSum = true;
@@ -1622,7 +1604,7 @@ class EquipmentsClass
             }
         }
 
-        if ($amount_repair !== '') {
+        if ($amount_repair !== 0) {
             Yii::info('Добавляем запись в финансы', __METHOD__);
 
             /**
