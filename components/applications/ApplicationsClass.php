@@ -596,6 +596,7 @@ class ApplicationsClass
             ];
         }
 
+        $app_id = '';
         foreach ($equipments as $value) {
             /**
              * @var Sessions $Sessions
@@ -617,55 +618,59 @@ class ApplicationsClass
                 ];
             }
 
-            $dateDiff = strtotime($rent_end) - strtotime($rent_start);
-            if ($lesa) {
-                $price = ($dateDiff / (60 * 60 * 24)) * ($month_sum / 30);
-                $sale_sum = $month_sum / 30;
-            } else {
-                $price = ($dateDiff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
-                $sale_sum = $equipment->price_per_day;
-            }
+            if (($app_id === '' && $lesa) || !$lesa) {
+                $dateDiff = strtotime($rent_end) - strtotime($rent_start);
+                if ($lesa) {
+                    $price = ($dateDiff / (60 * 60 * 24)) * ($month_sum / 30);
+                    $sale_sum = $month_sum / 30;
+                } else {
+                    $price = ($dateDiff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
+                    $sale_sum = $equipment->price_per_day;
+                }
 
-            if ((int)$disc->code !== 0) {
-                $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
-                $price = $price - ($price * $disc->code / 100);
-            }
+                if ((int)$disc->code !== 0) {
+                    $sale_sum = $sale_sum - ($sale_sum * $disc->code / 100);
+                    $price = $price - ($price * $disc->code / 100);
+                }
 
-            $newApplications = new Applications();
-            $newApplications->client_id = $client_id !== '' ? $client_id : 0;
-            $newApplications->user_id = $session->user_id;
-            $newApplications->source_id = $source;
-            $newApplications->discount_id = $sale;
-            $newApplications->delivery_id = $delivery;
-            $newApplications->type_lease_id = $typeLease;
-            $newApplications->branch_id = $branch;
-            $newApplications->comment = $comment;
-            $newApplications->rent_start = $rent_start;
-            $newApplications->rent_end = $rent_end;
-            $newApplications->lesa = +$lesa;
-            $newApplications->date_create = date('Y-m-d H:i:s');
-            $newApplications->month_sum = $month_sum;
-            $newApplications->square = $square;
-            $newApplications->address = $address;
-            $newApplications->delivery_sum_id = 1;
-            $newApplications->sum = $price;
-            $newApplications->sum_sale = $sale_sum;
-            $newApplications->total_paid = 0;
-            $newApplications->status_id = $status;
-            $newApplications->hire_state_id = $status === 1 ? 4 : 1;
+                $newApplications = new Applications();
+                $newApplications->client_id = $client_id !== '' ? $client_id : 0;
+                $newApplications->user_id = $session->user_id;
+                $newApplications->source_id = $source;
+                $newApplications->discount_id = $sale;
+                $newApplications->delivery_id = $delivery;
+                $newApplications->type_lease_id = $typeLease;
+                $newApplications->branch_id = $branch;
+                $newApplications->comment = $comment;
+                $newApplications->rent_start = $rent_start;
+                $newApplications->rent_end = $rent_end;
+                $newApplications->lesa = +$lesa;
+                $newApplications->date_create = date('Y-m-d H:i:s');
+                $newApplications->month_sum = $month_sum;
+                $newApplications->square = $square;
+                $newApplications->address = $address;
+                $newApplications->delivery_sum_id = 1;
+                $newApplications->sum = round($price);
+                $newApplications->sum_sale = round($sale_sum);
+                $newApplications->total_paid = 0;
+                $newApplications->status_id = $status;
+                $newApplications->hire_state_id = $status === 1 ? 4 : 1;
 
-            try {
-                if (!$newApplications->save(false)) {
-                    Yii::error('Ошибка при добавлении заявки: ' . serialize($newApplications->getErrors()), __METHOD__);
+                try {
+                    if (!$newApplications->save(false)) {
+                        Yii::error('Ошибка при добавлении заявки: ' . serialize($newApplications->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при добавлении заявки: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
-            } catch (\Exception $e) {
-                Yii::error('Поймали Exception при добавлении заявки: ' . serialize($e->getMessage()), __METHOD__);
-                return false;
+
+                $app_id = $newApplications->id;
             }
 
             $newApplicationEquipment = new ApplicationEquipment();
-            $newApplicationEquipment->application_id = $newApplications->id;
+            $newApplicationEquipment->application_id = $app_id;
             $newApplicationEquipment->equipments_id = $value->id;
             $newApplicationEquipment->equipments_count = $value->count;
 
@@ -734,7 +739,7 @@ class ApplicationsClass
 
             Yii::info('Правим статусы у прокатов', __METHOD__);
 
-            $check = HireClass::checkHire($newApplications->id);
+            $check = HireClass::checkHire($lesa ? $app_id : $newApplications->id);
 
             if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
                 Yii::error('Ошибка при определии статуса', __METHOD__);

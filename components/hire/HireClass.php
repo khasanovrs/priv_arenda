@@ -548,17 +548,24 @@ class HireClass
         foreach ($list as $value) {
             $date_cr = date('Y-m-d');
 
-            $app_eq = $value->applicationEquipments[0];
-            $eq = $app_eq->equipments;
+            if (count($value->applicationEquipments)===0) {
+                Yii::info('Список пуст', __METHOD__);
+                continue;
+            }
+
+            if (!$lesa) {
+                $app_eq = $value->applicationEquipments[0];
+                $eq = $app_eq->equipments;
+                $mark = $eq->mark0->name;
+                $model = $eq->model;
+                $type = $eq->type0->name;
+            }
 
             /**
              * @var ApplicationPay $checkPay
              */
             $sumCurrentDay = ApplicationPay::find()->joinWith('cashBox0')->where('finance_cashbox.check_zalog=0 and finance_cashbox.delivery=0 and application_id=:id and date_create like :date', [':id' => $value->id, ':date' => $date_cr . '%'])->sum('application_pay.sum');
 
-            $mark = $eq->mark0->name;
-            $model = $eq->model;
-            $type = $eq->type0->name;
 
             $client = ClientsClass::GetClientInfo($value->client_id);
 
@@ -567,7 +574,7 @@ class HireClass
                 'typeLease_id' => $value->type_lease_id,
                 'client' => $client->name,
                 'client_phone' => $client->phone,
-                'equipments' => $type . ' ' . $mark . ' ' . $model,
+                'equipments' => $lesa ? 'Леса' : $type . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
                 'end_hire' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
                 'status' => $value->hire_state_id,
@@ -585,28 +592,21 @@ class HireClass
                 'delivery_sum' => '', //@todo сделать
                 'delivery_sum_paid' => '', //@todo сделать
                 'current_pay' => (float)$sumCurrentDay,
+                'square' => $value->square,
+
                 'rama_prokhodnaya' => 0,
                 'rama_letsnitsey' => 0,
                 'diagonalnaya_svyaz' => 0,
                 'gorizontalnaya_svyaz' => 0,
                 'rigel' => 0,
                 'nastil' => 0,
-                'square' => $value->square,
             ];
 
             if ($lesa) {
                 $app_eq = $value->applicationEquipments;
-
-                if (empty($app_eq)) {
-                    Yii::info('Список прокатов пуст', __METHOD__);
-
-                    return [
-                        'status' => 'SUCCESS',
-                        'msg' => 'Список прокатов пуст',
-                        'data' => $result
-                    ];
-                }
-
+                /**
+                 * @var ApplicationEquipment $item
+                 */
                 foreach ($app_eq as $item) {
                     $rama_prokhodnaya = 0;
                     $rama_letsnitsey = 0;
