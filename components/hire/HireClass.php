@@ -591,16 +591,10 @@ class HireClass
             $model = $eq->model;
             $category = $eq->category->name;
             $nameEq = $category . ' ' . $mark . ' ' . $model;
-            $stateEq = $eq->status0->name;
-            $statusEq = $eq->status;
             $photoEq = $eq->photo;
             $photo_aliasEq = $eq->photo_alias;
         } else {
-            $eq = $app->applicationEquipments[0]->equipments;
-
             $nameEq = 'Леса';
-            $stateEq = $eq->status0->name;
-            $statusEq = $eq->status;
             $photoEq = '';
             $photo_aliasEq = '';
         }
@@ -658,8 +652,8 @@ class HireClass
             'equipments' =>
                 [
                     'name' => $nameEq,
-                    'state' => $stateEq,
-                    'state_id' => $statusEq,
+                    'state' => $eq->status0->name,
+                    'state_id' => $app->equipments_status,
                     'photo' => $photoEq,
                     'photo_alias' => $photo_aliasEq
                 ],
@@ -1210,16 +1204,7 @@ class HireClass
          * @var ApplicationEquipment $item
          */
         foreach ($app_eq as $item) {
-            $checkChangeStatus = EquipmentsClass::changeStatus($item->equipments_id, 4);
-
-            if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
-                Yii::error('Ошибка при изменении статуса', __METHOD__);
-
-                return [
-                    'status' => 'ERROR',
-                    'msg' => 'Ошибка при изменении статуса',
-                ];
-            }
+            $status = 4;
 
             if ($app->lesa === '1') {
                 $eq = $item->equipments;
@@ -1234,6 +1219,19 @@ class HireClass
                     Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
                     return false;
                 }
+
+                $status = $eq->count === $eq->count_hire > 0 ? 4 : 1;
+            }
+
+            $checkChangeStatus = EquipmentsClass::changeStatus($item->equipments_id, $status);
+
+            if (!is_array($checkChangeStatus) || !isset($checkChangeStatus['status']) || $checkChangeStatus['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при изменении статуса', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при изменении статуса',
+                ];
             }
         }
 
@@ -1246,6 +1244,7 @@ class HireClass
 
         if ($hire_state_id !== '') {
             $app->hire_state_id = $hire_state_id;
+            $app->equipments_status = 4;
 
             try {
                 if (!$app->save(false)) {

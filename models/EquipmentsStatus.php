@@ -11,6 +11,7 @@ use Yii;
  * @property string $name
  * @property string $color
  *
+ * @property Applications[] $applications
  * @property Equipments[] $equipments
  * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses
  * @property EquipmentsHistoryChangeStatus[] $equipmentsHistoryChangeStatuses0
@@ -47,6 +48,14 @@ class EquipmentsStatus extends \yii\db\ActiveRecord
             'name' => 'Name',
             'color' => 'Color',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplications()
+    {
+        return $this->hasMany(Applications::className(), ['equipments_status' => 'id']);
     }
 
     /**

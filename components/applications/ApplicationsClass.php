@@ -655,6 +655,7 @@ class ApplicationsClass
                 $newApplications->total_paid = 0;
                 $newApplications->status_id = $status;
                 $newApplications->hire_state_id = $status === 1 ? 4 : 1;
+                $newApplications->equipments_status = $status === 1 ? 1 : 4;
 
                 try {
                     if (!$newApplications->save(false)) {
