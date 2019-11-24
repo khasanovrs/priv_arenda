@@ -475,7 +475,7 @@ class HireClass
                 'client_phone' => $client->phone,
                 'equipments' => $lesa ? 'Леса' : $type . ' ' . $mark . ' ' . $model,
                 'start_hire' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
-                'end_hire' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
+                'end_hire' => $value->rent_end,
                 'status' => $value->hire_state_id,
                 'state' => $value->hireState->name,
                 //@todo сделать color 'color' => $value->hireState->color,
