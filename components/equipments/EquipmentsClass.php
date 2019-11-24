@@ -572,7 +572,7 @@ class EquipmentsClass
 
         $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
         where(['in', 'stock_id', $arr])->
-        andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter)' . $secondFilter, [':filter' => $filter])->
+        andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter) and status not in (2,3,6)' . $secondFilter, [':filter' => $filter])->
         orderBy('equipments.id desc')->
         all();
 
