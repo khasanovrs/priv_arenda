@@ -1398,7 +1398,7 @@ class HireClass
             ];
         }
 
-        $check = self::checkHire($app_id);
+        $check = self::checkHire($app_id, true);
 
         if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
             Yii::error('Ошибка при продлении контракта', __METHOD__);
@@ -1420,9 +1420,10 @@ class HireClass
     /**
      * Проверка и изменение состояния у проката
      * @param $app_id
+     * @param $check_close
      * @return array|bool
      */
-    public static function checkHire($app_id)
+    public static function checkHire($app_id, $check_close = false)
     {
         Yii::info('Проверка и изменение состояния проката', __METHOD__);
 
@@ -1434,10 +1435,8 @@ class HireClass
         if (!is_object($app)) {
             Yii::info('Информация о заявке не найдена', __METHOD__);
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Заявка не найдена'
-            ];
+            return ['status' => 'ERROR',
+                'msg' => 'Заявка не найдена'];
         }
 
         $hire_state_id = $app->hire_state_id;
@@ -1455,7 +1454,7 @@ class HireClass
         Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
         Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
 
-        // статус заявки в прокате
+// статус заявки в прокате
         if ($rent_start < $date && $date < $rent_end) {
             $hire_state_id = 4;
         };
@@ -1463,19 +1462,19 @@ class HireClass
         $eq_status = $app->applicationEquipments[0]->equipments->status;
         $msg = 'Состояние успешно изменено';
 
-        // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
-        if (($delivery_sum <= $delivery_sum_paid || $app->sum <= $app->total_paid) && $dateDiff < 3 && $eq_status === 4) {
+// закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
+        if ((($delivery_sum <= $delivery_sum_paid || $app->sum <= $app->total_paid) && $dateDiff < 3 && $eq_status === 4) && $check_close) {
             $hire_state_id = 3;
             $msg = 'Прокат успешно закрыт';
         }
 
-        // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
+// просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
         if ($date > $rent_end && $eq_status === 1) {
             $hire_state_id = 2;
             $msg = 'Невозможно закрыть. Оборудование у клиента';
         }
 
-        // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
+// долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
         if (($delivery_sum > $delivery_sum_paid || $app->sum > $app->total_paid) && $eq_status === 4) {
             $hire_state_id = 5;
             $msg = 'Невозможно закрыть. Есть долг';
