@@ -2157,7 +2157,7 @@ class EquipmentsClass
         $equipments = Equipments::find()->where('id=:id', [':id' => $id_eq])->one();
 
         if (!is_object($equipments)) {
-            Yii::info('Ошибка при получении оборудования', __METHOD__);
+            Yii::error('Ошибка при получении оборудования', __METHOD__);
 
             return [
                 'status' => 'ERROR',

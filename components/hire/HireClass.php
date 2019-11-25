@@ -12,6 +12,7 @@ use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use app\models\Applications;
+use app\models\ApplicationSumDelivery;
 use app\models\Equipments;
 use app\models\Extension;
 use app\models\HireField;
@@ -628,6 +629,40 @@ class HireClass
             ];
         }
 
+        Yii::info('Разбор доставки', __METHOD__);
+
+        $delivery_app = [];
+
+        $appArr = Applications::find()->where('delivery_sum_id=:delivery_sum_id', [':delivery_sum_id' => $app->delivery_sum_id])->all();
+        if (count($appArr) > 1) {
+            /**
+             * @var Applications $item
+             */
+            foreach ($appArr as $item) {
+                if ($item->lesa !== '1') {
+                    $eq_tmp = $item->applicationEquipments[0]->equipments;
+                    $mark_tmp = $eq_tmp->mark0->name;
+                    $model_tmp = $eq_tmp->model;
+                    $category_tmp = $eq_tmp->category->name;
+                    $name = $category_tmp . ' ' . $mark_tmp . ' ' . $model_tmp;
+                } else {
+                    $name = 'Леса';
+                }
+
+                $delivery_app[] = [
+                    'id' => $item->id,
+                    'name' => $name
+                ];
+            }
+        }
+
+        $deliver_data = [
+            'delivery_sum' => $app->deliverySum->delivery_sum,
+            'delivery_sum_paid' => $app->deliverySum->delivery_sum_paid,
+            'delivery_app' => $delivery_app
+        ];
+
+
         $result = [
             'id' => $app->id,
             'branch' => $app->branch->name,
@@ -643,7 +678,6 @@ class HireClass
             'rent_end' => $app->rent_end,
             'client_fio' => $client->name,
             'client_phone' => $client->phone,
-            //'delivery_sum' => $app->delivery_sum, //@todo сделать
             'sum' => $app->sum,
             'total_paid' => $app->total_paid,
             'remainder' => $app->sum - $app->total_paid,
@@ -668,6 +702,7 @@ class HireClass
             'month_sum' => $app->month_sum,
             'square' => $app->square,
             'address' => $app->address,
+            'delivery_data' => $deliver_data
         ];
 
         if ($app->lesa === '1') {
@@ -1243,17 +1278,18 @@ class HireClass
 
         if ($hire_state_id !== '') {
             $app->hire_state_id = $hire_state_id;
-            $app->equipments_status = 4;
+        }
 
-            try {
-                if (!$app->save(false)) {
-                    Yii::error('Ошибка при закрытии проката: ' . serialize($app->getErrors()), __METHOD__);
-                    return false;
-                }
-            } catch (\Exception $e) {
-                Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
+        $app->equipments_status = 4;
+
+        try {
+            if (!$app->save(false)) {
+                Yii::error('Ошибка при закрытии проката: ' . serialize($app->getErrors()), __METHOD__);
                 return false;
             }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при закрытии проката: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
         }
 
         Yii::info('Оборудование успешно вернули', __METHOD__);
