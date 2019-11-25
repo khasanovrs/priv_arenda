@@ -111,7 +111,7 @@ class ReportClass
     {
         Yii::info('Запускк функции GetPastDueEquipments', __METHOD__);
 
-        $result = ApplicationEquipment::find()->where('hire_status_id=2')->count();
+        $result = Applications::find()->where('hire_state_id=2')->count();
 
         return [
             'status' => 'SUCCESS',
