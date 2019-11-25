@@ -20,6 +20,7 @@ use app\models\ApplicationsShowField;
 use app\models\ApplicationsStatus;
 use app\models\ApplicationsTypeLease;
 use app\models\ApplicationSum;
+use app\models\ApplicationSumDelivery;
 use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
@@ -597,6 +598,7 @@ class ApplicationsClass
         }
 
         $app_id = '';
+        $delivery_id = 1;
         foreach ($equipments as $value) {
             /**
              * @var Sessions $Sessions
@@ -616,6 +618,24 @@ class ApplicationsClass
                     'status' => 'ERROR',
                     'msg' => 'Ошибка при получении оборудования'
                 ];
+            }
+
+            if ($delivery_sum !== '' && $delivery_id === 1) {
+                $newApplicationSumDelivery = new ApplicationSumDelivery();
+                $newApplicationSumDelivery->delivery_sum = $delivery_sum;
+                $newApplicationSumDelivery->delivery_sum_paid = 0;
+
+                try {
+                    if (!$newApplicationSumDelivery->save(false)) {
+                        Yii::error('Ошибка при добавлении доставки: ' . serialize($newApplicationSumDelivery->getErrors()), __METHOD__);
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    Yii::error('Поймали Exception при добавлении доставки: ' . serialize($e->getMessage()), __METHOD__);
+                    return false;
+                }
+
+                $delivery_id = $newApplicationSumDelivery->id;
             }
 
             if (($app_id === '' && $lesa) || !$lesa) {
@@ -649,7 +669,7 @@ class ApplicationsClass
                 $newApplications->month_sum = $month_sum;
                 $newApplications->square = $square;
                 $newApplications->address = $address;
-                $newApplications->delivery_sum_id = 1;
+                $newApplications->delivery_sum_id = $delivery_id;
                 $newApplications->sum = round($price);
                 $newApplications->sum_sale = round($sale_sum);
                 $newApplications->total_paid = 0;

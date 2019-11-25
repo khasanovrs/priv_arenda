@@ -14,7 +14,7 @@ class m191124_174906_fix_table extends Migration
     {
         $this->execute("ALTER TABLE `applications` 
 ADD COLUMN `equipments_status` INT(11) NOT NULL AFTER `hire_state_id`,
-ADD INDEX `fk_applications_7_idx1` (`equipments_status` ASC) VISIBLE;
+ADD INDEX `fk_applications_7_idx1` (`equipments_status` ASC);
 ;
 
 ");

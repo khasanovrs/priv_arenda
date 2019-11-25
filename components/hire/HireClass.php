@@ -488,11 +488,10 @@ class HireClass
                 'comment' => $value->comment,
                 'date_end' => $value->date_end,
                 'branch' => $value->branch->name,
-                'delivery_sum' => '', //@todo сделать
-                'delivery_sum_paid' => '', //@todo сделать
+                'delivery_sum' => $value->deliverySum->delivery_sum,
+                'delivery_sum_paid' => $value->deliverySum->delivery_sum_paid,
                 'current_pay' => (float)$sumCurrentDay,
                 'square' => $value->square,
-
                 'rama_prokhodnaya' => 0,
                 'rama_letsnitsey' => 0,
                 'diagonalnaya_svyaz' => 0,
@@ -652,7 +651,7 @@ class HireClass
             'equipments' =>
                 [
                     'name' => $nameEq,
-                    'state' => $eq->status0->name,
+                    'state' => $app->equipmentsStatus->name,
                     'state_id' => $app->equipments_status,
                     'photo' => $photoEq,
                     'photo_alias' => $photo_aliasEq
@@ -1413,6 +1412,9 @@ class HireClass
 
         $dateDiff = (strtotime($date) - strtotime($rent_end)) / (60 * 60);
 
+        $delivery_sum = $app->deliverySum->delivery_sum;
+        $delivery_sum_paid = $app->deliverySum->delivery_sum_paid;
+
         Yii::info('Текущее время: ' . serialize($date), __METHOD__);
         Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
         Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
@@ -1426,7 +1428,7 @@ class HireClass
         $msg = 'Состояние успешно изменено';
 
         // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
-        if ($app->sum <= $app->total_paid && $dateDiff < 3 && $eq_status === 4) {
+        if (($delivery_sum <= $delivery_sum_paid || $app->sum <= $app->total_paid) && $dateDiff < 3 && $eq_status === 4) {
             $hire_state_id = 3;
             $msg = 'Прокат успешно закрыт';
         }
@@ -1438,7 +1440,7 @@ class HireClass
         }
 
         // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if ($app->sum > $app->total_paid && $eq_status === 4) {
+        if (($delivery_sum > $delivery_sum_paid || $app->sum > $app->total_paid) && $eq_status === 4) {
             $hire_state_id = 5;
             $msg = 'Невозможно закрыть. Есть долг';
         }

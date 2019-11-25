@@ -158,7 +158,25 @@ class PayClass
                 ];
             }
         } elseif ($newPay->cashBox0->delivery === '1') {
-            //@todo доставка
+            $delivery = $app->deliverySum;
+
+            if (!is_object($delivery)) {
+                Yii::error('Доставка не найдена: ' . serialize($app), __METHOD__);
+                return false;
+            }
+
+            $delivery->delivery_sum_paid += (float)$sum;
+
+            try {
+                if (!$delivery->save(false)) {
+                    Yii::error('Ошибка при сохранении информации по доставке: ' . serialize($delivery->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении информации по доставке: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
         }
 
         try {
