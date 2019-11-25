@@ -247,8 +247,14 @@ class EquipmentsClass
 
         if ($status !== '' and $status !== null) {
             Yii::info('Параметр status: ' . serialize($status), __METHOD__);
-            $listFilter[] = 'status=:status';
-            $params[':status'] = $status;
+
+            if ($status === '4') {
+                $listFilter[] = 'status not in (2,3)';
+            } elseif ($status === '5') {
+                $listFilter[] = 'status in (1,2,4)';
+            } else {
+                $listFilter[] = 'status=' . $status;
+            }
         }
 
         if ($stock !== '' and $stock !== null) {
