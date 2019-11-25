@@ -2147,11 +2147,12 @@ class EquipmentsClass
 
     /**
      * Функция изменения статуса у оборудования
-     * @param $id_eq ,
+     * @param $id_eq
      * @param $status
-     * @param $rent_start
-     * @param $rent_end
-     * @return bool|array
+     * @param bool $rent_start
+     * @param bool $rent_end
+     * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
     public static function changeStatus($id_eq, $status, $rent_start = false, $rent_end = false)
     {
@@ -2171,6 +2172,7 @@ class EquipmentsClass
             ];
         }
 
+        $old_status =$equipments->status;
         $equipments->status = $status;
         $equipments->rentals = $status === 1 ? ++$equipments->rentals : $equipments->rentals;
 
@@ -2187,6 +2189,21 @@ class EquipmentsClass
         } catch (\Exception $e) {
             Yii::error('Поймали Exception при сохранении статуса оборудования: ' . serialize($e->getMessage()), __METHOD__);
             return false;
+        }
+
+        $check = self::addHistoryChangeStatus($equipments->id, $equipments->status, $old_status, 'Система', 0, 0, 0);
+
+        if (!is_array($check) || !isset($check['status']) || $check['status'] != 'SUCCESS') {
+            Yii::error('Ошибка при изменении статуса', __METHOD__);
+
+            if (is_array($check) && isset($check['status']) && $check['status'] === 'ERROR') {
+                return $check;
+            }
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при изменении статуса',
+            ];
         }
 
         return [
