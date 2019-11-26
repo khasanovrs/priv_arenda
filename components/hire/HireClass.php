@@ -936,12 +936,13 @@ class HireClass
                 ];
             }
 
-            $dateDiff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
+            $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
+            Yii::info('Период аренды в днях: ' . serialize($dateDiff), __METHOD__);
 
             if ($applications->lesa === '0') {
-                $price = ($dateDiff / (60 * 60 * 24)) * $equipments->price_per_day * $value->equipments_count;
+                $price = round($dateDiff * $equipments->price_per_day * $value->equipments_count);
             } else {
-                $price = ($dateDiff / (60 * 60 * 24)) * ($applications->month_sum / 30);
+                $price = round($dateDiff * ($applications->month_sum / 30));
             }
 
             if ((int)$applications->discount->code !== 0) {
@@ -1124,12 +1125,13 @@ class HireClass
                 ];
             }
 
-            $dateDiff = strtotime($applications->rent_end) - strtotime($applications->rent_start);
+            $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
+            Yii::info('Период аренды в днях: ' . serialize($dateDiff), __METHOD__);
 
             if ($applications->lesa === '0') {
-                $price = ($dateDiff / (60 * 60 * 24)) * $equipments->price_per_day * $value->equipments_count;
+                $price = round($dateDiff * $equipments->price_per_day * $value->equipments_count);
             } else {
-                $price = ($dateDiff / (60 * 60 * 24)) * ($applications->month_sum / 30);
+                $price = round($dateDiff * ($applications->month_sum / 30));
             }
 
             if ((int)$applications->discount->code !== 0) {
@@ -1143,6 +1145,16 @@ class HireClass
             try {
                 if (!$value->save(false)) {
                     Yii::error('Ошибка при сохранении новой суммы: ' . serialize($value->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при сохранении новой суммы: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
+            try {
+                if (!$applications->save(false)) {
+                    Yii::error('Ошибка при сохранении новой суммы: ' . serialize($applications->getErrors()), __METHOD__);
                     return false;
                 }
             } catch (\Exception $e) {
@@ -1205,6 +1217,7 @@ class HireClass
      * Функция возврата оборудования на склад
      * @param $app_id
      * @return array|bool
+     * @throws \yii\base\InvalidConfigException
      */
     public static function equipmentReturn($app_id)
     {
