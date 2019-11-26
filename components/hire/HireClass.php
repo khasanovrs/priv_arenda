@@ -1009,6 +1009,7 @@ class HireClass
         $extension->user_id = $session->user_id;
         $extension->type = $applications->type_lease_id;
         $extension->application_id = $applications->id;
+        $extension->extend = '1';
 
         try {
             if (!$extension->save(false)) {
@@ -1194,6 +1195,7 @@ class HireClass
         $extension->user_id = $session->user_id;
         $extension->type = $applications->type_lease_id;
         $extension->application_id = $applications->id;
+        $extension->extend = '0';
 
         try {
             if (!$extension->save(false)) {

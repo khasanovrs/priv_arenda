@@ -13,6 +13,7 @@ use Yii;
  * @property int $user_id
  * @property int $application_id
  * @property string $type тип продления, 1- день, 2-месяц
+ * @property string $extend 1-продление,0-сокращение
  *
  * @property Applications $application
  * @property Users $user
@@ -33,10 +34,10 @@ class Extension extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['date_create', 'count', 'user_id', 'application_id', 'type'], 'required'],
+            [['date_create', 'count', 'user_id', 'application_id', 'type', 'extend'], 'required'],
             [['date_create'], 'safe'],
             [['user_id', 'application_id'], 'integer'],
-            [['count', 'type'], 'string', 'max' => 45],
+            [['count', 'type', 'extend'], 'string', 'max' => 45],
             [['application_id'], 'exist', 'skipOnError' => true, 'targetClass' => Applications::className(), 'targetAttribute' => ['application_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -54,6 +55,7 @@ class Extension extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'application_id' => 'Application ID',
             'type' => 'Type',
+            'extend' => 'Extend',
         ];
     }
 

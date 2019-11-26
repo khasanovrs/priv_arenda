@@ -275,11 +275,8 @@ class PayClass
              */
             foreach ($extensions_arr as $value) {
 
-                if ($value->type == 1) {
-                    $txt = 'дней: ';
-                } else {
-                    $txt = 'месяцев: ';
-                }
+                $txt = $value->extend === '1' ? 'Продление ' : 'Сокращение ';
+                $txt .= ($value->type == 1) ? 'дней: ' : 'месяцев: ';
 
                 $arr = [
                     'date' => date('d.m.Y H:i', strtotime($value->date_create)),
