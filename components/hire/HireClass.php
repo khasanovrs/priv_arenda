@@ -21,6 +21,7 @@ use app\models\HireLesaShowField;
 use app\models\HireShowField;
 use app\models\HireState;
 use app\models\Users;
+use Symfony\Component\Console\Application;
 use Yii;
 
 class HireClass
@@ -1488,6 +1489,20 @@ class HireClass
 
 // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
         if ((($delivery_sum <= $delivery_sum_paid || $app->sum <= $app->total_paid) && $dateDiff < 3 && $eq_status === 4) && $check_close) {
+            $check = ApplicationPay::find()
+                ->joinWith('cashBox0')
+                ->where('application_id=:application_id and finance_cashbox.check_zalog=1', [':application_id' => $app->id])
+                ->sum('application_pay.sum');
+
+
+            Yii::info('Проверяем сумму в залоге' . serialize($check), __METHOD__);
+            if ($check !== null) {
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'Невозможно закрыть. В залоге сумма: '. $check
+                ];
+            }
+
             $hire_state_id = 3;
             $msg = 'Прокат успешно закрыт';
         }
