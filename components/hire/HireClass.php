@@ -1496,10 +1496,10 @@ class HireClass
 
 
             Yii::info('Проверяем сумму в залоге' . serialize($check), __METHOD__);
-            if ($check !== null) {
+            if ($check !== null && (int)$check > 0) {
                 return [
                     'status' => 'SUCCESS',
-                    'msg' => 'Невозможно закрыть. В залоге сумма: '. $check
+                    'msg' => 'Невозможно закрыть. В залоге сумма: ' . $check
                 ];
             }
 
