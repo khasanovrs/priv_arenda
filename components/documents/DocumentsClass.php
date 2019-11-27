@@ -176,7 +176,7 @@ class DocumentsClass
         $dateDiff = strtotime($rent_end) - strtotime($rent_start);
         $days = ($dateDiff / (60 * 60 * 24));
 
-        $id_app_eq = substr($branch->name, 0, 1) . date('ymd') . $equipments->id;
+        $id_app_eq = mb_substr($branch->name, 0, 1) . date('ymd') . $equipments->id;
         $fileName = $id_app_eq . '.docx';
 
         $document->setValue('id_app_eq', $id_app_eq);

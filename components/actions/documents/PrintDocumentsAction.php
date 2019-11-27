@@ -40,7 +40,7 @@ class PrintDocumentsAction extends Action
             ];
         }
 
-        Yii::info('Документ успешно сформирован'.serialize($result['data']), __METHOD__);
+        Yii::info('Документ успешно сформирован', __METHOD__);
 
         return [
             'status' => 'OK',
