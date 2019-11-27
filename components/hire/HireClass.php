@@ -667,7 +667,6 @@ class HireClass
             'id' => $app->id,
             'branch' => $app->branch->name,
             'delivery' => $app->delivery_id,
-            'typeLease' => $app->typeLease->name,
             'typeLease_id' => $app->type_lease_id,
             'sale' => $app->discount_id,
             'hire_state_id' => $app->hire_state_id,
@@ -765,11 +764,11 @@ class HireClass
         }
 
         /**
-         * @var ApplicationEquipment $applicationEq
+         * @var Applications $app
          */
-        $applicationEq = ApplicationEquipment::find()->where('id=:id', [':id' => $id])->one();
+        $app = Applications::find()->where('id=:id', [':id' => $id])->one();
 
-        if (!is_object($applicationEq)) {
+        if (!is_object($app)) {
             Yii::info('Ошибка при получении заявки', __METHOD__);
 
             return [
@@ -777,24 +776,6 @@ class HireClass
                 'msg' => 'Ошибка при получении заявки'
             ];
         }
-
-        $app = $applicationEq->application;
-        $app->comment = $comment;
-
-        try {
-            if (!$app->save(false)) {
-                Yii::error('Ошибка при изменении заявки: ' . serialize($app->getErrors()), __METHOD__);
-                return false;
-            }
-        } catch (\Exception $e) {
-            Yii::error('Поймали Exception при изменении заявки: ' . serialize($e->getMessage()), __METHOD__);
-            return false;
-        }
-
-        /**
-         * @var Applications $app
-         */
-        $app = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
 
         if (!is_object($app)) {
             Yii::error('Ошибка при получении основной заявки', __METHOD__);
@@ -809,6 +790,7 @@ class HireClass
             Yii::info('Изменили тип доставки', __METHOD__);
         }
 
+        $app->comment = $comment;
         $app->type_lease_id = $typeLease_id;
         $app->discount_id = $sale;
         $app->delivery_id = $delivery;
