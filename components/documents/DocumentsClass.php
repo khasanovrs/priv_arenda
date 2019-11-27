@@ -177,6 +177,7 @@ class DocumentsClass
         $days = ($dateDiff / (60 * 60 * 24));
 
         $id_app_eq = substr($branch->name, 0, 1) . date('ymd') . $equipments->id;
+        $fileName = $id_app_eq . '.docx';
 
         $document->setValue('id_app_eq', $id_app_eq);
         $document->setValue('telephone', $client->phone);
@@ -194,13 +195,13 @@ class DocumentsClass
         $document->setValue('sum_pay', $sum_pay);
         $document->setValue('sum_eq', $equipments->selling);
 
-        $document->saveAs('uploads/doc/' . $id_app_eq . '.docx');
+        $document->saveAs('uploads/doc/' . $fileName);
 
         Yii::info('Список типов оборудования получен', __METHOD__);
         return [
             'status' => 'SUCCESS',
             'msg' => 'Список типов оборудования получен',
-            'data' => $id_app_eq . '.docx'
+            'data' => $fileName
         ];
 
 
