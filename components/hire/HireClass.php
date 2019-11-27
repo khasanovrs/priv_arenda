@@ -750,9 +750,10 @@ class HireClass
      * @param $sale ,
      * @param $rent_start ,
      * @param $rent_end
+     * @param $typeLease_id
      * @return array|bool
      */
-    public static function UpdateHire($id, $comment, $delivery, $sale, $rent_start, $rent_end)
+    public static function UpdateHire($id, $comment, $delivery, $sale, $rent_start, $rent_end, $typeLease_id)
     {
         if ($id === '') {
             Yii::error('Не передан идентификатор заявки, applicationId: ' . serialize($id), __METHOD__);
@@ -796,7 +797,7 @@ class HireClass
         $app = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
 
         if (!is_object($app)) {
-            Yii::info('Ошибка при получении основной заявки', __METHOD__);
+            Yii::error('Ошибка при получении основной заявки', __METHOD__);
 
             return [
                 'status' => 'SUCCESS',
@@ -804,6 +805,11 @@ class HireClass
             ];
         }
 
+        if ((int)$app->type_lease_id !== (int)$typeLease_id) {
+            Yii::info('Изменили тип доставки', __METHOD__);
+        }
+
+        $app->type_lease_id = $typeLease_id;
         $app->discount_id = $sale;
         $app->delivery_id = $delivery;
         $app->rent_start = date('Y-m-d H:i:s', strtotime($rent_start));
@@ -936,7 +942,7 @@ class HireClass
                 ];
             }
 
-            if ($applications->typeLease === 1) {
+            if ((int)$applications->type_lease_id === 1) {
                 $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
             } else {
                 $dateDiff = floor(((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24)) / 30);
@@ -1131,14 +1137,13 @@ class HireClass
                 ];
             }
 
-            if ($applications->typeLease === 1) {
+            if ($applications->type_lease_id === 1) {
                 $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
             } else {
                 $dateDiff = floor(((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24)) / 30);
                 $dateDiff *= 30;
             }
             Yii::info('Период аренды в днях: ' . serialize($dateDiff), __METHOD__);
-
 
 
             if ($applications->lesa === '0') {

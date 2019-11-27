@@ -23,8 +23,9 @@ class UpdateHireAction extends Action
         $rent_start = $request->getBodyParam('rent_start');
         $rent_end = $request->getBodyParam('rent_end');
         $comment = $request->getBodyParam('comment');
+        $typeLease_id = $request->getBodyParam('typeLease_id');
 
-        $result = HireClass::UpdateHire($id, $comment, $delivery, $sale, $rent_start, $rent_end);
+        $result = HireClass::UpdateHire($id, $comment, $delivery, $sale, $rent_start, $rent_end, $typeLease_id);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при изменении информации проката', __METHOD__);
