@@ -249,7 +249,7 @@ class EquipmentsClass
             Yii::info('Параметр status: ' . serialize($status), __METHOD__);
 
             if ($status === '4') {
-                $listFilter[] = 'status not in (2,3)';
+                $listFilter[] = 'status not in (2,3,7)';
             } elseif ($status === '5') {
                 $listFilter[] = 'status in (1,2,4)';
             } else {
@@ -397,17 +397,21 @@ class EquipmentsClass
             $params[':like'] = strtolower($like);
         }
 
-        if ($lesa) {
-            $listFilter[] = 'equipments.category_id=33';
-        } else {
-            $listFilter[] = 'equipments.category_id!=33';
+        // леса
+        $listFilter[] = $lesa ? 'equipments.category_id=33' : 'equipments.category_id!=33';
+
+        // определяем менеджера
+        if ($stockUser !== '') {
+            $listFilter[] = 'stock_id=' . $stockUser;
         }
 
-        if ($stockUser !== '') {
-            $listFilter[] = 'is_not_active=0 and status!=7 and stock_id=' . $stockUser;
-        } else {
-            $listFilter[] = 'is_not_active=0 and status!=7';
+        // оборудование на спрос
+        if ($status !== '7') {
+            $listFilter[] = 'status!=7';
         }
+
+        // только активные
+        $listFilter[] = 'is_not_active=0';
 
         $equipmentsTypeList = Equipments::find()->joinWith(['mark0', 'status0', 'stock', 'type0', 'category', 'equipmentsInfos'])->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
@@ -2172,7 +2176,7 @@ class EquipmentsClass
             ];
         }
 
-        $old_status =$equipments->status;
+        $old_status = $equipments->status;
         $equipments->status = $status;
         $equipments->rentals = $status === 1 ? ++$equipments->rentals : $equipments->rentals;
 
