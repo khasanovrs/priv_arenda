@@ -411,6 +411,9 @@ class ApiController extends Controller
             'get-doc' => [
                 'class' => 'app\components\actions\documents\GetDocumentsAction',
             ],
+            'print-doc' => [
+                'class' => 'app\components\actions\documents\PrintDocumentsAction',
+            ],
             /**
              * Запуск крона
              */
