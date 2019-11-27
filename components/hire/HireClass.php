@@ -936,7 +936,12 @@ class HireClass
                 ];
             }
 
-            $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
+            if ($applications->typeLease === 1) {
+                $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
+            } else {
+                $dateDiff = floor(((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24)) / 30);
+                $dateDiff *= 30;
+            }
             Yii::info('Период аренды в днях: ' . serialize($dateDiff), __METHOD__);
 
             if ($applications->lesa === '0') {
@@ -1126,8 +1131,15 @@ class HireClass
                 ];
             }
 
-            $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
+            if ($applications->typeLease === 1) {
+                $dateDiff = ((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24));
+            } else {
+                $dateDiff = floor(((strtotime($applications->rent_end) - strtotime($applications->rent_start)) / (60 * 60 * 24)) / 30);
+                $dateDiff *= 30;
+            }
             Yii::info('Период аренды в днях: ' . serialize($dateDiff), __METHOD__);
+
+
 
             if ($applications->lesa === '0') {
                 $price = round($dateDiff * $equipments->price_per_day * $value->equipments_count);

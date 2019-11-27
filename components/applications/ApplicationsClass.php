@@ -639,12 +639,18 @@ class ApplicationsClass
             }
 
             if (($app_id === '' && $lesa) || !$lesa) {
-                $dateDiff = strtotime($rent_end) - strtotime($rent_start);
+                if ($typeLease === 1) {
+                    $dateDiff = (strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24);
+                } else {
+                    $dateDiff = floor(((strtotime($rent_end) - strtotime($rent_start)) / (60 * 60 * 24)) / 30);
+                    $dateDiff *= 30;
+                }
+
                 if ($lesa) {
-                    $price = ($dateDiff / (60 * 60 * 24)) * ($month_sum / 30);
+                    $price = $dateDiff * ($month_sum / 30);
                     $sale_sum = $month_sum / 30;
                 } else {
-                    $price = ($dateDiff / (60 * 60 * 24)) * $equipment->price_per_day * (int)$value->count;
+                    $price = $dateDiff * $equipment->price_per_day * (int)$value->count;
                     $sale_sum = $equipment->price_per_day;
                 }
 
