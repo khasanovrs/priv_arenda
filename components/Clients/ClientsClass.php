@@ -286,7 +286,8 @@ class ClientsClass
         if ($clientId !== '') {
             return [
                 'status' => 'SUCCESS',
-                'msg' => 'Клиент успешно изменен'
+                'msg' => 'Клиент успешно изменен',
+                'data' => ''
             ];
         } else {
             $user = [
@@ -705,7 +706,7 @@ class ClientsClass
 
         $listFilter[] = 'is_not_active=0 and type!=3';
 
-        $clients = Clients::find()->joinWith('clientsInfos','status0')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
+        $clients = Clients::find()->joinWith('clientsInfos', 'status0')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
 
         if (is_array($clients)) {
             /**
@@ -941,12 +942,12 @@ class ClientsClass
                     $application_list[] = [
                         'rent_start' => date('d.m.Y H:i:s', strtotime($value->rent_start)),
                         'rent_end' => date('d.m.Y H:i:s', strtotime($value->rent_end)),
-                        'sum' => $value_2->sum,
-                        'total_paid' => $value_2->total_paid,
+                        'sum' => $value->sum,
+                        'total_paid' => $value->total_paid,
                         'equipments' => $value_2->equipments->type0->name . ' ' . $value_2->equipments->mark0->name . ' ' . $value_2->equipments->model
                     ];
 
-                    foreach ($value_2->applicationPays as $value3) {
+                    foreach ($value->applicationPays as $value3) {
                         $pay_list[] = [
                             'sum' => $value3->sum,
                             'date' => date('d.m.Y H:i:s', strtotime($value3->date_create)),
@@ -956,7 +957,7 @@ class ClientsClass
                     }
 
 
-                    $all_total_paid += (float)$value_2->total_paid;
+                    $all_total_paid += (float)$value->total_paid;
                 }
             }
         }

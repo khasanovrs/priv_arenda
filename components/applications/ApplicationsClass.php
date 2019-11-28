@@ -425,14 +425,44 @@ class ApplicationsClass
                 ];
             }
 
-            $check = Clients::find()->where('id=:id', [':id' => $client_id])->one();
-            if (!is_object($check)) {
+            /**
+             * @var Clients $client_check
+             */
+            $client_check = Clients::find()->where('id=:id', [':id' => $client_id])->one();
+            if (!is_object($client_check)) {
                 Yii::error('Клиент не найден, client_id: ' . serialize($client_id), __METHOD__);
 
                 return [
                     'status' => 'ERROR',
                     'msg' => 'Клиент не найден',
                 ];
+            }
+
+            if ((int)$client_check->status === 1) {
+                foreach ($equipments as $value) {
+                    $sumCheck = 0;
+                    foreach ($value->payList as $valueSecond) {
+                        $cashBox = FinanceCashbox::find()->where('id=:id', [':id' => $valueSecond->cashBox])->one();
+                        if (!is_object($cashBox)) {
+                            Yii::error('Касса не найдена', __METHOD__);
+
+                            return [
+                                'status' => 'ERROR',
+                                'msg' => 'Касса не найдена',
+                            ];
+                        }
+                        $sumCheck += $valueSecond->sum;
+                    }
+
+                    if ($sumCheck===0) {
+                        Yii::error('У клиента статус "с залогом". Необходимо добавить залог', __METHOD__);
+
+                        return [
+                            'status' => 'ERROR',
+                            'msg' => 'У клиента статус "с залогом". Необходимо добавить залог',
+                        ];
+                    }
+                }
             }
 
             if (!is_numeric($typeLease)) {

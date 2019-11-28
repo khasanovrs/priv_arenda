@@ -55,7 +55,6 @@ class UpdateClientInfoAction extends Action
         return [
             'status' => 'OK',
             'msg' => 'Пользователь успешно изменен',
-
         ];
     }
 }
