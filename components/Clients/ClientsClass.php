@@ -697,9 +697,15 @@ class ClientsClass
             $params[':date_end'] = $date_end . ' 23:59:59';
         }
 
+        if ($source !== '' and $source !== null) {
+            Yii::info('Параметр source: ' . serialize($source), __METHOD__);
+            $listFilter[] = 'clients_info.source=:source';
+            $params[':source'] = $source;
+        }
+
         $listFilter[] = 'is_not_active=0 and type!=3';
 
-        $clients = Clients::find()->with('clientsInfos','status0')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
+        $clients = Clients::find()->joinWith('clientsInfos','status0')->where(implode(" and ", $listFilter), $params)->orderBy('last_contact desc')->all();
 
         if (is_array($clients)) {
             /**
@@ -708,10 +714,6 @@ class ClientsClass
             foreach ($clients as $value) {
                 $sourceBD = $value->clientsInfos[0]->source0;
                 $discount = $value->clientsInfos[0]->sale0;
-
-                if ($source !== '' && $source !== null && $source !== $sourceBD) {
-                    continue;
-                }
 
                 if ($rentals_start !== '' && $rentals_start !== null) {
                     continue;
