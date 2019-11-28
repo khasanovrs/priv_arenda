@@ -1476,6 +1476,8 @@ class HireClass
         $delivery_sum = $app->deliverySum->delivery_sum;
         $delivery_sum_paid = $app->deliverySum->delivery_sum_paid;
 
+        echo (strtotime(date('Y-m-d H:i:s')) - strtotime('2019-12-29 21:11:00')) / (60 * 60);
+
         Yii::info('Текущее время: ' . serialize($date), __METHOD__);
         Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
         Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
@@ -1485,11 +1487,10 @@ class HireClass
             $hire_state_id = 4;
         };
 
-        $eq_status = $app->applicationEquipments[0]->equipments->status;
         $msg = 'Состояние успешно изменено';
 
 // закрыт - (отстутствии долгов и возвращении оборудования на склад и прошло менее 3 часов)
-        if ((($delivery_sum <= $delivery_sum_paid || $app->sum <= $app->total_paid) && $dateDiff < 3 && $eq_status === 4) && $check_close) {
+        if ((($delivery_sum <= $delivery_sum_paid || $app->sum <= $app->total_paid) && $dateDiff < 3 && $app->equipments_status === 4) && $check_close) {
             $check = ApplicationPay::find()
                 ->joinWith('cashBox0')
                 ->where('application_id=:application_id and finance_cashbox.check_zalog=1', [':application_id' => $app->id])
@@ -1509,18 +1510,18 @@ class HireClass
         }
 
         // оборудование не возвращено
-        if ($eq_status === 1) {
+        if ($app->equipments_status === 1) {
             $msg = 'Невозможно закрыть, оборудование в аренде';
         }
 
         // просрочен - по истечению времени первичного проката прокат не продлен, оборудование не возвращено
-        if ($date > $rent_end && $eq_status === 1) {
+        if ($date > $rent_end && $app->equipments_status === 1) {
             $hire_state_id = 2;
             $msg = 'Невозможно закрыть. Оборудование у клиента';
         }
 
         // долг - прокат не продлен, оборудование возвращено, но есть долг по оплате
-        if (($delivery_sum > $delivery_sum_paid || $app->sum > $app->total_paid) && $eq_status === 4) {
+        if (($delivery_sum > $delivery_sum_paid || $app->sum > $app->total_paid) && $app->equipments_status === 4) {
             $hire_state_id = 5;
             $msg = 'Невозможно закрыть. Есть долг';
         }
