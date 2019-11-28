@@ -554,13 +554,14 @@ class EquipmentsClass
         }
 
         /**
-         * @var Equipments $value
+         * @var EquipmentsDemand $value
          */
         foreach ($equipmentsTypeList as $value) {
             $result[] = [
                 'id' => $value->id,
                 'name' => $value->model,
                 'stock' => $value->stock->name,
+                'count_demand' => $value->count_demand,
             ];
         }
 
