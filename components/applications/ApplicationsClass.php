@@ -682,6 +682,7 @@ class ApplicationsClass
                 $newApplications->status_id = $status;
                 $newApplications->hire_state_id = $status === 1 ? 4 : 1;
                 $newApplications->equipments_status = $status === 1 ? 1 : 4;
+                $newApplications->num_dog = mb_substr($checkBranch->name, 0, 1) . date('ymd') . $equipment->id;
 
                 try {
                     if (!$newApplications->save(false)) {

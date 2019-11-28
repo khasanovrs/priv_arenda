@@ -472,6 +472,7 @@ class HireClass
 
             $result[$keyArr] = [
                 'id' => $value->id,
+                'dog_num' => $value->num_dog,
                 'typeLease_id' => $value->type_lease_id,
                 'client' => $client->name,
                 'client_phone' => $client->phone,

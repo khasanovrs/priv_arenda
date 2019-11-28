@@ -32,6 +32,7 @@ use Yii;
  * @property int $status_id
  * @property int $hire_state_id
  * @property int $equipments_status
+ * @property string $num_dog Номер договора
  *
  * @property ApplicationEquipment[] $applicationEquipments
  * @property ApplicationPay[] $applicationPays
@@ -65,10 +66,10 @@ class Applications extends \yii\db\ActiveRecord
     {
         return [
             [['client_id', 'source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id', 'status_id', 'hire_state_id', 'equipments_status'], 'integer'],
-            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id', 'sum', 'status_id', 'hire_state_id', 'equipments_status'], 'required'],
+            [['source_id', 'discount_id', 'delivery_id', 'type_lease_id', 'user_id', 'branch_id', 'delivery_sum_id', 'sum', 'status_id', 'hire_state_id', 'equipments_status', 'num_dog'], 'required'],
             [['rent_start', 'rent_end', 'date_create', 'date_end'], 'safe'],
             [['comment', 'address'], 'string', 'max' => 500],
-            [['is_not_active', 'lesa', 'square', 'sum', 'sum_sale', 'total_paid'], 'string', 'max' => 45],
+            [['is_not_active', 'lesa', 'square', 'sum', 'sum_sale', 'total_paid', 'num_dog'], 'string', 'max' => 45],
             [['month_sum'], 'string', 'max' => 150],
             [['source_id'], 'exist', 'skipOnError' => true, 'targetClass' => Source::className(), 'targetAttribute' => ['source_id' => 'id']],
             [['discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => Discount::className(), 'targetAttribute' => ['discount_id' => 'id']],
@@ -115,6 +116,7 @@ class Applications extends \yii\db\ActiveRecord
             'status_id' => 'Status ID',
             'hire_state_id' => 'Hire State ID',
             'equipments_status' => 'Equipments Status',
+            'num_dog' => 'Num Dog',
         ];
     }
 
