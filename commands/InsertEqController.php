@@ -213,7 +213,7 @@ class InsertEqController extends Controller
                     $newEq->category_id = $checkCategory->id;
                     $newEq->tool_number = $tool_number;
                     $newEq->selling = $sum;
-                    $newEq->selling_price = $selling_price;
+                    $newEq->selling_price = $selling_price == null ? $sum * 70 / 100 : $selling_price;
                     $newEq->price_per_day = $price_per_day;
                     $newEq->revenue = $revenue;
                     $newEq->degree_wear = 0;
