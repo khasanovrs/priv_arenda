@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $model
  * @property int $stock_id
+ * @property int $count_demand Количество запросов
  *
  * @property Stock $stock
  */
@@ -30,7 +31,7 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
     {
         return [
             [['model', 'stock_id'], 'required'],
-            [['stock_id'], 'integer'],
+            [['stock_id', 'count_demand'], 'integer'],
             [['model'], 'string', 'max' => 150],
             [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
         ];
@@ -45,6 +46,7 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
             'id' => 'ID',
             'model' => 'Model',
             'stock_id' => 'Stock ID',
+            'count_demand' => 'Count Demand',
         ];
     }
 
