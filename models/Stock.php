@@ -14,6 +14,7 @@ use Yii;
  * @property string $date_update тип роли
  *
  * @property Equipments[] $equipments
+ * @property EquipmentsDemand[] $equipmentsDemands
  * @property Branch $branch
  */
 class Stock extends \yii\db\ActiveRecord
@@ -59,6 +60,14 @@ class Stock extends \yii\db\ActiveRecord
     public function getEquipments()
     {
         return $this->hasMany(Equipments::className(), ['stock_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEquipmentsDemands()
+    {
+        return $this->hasMany(EquipmentsDemand::className(), ['stock_id' => 'id']);
     }
 
     /**

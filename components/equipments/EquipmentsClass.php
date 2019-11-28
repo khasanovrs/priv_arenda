@@ -11,6 +11,7 @@ use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
 use app\models\Equipments;
 use app\models\EquipmentsCategory;
+use app\models\EquipmentsDemand;
 use app\models\EquipmentsField;
 use app\models\EquipmentsHistory;
 use app\models\EquipmentsHistoryChangeStatus;
@@ -1105,6 +1106,50 @@ class EquipmentsClass
             }
 
             $i++;
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно добавлено'
+        ];
+    }
+
+    /**
+     * Функция добавления оборудования для спроса
+     * @param $model
+     * @param $stock
+     * @return array|bool
+     */
+    public static function AddEquipmentMini($model, $stock)
+    {
+        if ($model === '') {
+            Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передано наименование оборудования',
+            ];
+        }
+
+        if ($stock === '') {
+            Yii::error('Не передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификатор склада',
+            ];
+        }
+
+        $newEquipment = new EquipmentsDemand();
+        $newEquipment->model = $model;
+        $newEquipment->stock_id = $stock;
+
+        try {
+            if (!$newEquipment->save(false)) {
+                Yii::error('Ошибка при добавлении оборудования: ' . serialize($newEquipment->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при добавлении оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
         }
 
         return [
