@@ -250,7 +250,7 @@ class EquipmentsClass
             Yii::info('Параметр status: ' . serialize($status), __METHOD__);
 
             if ($status === '4') {
-                $listFilter[] = 'status not in (2,3,7)';
+                $listFilter[] = 'status not in (2,3)';
             } elseif ($status === '5') {
                 $listFilter[] = 'status in (1,2,4)';
             } else {
@@ -404,11 +404,6 @@ class EquipmentsClass
         // определяем менеджера
         if ($stockUser !== '') {
             $listFilter[] = 'stock_id=' . $stockUser;
-        }
-
-        // оборудование на спрос
-        if ($status !== '7') {
-            $listFilter[] = 'status!=7';
         }
 
         // только активные
