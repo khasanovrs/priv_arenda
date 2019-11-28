@@ -271,7 +271,7 @@ class EquipmentsClass
 
         if ($equipmentsCategory !== '' and $equipmentsCategory !== null) {
             Yii::info('Параметр equipmentsCategory: ' . serialize($equipmentsCategory), __METHOD__);
-            $listFilter[] = 'category_id=:equipmentsCategory';
+            $listFilter[] = 'equipments.category_id=:equipmentsCategory';
             $params[':equipmentsCategory'] = $equipmentsCategory;
         }
 
