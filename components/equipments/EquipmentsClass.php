@@ -693,7 +693,8 @@ class EquipmentsClass
         where(['in', 'stock_id', $arr])->
         andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter) and status not in (2,3,6)' . $secondFilter, [':filter' => $filter])->
         orderBy('equipments.id desc')->
-        all();
+        limit(20)
+            ->all();
 
         if (empty($equipments)) {
             Yii::error('Список оборудования пуст', __METHOD__);
