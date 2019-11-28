@@ -12,6 +12,7 @@ use app\models\ApplicationEquipment;
 use app\models\Equipments;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsDemand;
+use app\models\EquipmentsDemandField;
 use app\models\EquipmentsField;
 use app\models\EquipmentsHistory;
 use app\models\EquipmentsHistoryChangeStatus;
@@ -462,6 +463,118 @@ class EquipmentsClass
 
     /**
      * Получение списка оборудования
+     * @param $like
+     * @param $stock
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function GetEquipmentsDemand($like, $stock)
+    {
+        Yii::info('Запуск функции GetEquipmentsDemand' . serialize($like), __METHOD__);
+
+        $result = [];
+        $listFilter = [];
+        $params = [];
+        $stockUser = '';
+
+        /**
+         * @var Sessions $Sessions
+         */
+        $Sessions = Yii::$app->get('Sessions');
+        $session = $Sessions->getSession();
+
+        if (!is_object($session)) {
+            Yii::error('Ошибка при опредении пользователя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ошибка при опредении пользователя'
+            ];
+        }
+
+        /**
+         * @var Users $user
+         */
+        $user = Users::find()->where('id=:id', [':id' => $session->user_id])->one();
+
+        if (!is_object($user)) {
+            Yii::error('Пользователь не найден', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Пользователь не найден',
+            ];
+        }
+
+        if ($user->user_type === 2) {
+            $stockUserObject = $user->branch->stocks[0];
+
+            if (!is_object($stockUserObject)) {
+                Yii::error('Ошибка при определении филиала у менеджера' . serialize($stockUser), __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при определении филиала у менеджера',
+                ];
+            }
+
+            $stockUser = $stockUserObject->id;
+        }
+
+        if ($stock !== '' and $stock !== null) {
+            Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
+            $listFilter[] = 'stock_id=:stock';
+            $params[':stock'] = $stock;
+        }
+
+
+        if ($like !== '' and $like !== null) {
+            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+            $like = mb_strtolower($like);
+            $like = '%' . $like . '%';
+            $listFilter[] = 'lower(model) like :like';
+            $params[':like'] = strtolower($like);
+        }
+
+
+        // определяем менеджера
+        if ($stockUser !== '') {
+            $listFilter[] = 'stock_id=' . $stockUser;
+        }
+
+        $equipmentsTypeList = EquipmentsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+
+        if (!is_array($equipmentsTypeList)) {
+            Yii::error('Список категорий оборудования пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список категорий оборудования пуст'
+            ];
+        }
+
+        /**
+         * @var Equipments $value
+         */
+        foreach ($equipmentsTypeList as $value) {
+            $result[] = [
+                'id' => $value->id,
+                'name' => $value->model,
+                'stock' => $value->stock->name,
+            ];
+        }
+
+        Yii::info('Список оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список оборудования получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение списка оборудования
      * @param $branch
      * @param $date_start ,
      * @param $date_end
@@ -806,6 +919,47 @@ class EquipmentsClass
                 'code' => $value->code,
                 'name' => $value->name,
                 'flag' => $flag
+            ];
+        }
+
+        Yii::info('Список полей получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список полей получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение списка полей для оборудования
+     * @return array
+     */
+    public static function GetEquipmentDemandFields()
+    {
+        Yii::info('Запуск функции GetEquipmentDemandFields', __METHOD__);
+        $result = [];
+
+        $equipmentsFieldList = EquipmentsDemandField::find()->orderBy('id')->all();
+
+        if (!is_array($equipmentsFieldList)) {
+            Yii::error('Список полей пуст', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Список категорий оборудования пуст'
+            ];
+        }
+
+
+        /**
+         * @var EquipmentsField $value
+         */
+        foreach ($equipmentsFieldList as $value) {
+            $result[] = [
+                'id' => $value->id,
+                'code' => $value->code,
+                'name' => $value->name,
             ];
         }
 
