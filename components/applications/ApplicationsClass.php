@@ -439,6 +439,7 @@ class ApplicationsClass
             }
 
             if ((int)$client_check->status === 1) {
+                $sumCheckLesa = 0;
                 foreach ($equipments as $value) {
                     $sumCheck = 0;
                     foreach ($value->payList as $valueSecond) {
@@ -452,9 +453,10 @@ class ApplicationsClass
                             ];
                         }
                         $sumCheck += $valueSecond->sum;
+                        $sumCheckLesa += $valueSecond->sum;
                     }
 
-                    if ($sumCheck===0) {
+                    if (!$lesa && $sumCheck===0) {
                         Yii::error('У клиента статус "с залогом". Необходимо добавить залог', __METHOD__);
 
                         return [
@@ -462,6 +464,15 @@ class ApplicationsClass
                             'msg' => 'У клиента статус "с залогом". Необходимо добавить залог',
                         ];
                     }
+                }
+
+                if ($lesa && $sumCheckLesa===0) {
+                    Yii::error('У клиента статус "с залогом". Необходимо добавить залог', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'У клиента статус "с залогом". Необходимо добавить залог',
+                    ];
                 }
             }
 
