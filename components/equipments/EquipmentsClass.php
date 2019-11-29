@@ -679,77 +679,108 @@ class EquipmentsClass
         /**
          * @var Stock $value
          */
+
         foreach ($stock as $value) {
             array_push($arr, $value->id);
         }
 
         // показываем или нет оборудование со спросом
         $secondFilter = $lesa ? ' and equipments.category_id=33' : ' and equipments.category_id!=33';
-        $secondFilter .= $applicationStatus !== 3 ? ' and status!=7' : '';
 
         $filter = strtolower($filter);
         $filter = '%' . $filter . '%';
 
-        $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
-        where(['in', 'stock_id', $arr])->
-        andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter) and status not in (2,3,6)' . $secondFilter, [':filter' => $filter])->
-        orderBy('equipments.id desc')->
-        limit(20)
-            ->all();
+        if ($applicationStatus !== 3) {
+            $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
+            where(['in', 'stock_id', $arr])->
+            andWhere('(lower(model) like :filter or lower(equipments_mark.name) like :filter or lower(equipments_type.name) like :filter) and status not in (2,3,6)' . $secondFilter, [':filter' => $filter])->
+            orderBy('equipments.id desc')->
+            limit(20)
+                ->all();
 
-        if (empty($equipments)) {
-            Yii::error('Список оборудования пуст', __METHOD__);
+            if (empty($equipments)) {
+                Yii::error('Список оборудования пуст', __METHOD__);
 
-            return [
-                'status' => 'SUCCESS',
-                'msg' => 'Список оборудования пуст',
-                'data' => $result
-            ];
-        }
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'Список оборудования пуст',
+                    'data' => $result
+                ];
+            }
 
-        /**
-         * @var Equipments $value
-         */
-        foreach ($equipments as $value) {
-            if ($value->status === 1 || $value->status === 5) {
+            /**
+             * @var Equipments $value
+             */
+            foreach ($equipments as $value) {
+                if ($value->status === 1 || $value->status === 5) {
 
-                /**
-                 * @var ApplicationEquipment $ap_eq
-                 */
-                $ap_eq = ApplicationEquipment::find()->joinWith(['application'])->where('equipments_id=:id and applications.branch_id=:branch_id', [':id' => $value->id, ':branch_id' => $branch])->one();
+                    /**
+                     * @var ApplicationEquipment $ap_eq
+                     */
+                    $ap_eq = ApplicationEquipment::find()->joinWith(['application'])->where('equipments_id=:id and applications.branch_id=:branch_id', [':id' => $value->id, ':branch_id' => $branch])->one();
 
-                if (!is_object($ap_eq)) {
-                    Yii::error('Оборудования в данном филиале нет', __METHOD__);
+                    if (!is_object($ap_eq)) {
+                        Yii::error('Оборудования в данном филиале нет', __METHOD__);
 
-                    continue;
+                        continue;
+                    }
+
+                    $rent_end = date('d.m.Y H:i', strtotime($ap_eq->application->rent_end));
+                    $rent_start = date('d.m.Y H:i', strtotime($ap_eq->application->rent_start));
+
+                    $status = $value->status0->name . ' с ' . $rent_start . ' до ' . $rent_end;
+                    $checkClick = '0';
+                } else {
+                    $status = $value->status0->name;
+                    $checkClick = '1';
                 }
 
-                $rent_end = date('d.m.Y H:i', strtotime($ap_eq->application->rent_end));
-                $rent_start = date('d.m.Y H:i', strtotime($ap_eq->application->rent_start));
+                if ($lesa && $value->count - $value->count_hire > 0) {
+                    $status = 'Доступен';
+                    $checkClick = '1';
+                }
 
-                $status = $value->status0->name . ' с ' . $rent_start . ' до ' . $rent_end;
-                $checkClick = '0';
-            } else {
-                $status = $value->status0->name;
-                $checkClick = '1';
+                $result[] = [
+                    'id' => $value->id,
+                    'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
+                    'price_per_day' => $value->price_per_day,
+                    'status' => $status,
+                    'check_click' => $checkClick,
+                    'count' => $value->count - $value->count_hire,
+
+                    //'count' => $value->count,
+                    //'photo' => $value->photo
+                ];
+            }
+        } else {
+            $equipments = EquipmentsDemand::find()->
+            where(['in', 'stock_id', $arr])->
+            andWhere('lower(model) like :filter', [':filter' => $filter])->
+            orderBy('id desc')
+                ->limit(20)
+                ->all();
+
+            if (empty($equipments)) {
+                Yii::error('Список оборудования пуст', __METHOD__);
+
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'Список оборудования пуст',
+                    'data' => $result
+                ];
             }
 
-            if ($lesa && $value->count - $value->count_hire > 0) {
-                $status = 'Доступен';
-                $checkClick = '1';
+            /**
+             * @var EquipmentsDemand $value
+             */
+            foreach ($equipments as $value) {
+
+                $result[] = [
+                    'id' => $value->id,
+                    'name' => $value->model,
+                    'status' => 'Спрос',
+                ];
             }
-
-            $result[] = [
-                'id' => $value->id,
-                'name' => $value->type0->name . ' ' . $value->mark0->name . ' ' . $value->model,
-                'price_per_day' => $value->price_per_day,
-                'status' => $status,
-                'check_click' => $checkClick,
-                'count' => $value->count - $value->count_hire,
-
-                //'count' => $value->count,
-                //'photo' => $value->photo
-            ];
         }
 
         Yii::info('Список оборудования получен', __METHOD__);

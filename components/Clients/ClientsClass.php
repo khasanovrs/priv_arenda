@@ -1093,8 +1093,6 @@ class ClientsClass
             ];
         }
 
-        Yii::error('ololo: ' . serialize($clients), __METHOD__);
-
         /**
          * @var Clients $value
          */

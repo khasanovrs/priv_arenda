@@ -12,6 +12,7 @@ use Yii;
  * @property int $stock_id
  * @property int $count_demand Количество запросов
  *
+ * @property ApplicationsDemand[] $applicationsDemands
  * @property Stock $stock
  */
 class EquipmentsDemand extends \yii\db\ActiveRecord
@@ -48,6 +49,14 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
             'stock_id' => 'Stock ID',
             'count_demand' => 'Count Demand',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationsDemands()
+    {
+        return $this->hasMany(ApplicationsDemand::className(), ['eq_id' => 'id']);
     }
 
     /**
