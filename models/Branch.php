@@ -13,6 +13,7 @@ use Yii;
  * @property string $time_diff Разница с московским временем
  *
  * @property Applications[] $applications
+ * @property ApplicationsDemand[] $applicationsDemands
  * @property Clients[] $clients
  * @property Finance[] $finances
  * @property Stock[] $stocks
@@ -59,6 +60,14 @@ class Branch extends \yii\db\ActiveRecord
     public function getApplications()
     {
         return $this->hasMany(Applications::className(), ['branch_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationsDemands()
+    {
+        return $this->hasMany(ApplicationsDemand::className(), ['branch_id' => 'id']);
     }
 
     /**

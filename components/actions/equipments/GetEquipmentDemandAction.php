@@ -19,8 +19,9 @@ class GetEquipmentDemandAction extends Action
 
         $like = $request->getBodyParam('like');
         $stock = $request->getBodyParam('stock');
+        $type = $request->getBodyParam('type');
 
-        $result = EquipmentsClass::GetEquipmentsDemand($like, $stock);
+        $result = EquipmentsClass::GetEquipmentsDemand($like, $stock, $type);
 
         if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
             Yii::error('Ошибка при получении списка оборудования', __METHOD__);

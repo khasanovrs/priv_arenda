@@ -17,6 +17,9 @@ use Yii;
  * @property int $eq_id
  *
  * @property EquipmentsDemand $eq
+ * @property Branch $branch
+ * @property Users $user
+ * @property Clients $client
  */
 class ApplicationsDemand extends \yii\db\ActiveRecord
 {
@@ -40,6 +43,9 @@ class ApplicationsDemand extends \yii\db\ActiveRecord
             [['comment'], 'string', 'max' => 500],
             [['is_not_active'], 'string', 'max' => 45],
             [['eq_id'], 'exist', 'skipOnError' => true, 'targetClass' => EquipmentsDemand::className(), 'targetAttribute' => ['eq_id' => 'id']],
+            [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branch::className(), 'targetAttribute' => ['branch_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Clients::className(), 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -66,5 +72,29 @@ class ApplicationsDemand extends \yii\db\ActiveRecord
     public function getEq()
     {
         return $this->hasOne(EquipmentsDemand::className(), ['id' => 'eq_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBranch()
+    {
+        return $this->hasOne(Branch::className(), ['id' => 'branch_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClient()
+    {
+        return $this->hasOne(Clients::className(), ['id' => 'client_id']);
     }
 }

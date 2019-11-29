@@ -20,6 +20,7 @@ use Yii;
  *
  * @property ApplicationPay[] $applicationPays
  * @property Applications[] $applications
+ * @property ApplicationsDemand[] $applicationsDemands
  * @property ApplicationsShowField[] $applicationsShowFields
  * @property BunchUserRight[] $bunchUserRights
  * @property ClientShowField[] $clientShowFields
@@ -95,6 +96,14 @@ class Users extends \yii\db\ActiveRecord
     public function getApplications()
     {
         return $this->hasMany(Applications::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationsDemands()
+    {
+        return $this->hasMany(ApplicationsDemand::className(), ['user_id' => 'id']);
     }
 
     /**

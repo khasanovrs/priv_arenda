@@ -9,6 +9,7 @@ use app\components\finance\FinanceClass;
 use app\components\pay\PayClass;
 use app\components\Session\Sessions;
 use app\models\ApplicationEquipment;
+use app\models\ApplicationsDemand;
 use app\models\Equipments;
 use app\models\EquipmentsCategory;
 use app\models\EquipmentsDemand;
@@ -465,10 +466,11 @@ class EquipmentsClass
      * Получение списка оборудования
      * @param $like
      * @param $stock
+     * @param $type
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function GetEquipmentsDemand($like, $stock)
+    public static function GetEquipmentsDemand($like, $stock, $type)
     {
         Yii::info('Запуск функции GetEquipmentsDemand' . serialize($like), __METHOD__);
 
@@ -542,27 +544,56 @@ class EquipmentsClass
             $listFilter[] = 'stock_id=' . $stockUser;
         }
 
-        $equipmentsTypeList = EquipmentsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+        if ($type === 'eq') {
+            $equipmentsTypeList = EquipmentsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
-        if (!is_array($equipmentsTypeList)) {
-            Yii::error('Список категорий оборудования пуст', __METHOD__);
+            if (!is_array($equipmentsTypeList)) {
+                Yii::error('Список категорий оборудования пуст', __METHOD__);
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список категорий оборудования пуст'
-            ];
-        }
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Список категорий оборудования пуст'
+                ];
+            }
 
-        /**
-         * @var EquipmentsDemand $value
-         */
-        foreach ($equipmentsTypeList as $value) {
-            $result[] = [
-                'id' => $value->id,
-                'name' => $value->model,
-                'stock' => $value->stock->name,
-                'count_demand' => $value->count_demand,
-            ];
+            /**
+             * @var EquipmentsDemand $value
+             */
+            foreach ($equipmentsTypeList as $value) {
+                $result[] = [
+                    'id' => $value->id,
+                    'name' => $value->model,
+                    'stock' => $value->stock->name,
+                    'count_demand' => $value->count_demand,
+                ];
+            }
+        } elseif ($type === 'hire') {
+            $equipmentsTypeList = ApplicationsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+
+            if (!is_array($equipmentsTypeList)) {
+                Yii::error('Список категорий оборудования пуст', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Список категорий оборудования пуст'
+                ];
+            }
+
+            /**
+             * @var ApplicationsDemand $value
+             */
+            foreach ($equipmentsTypeList as $value) {
+                $eq = $value->eq;
+                $result[] = [
+                    'id' => $value->id,
+                    'name' => $eq->model,
+                    'stock' => $value->branch->name,
+                    'user' => $value->user->fio,
+                    'client' => $value->client->name,
+                    'coment' => $value->comment,
+                    'date_create' => date('d.m.Y', strtotime($value->date_create))
+                ];
+            }
         }
 
         Yii::info('Список оборудования получен', __METHOD__);

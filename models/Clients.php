@@ -18,6 +18,7 @@ use Yii;
  * @property string $is_not_active 0-активный,1-не активный
  *
  * @property Applications[] $applications
+ * @property ApplicationsDemand[] $applicationsDemands
  * @property ClientStatusChange[] $clientStatusChanges
  * @property Branch $branch
  * @property ClientStatus $status0
@@ -74,6 +75,14 @@ class Clients extends \yii\db\ActiveRecord
     public function getApplications()
     {
         return $this->hasMany(Applications::className(), ['client_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getApplicationsDemands()
+    {
+        return $this->hasMany(ApplicationsDemand::className(), ['client_id' => 'id']);
     }
 
     /**
