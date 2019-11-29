@@ -69,11 +69,6 @@ class MainClass
             ->where('branch_id=:branch and application_equipment.renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->count('DISTINCT applications.id');
 
-        $applicationEquipment = Applications::find()
-            ->joinWith('applicationEquipments')
-            ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
-            ->all();
-
         $debtorSumList = Applications::find()
             ->where('hire_state_id=5')
             ->all();
