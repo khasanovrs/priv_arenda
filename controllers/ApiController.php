@@ -216,7 +216,7 @@ class ApiController extends Controller
             'get-equipments-fields' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentActionFields',
             ],
-            'get-equipments--demand-fields' => [
+            'get-equipments-demand-fields' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentDemandActionFields',
             ],
             'change-equipments-fields' => [

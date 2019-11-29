@@ -15,6 +15,7 @@ use app\models\ApplicationEquipment;
 use app\models\ApplicationPay;
 use app\models\Applications;
 use app\models\ApplicationsDelivery;
+use app\models\ApplicationsDemand;
 use app\models\ApplicationsField;
 use app\models\ApplicationsShowField;
 use app\models\ApplicationsStatus;
@@ -25,6 +26,7 @@ use app\models\Branch;
 use app\models\Clients;
 use app\models\Discount;
 use app\models\Equipments;
+use app\models\EquipmentsDemand;
 use app\models\FinanceCashbox;
 use app\models\Source;
 use app\models\Users;
@@ -456,7 +458,7 @@ class ApplicationsClass
                         $sumCheckLesa += $valueSecond->sum;
                     }
 
-                    if (!$lesa && $sumCheck===0) {
+                    if (!$lesa && $sumCheck === 0) {
                         Yii::error('У клиента статус "с залогом". Необходимо добавить залог', __METHOD__);
 
                         return [
@@ -466,7 +468,7 @@ class ApplicationsClass
                     }
                 }
 
-                if ($lesa && $sumCheckLesa===0) {
+                if ($lesa && $sumCheckLesa === 0) {
                     Yii::error('У клиента статус "с залогом". Необходимо добавить залог', __METHOD__);
 
                     return [
@@ -546,6 +548,71 @@ class ApplicationsClass
                 'msg' => 'Не указан способ доставки',
             ];
         }
+
+
+        if ($status !== 3) {
+            $result = self::AddApplicationEq($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch, $source, $lesa, $month_sum, $square, $address);
+
+            if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при добавлении заявки', __METHOD__);
+
+                if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
+                    return $result;
+                }
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при добавлении заявки',
+                ];
+            }
+        } else {
+            $result = self::AddApplicationDemand($client_id, $equipments, $comment, $branch);
+
+            if (!is_array($result) || !isset($result['status']) || $result['status'] != 'SUCCESS') {
+                Yii::error('Ошибка при добавлении заявки', __METHOD__);
+
+                if (is_array($result) && isset($result['status']) && $result['status'] === 'ERROR') {
+                    return $result;
+                }
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при добавлении заявки',
+                ];
+            }
+        }
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно добавлена'
+        ];
+    }
+
+    /**
+     * Создание проката для стандартных оборудований
+     * @param $client_id
+     * @param $equipments
+     * @param $typeLease
+     * @param $sale
+     * @param $rent_start
+     * @param $rent_end
+     * @param $delivery
+     * @param $sum
+     * @param $delivery_sum
+     * @param $status
+     * @param $comment
+     * @param $branch
+     * @param $source
+     * @param $lesa
+     * @param $month_sum
+     * @param $square
+     * @param $address
+     * @return array | bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function AddApplicationEq($client_id, $equipments, $typeLease, $sale, $rent_start, $rent_end, $delivery, $sum, $delivery_sum, $status, $comment, $branch, $source, $lesa, $month_sum, $square, $address)
+    {
+
 
         $check = ApplicationsDelivery::find()->where('id=:id', [':id' => $delivery])->one();
         if (!is_object($check)) {
@@ -829,6 +896,93 @@ class ApplicationsClass
     }
 
     /**
+     * Создание проката для спроса
+     * @param $client_id
+     * @param $equipments
+     * @param $comment
+     * @param $branch
+     * @return array | bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function AddApplicationDemand($client_id, $equipments, $comment, $branch)
+    {
+
+        foreach ($equipments as $value) {
+            /**
+             * @var Sessions $Sessions
+             */
+            $Sessions = Yii::$app->get('Sessions');
+            $session = $Sessions->getSession();
+
+            /**
+             * @var Equipments $equipment
+             */
+            $equipment = Equipments::find()->where('id=:id', [':id' => $value->id])->one();
+
+            if (!is_object($equipment)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'ERROR',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
+
+            $newApplications = new ApplicationsDemand();
+            $newApplications->client_id = $client_id !== '' ? $client_id : 0;
+            $newApplications->user_id = $session->user_id;
+            $newApplications->branch_id = $branch;
+            $newApplications->comment = $comment;
+            $newApplications->eq_id = $value->id;
+            $newApplications->is_not_active = 0;
+            $newApplications->date_create = date('Y-m-d H:i:s');
+
+            try {
+                if (!$newApplications->save(false)) {
+                    Yii::error('Ошибка при добавлении заявки: ' . serialize($newApplications->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при добавлении заявки: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+
+            /**
+             * @var EquipmentsDemand $eq
+             */
+            $eq = EquipmentsDemand::find()->where('id=:id', [':id' => $value->id])->one();
+
+            if (!is_object($eq)) {
+                Yii::info('Ошибка при получении оборудования', __METHOD__);
+
+                return [
+                    'status' => 'SUCCESS',
+                    'msg' => 'Ошибка при получении оборудования'
+                ];
+            }
+
+            $eq->count_demand = $eq->count_demand + 1;
+
+            try {
+                if (!$eq->save(false)) {
+                    Yii::error('Ошибка при обновлении количества запросов: ' . serialize($eq->getErrors()), __METHOD__);
+                    return false;
+                }
+            } catch (\Exception $e) {
+                Yii::error('Поймали Exception при обновлении количества запросов: ' . serialize($e->getMessage()), __METHOD__);
+                return false;
+            }
+        }
+
+        Yii::info('Заявка успешно добавлена', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Заявка успешно добавлена'
+        ];
+    }
+
+    /**
      * Получение детальной информации о заявке
      * @param $applicationId
      * @return array
@@ -860,7 +1014,9 @@ class ApplicationsClass
             ];
         }
 
-
+        /**
+         * @var Applications $application
+         */
         $application = Applications::find()->where('id=:id', [':id' => $applicationEq->application_id])->one();
 
         if (!is_object($application)) {

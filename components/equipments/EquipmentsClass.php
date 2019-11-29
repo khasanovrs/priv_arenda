@@ -690,6 +690,8 @@ class EquipmentsClass
         $filter = strtolower($filter);
         $filter = '%' . $filter . '%';
 
+        Yii::info('Определяем статус у нового проката, статус:' . serialize($applicationStatus), __METHOD__);
+
         if ($applicationStatus !== 3) {
             $equipments = Equipments::find()->joinWith(['mark0', 'type0'])->
             where(['in', 'stock_id', $arr])->
