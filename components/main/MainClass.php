@@ -74,31 +74,25 @@ class MainClass
             ->where('applications.branch_id=:branch and renewals_date BETWEEN :date_start and :date_end', [':branch' => $branch, ':date_start' => $date_start, ':date_end' => $date_end])
             ->all();
 
-        if (!is_array($applicationEquipment)) {
-            Yii::error('Список оборудований пуст', __METHOD__);
+        $debtorSumList = Applications::find()
+            ->where('hire_state_id=5')
+            ->all();
 
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Список оборудований пуст'
-            ];
-        }
-
-        /**
-         * @var Applications $value
-         */
-
-        foreach ($applicationEquipment as $value) {
-            if ($value->hire_state_id === 5) {
-                $debtorSum += (float)$value->sum - (float)$value->total_paid;
+        if (!empty($debtorSumList)) {
+            /**
+             * @var Applications $value
+             */
+            foreach ($debtorSumList as $value) {
+                $debtorSum += (float)$value->sum_sale - (float)$value->total_paid;
             }
         }
 
         Yii::info('Получаем средний чек и общая сумма', __METHOD__);
 
         $payList = ApplicationPay::find()
-            ->joinWith(['application','application.applicationEquipments'])
+            ->joinWith(['application', 'application.applicationEquipments'])
             ->where(['between', 'application_pay.date_create', $date_start, $date_end])
-            ->andWhere('applications.branch_id=:branch',[':branch' => $branch])
+            ->andWhere('applications.branch_id=:branch', [':branch' => $branch])
             ->all();
 
         if (!empty($payList)) {

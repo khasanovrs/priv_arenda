@@ -1476,8 +1476,6 @@ class HireClass
         $delivery_sum = $app->deliverySum->delivery_sum;
         $delivery_sum_paid = $app->deliverySum->delivery_sum_paid;
 
-        echo (strtotime(date('Y-m-d H:i:s')) - strtotime('2019-12-29 21:11:00')) / (60 * 60);
-
         Yii::info('Текущее время: ' . serialize($date), __METHOD__);
         Yii::info('Дата окончания аренды: ' . serialize($rent_end), __METHOD__);
         Yii::info('Разница времени в часах: ' . serialize($dateDiff), __METHOD__);
