@@ -523,13 +523,6 @@ class EquipmentsClass
             $stockUser = $stockUserObject->id;
         }
 
-        if ($stock !== '' and $stock !== null) {
-            Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
-            $listFilter[] = 'stock_id=:stock';
-            $params[':stock'] = $stock;
-        }
-
-
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = mb_strtolower($like);
@@ -545,6 +538,12 @@ class EquipmentsClass
         }
 
         if ($type === 'eq') {
+            if ($stock !== '' and $stock !== null) {
+                Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
+                $listFilter[] = 'stock_id=:stock';
+                $params[':stock'] = $stock;
+            }
+
             $equipmentsTypeList = EquipmentsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
             if (!is_array($equipmentsTypeList)) {
@@ -568,6 +567,28 @@ class EquipmentsClass
                 ];
             }
         } elseif ($type === 'hire') {
+            if ($stock !== '' and $stock !== null) {
+
+                /**
+                 * @var Stock $stock
+                 */
+                $stock = Stock::find()->where('id=:id', [':id' => $stock])->one();
+                if (!is_object($stock)) {
+                    Yii::error('Филиал не найден', __METHOD__);
+
+                    return [
+                        'status' => 'ERROR',
+                        'msg' => 'Филиал не найден',
+                    ];
+                }
+            }
+
+            if ($stock !== '' and $stock !== null) {
+                Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
+                $listFilter[] = 'branch_id=:stock';
+                $params[':stock'] = $stock->id_branch;
+            }
+
             $equipmentsTypeList = ApplicationsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
             if (!is_array($equipmentsTypeList)) {
