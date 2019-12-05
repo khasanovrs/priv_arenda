@@ -621,6 +621,47 @@ class EquipmentsClass
 
     /**
      * Получение списка оборудования
+     * @param $id
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function GetEquipmentsInfoDemand($id)
+    {
+        Yii::info('Запуск функции GetEquipmentsInfoDemand' . serialize($id), __METHOD__);
+
+        /**
+         * @var EquipmentsDemand $equipmentsTypeList
+         */
+        $equipmentsTypeList = EquipmentsDemand::find()->where('id=:id', [':id' => $id])->orderBy('id desc')->one();
+
+        if (!is_object($equipmentsTypeList)) {
+            Yii::error('Оборудование не найдено', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Оборудование не найдено'
+            ];
+        }
+
+
+        $result = [
+            'id' => $equipmentsTypeList->id,
+            'name' => $equipmentsTypeList->model,
+            'count_demand' => $equipmentsTypeList->count_demand,
+        ];
+
+
+        Yii::info('Список оборудования получен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Список оборудования получен',
+            'data' => $result
+        ];
+    }
+
+    /**
+     * Получение списка оборудования
      * @param $branch
      * @param $date_start ,
      * @param $date_end
@@ -1184,6 +1225,59 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Статус оборудования успешно изменен'
+        ];
+    }
+
+    /**
+     * Сохранение информации об оборудовании со спросом
+     * @param $id
+     * @param $name
+     * @return bool|array
+     */
+    public static function saveEquipmentsInfoDemand($id, $name)
+    {
+        Yii::info('Запуск функции saveEquipmentsInfoDemand', __METHOD__);
+
+        if ($id === '') {
+            Yii::error('Не передан идентификтор оборудования, id: ' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Не передан идентификтор оборудования',
+            ];
+        }
+
+        /**
+         * @var EquipmentsDemand $eq_demand
+         */
+        $eq_demand = EquipmentsDemand::find()->where('id=:id', [':id' => $id])->one();
+
+        if (!is_object($eq_demand)) {
+            Yii::error('Передан некорректный идентификатор, status:' . serialize($id), __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Передан некорректный идентификатор',
+            ];
+        }
+
+        $eq_demand->model = $name;
+
+        try {
+            if (!$eq_demand->save(false)) {
+                Yii::error('Ошибка при обновлении оборудования: ' . serialize($eq_demand->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при обновлении оборудования: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        Yii::info('Оборудование успешно изменен', __METHOD__);
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно изменено'
         ];
     }
 

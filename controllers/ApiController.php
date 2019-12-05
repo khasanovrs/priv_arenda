@@ -210,6 +210,12 @@ class ApiController extends Controller
             'get-equipments-demand' => [
                 'class' => 'app\components\actions\equipments\GetEquipmentDemandAction',
             ],
+            'get-equipments-demand-info' => [
+                'class' => 'app\components\actions\equipments\GetEquipmentDemandInfoAction',
+            ],
+            'save-equipments-demand-info' => [
+                'class' => 'app\components\actions\equipments\SaveEquipmentDemandInfoAction',
+            ],
             'get-all-equipments-branch' => [
                 'class' => 'app\components\actions\equipments\GetAllEquipmentBranchAction',
             ],
