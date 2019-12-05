@@ -516,25 +516,18 @@ class EquipmentsClass
             $stockUser = $stockUserObject->id;
         }
 
-        if ($like !== '' and $like !== null) {
-            Yii::info('Параметр like: ' . serialize($like), __METHOD__);
-            $like = mb_strtolower($like);
-            $like = '%' . $like . '%';
-            $listFilter[] = 'lower(model) like :like';
-            $params[':like'] = strtolower($like);
-        }
-
-
         // определяем менеджера
         if ($stockUser !== '') {
             $listFilter[] = 'stock_id=' . $stockUser;
         }
 
         if ($type === 'eq') {
-            if ($stock !== '' and $stock !== null) {
-                Yii::info('Параметр stock: ' . serialize($stock), __METHOD__);
-                $listFilter[] = 'stock_id=:stock';
-                $params[':stock'] = $stock;
+            if ($like !== '' and $like !== null) {
+                Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+                $like = mb_strtolower($like);
+                $like = '%' . $like . '%';
+                $listFilter[] = 'lower(model) like :like';
+                $params[':like'] = strtolower($like);
             }
 
             $equipmentsTypeList = EquipmentsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
@@ -581,7 +574,15 @@ class EquipmentsClass
                 $params[':stock'] = $stock->id_branch;
             }
 
-            $equipmentsTypeList = ApplicationsDemand::find()->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
+            if ($like !== '' and $like !== null) {
+                Yii::info('Параметр like: ' . serialize($like), __METHOD__);
+                $like = mb_strtolower($like);
+                $like = '%' . $like . '%';
+                $listFilter[] = 'lower(equipments_demand.model) like :like';
+                $params[':like'] = strtolower($like);
+            }
+
+            $equipmentsTypeList = ApplicationsDemand::find()->joinWith('eq')->where(implode(" and ", $listFilter), $params)->orderBy('id desc')->all();
 
             if (!is_array($equipmentsTypeList)) {
                 Yii::error('Список категорий оборудования пуст', __METHOD__);
@@ -800,8 +801,7 @@ class EquipmentsClass
             }
         } else {
             $equipments = EquipmentsDemand::find()->
-            where(['in', 'stock_id', $arr])->
-            andWhere('lower(model) like :filter', [':filter' => $filter])->
+            where('lower(model) like :filter', [':filter' => $filter])->
             orderBy('id desc')
                 ->limit(20)
                 ->all();
