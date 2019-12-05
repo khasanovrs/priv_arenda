@@ -9,11 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property string $model
- * @property int $stock_id
+ * @property string $confirmed 0- не подтвержден,1-подтвержден
  * @property int $count_demand Количество запросов
  *
  * @property ApplicationsDemand[] $applicationsDemands
- * @property Stock $stock
  */
 class EquipmentsDemand extends \yii\db\ActiveRecord
 {
@@ -31,10 +30,9 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['model', 'stock_id'], 'required'],
-            [['stock_id', 'count_demand'], 'integer'],
-            [['model'], 'string', 'max' => 150],
-            [['stock_id'], 'exist', 'skipOnError' => true, 'targetClass' => Stock::className(), 'targetAttribute' => ['stock_id' => 'id']],
+            [['model', 'confirmed'], 'required'],
+            [['count_demand'], 'integer'],
+            [['model', 'confirmed'], 'string', 'max' => 150],
         ];
     }
 
@@ -46,7 +44,7 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'model' => 'Model',
-            'stock_id' => 'Stock ID',
+            'confirmed' => 'Confirmed',
             'count_demand' => 'Count Demand',
         ];
     }
@@ -57,13 +55,5 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
     public function getApplicationsDemands()
     {
         return $this->hasMany(ApplicationsDemand::className(), ['eq_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStock()
-    {
-        return $this->hasOne(Stock::className(), ['id' => 'stock_id']);
     }
 }

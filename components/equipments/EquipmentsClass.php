@@ -190,12 +190,11 @@ class EquipmentsClass
      * @param $profit_end
      * @param $degree_wear_start
      * @param $degree_wear_end
-     * @param $confirmed
      * @param $lesa
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $confirmed, $lesa)
+    public static function GetEquipments($status, $like, $stock, $equipmentsType, $equipmentsCategory, $count_start, $count_end, $selling_price_start, $selling_price_end, $price_per_day_start, $price_per_day_end, $rentals_start, $rentals_end, $repairs_start, $repairs_end, $repairs_sum_start, $repairs_sum_end, $revenue_start, $revenue_end, $profit_start, $profit_end, $degree_wear_start, $degree_wear_end, $lesa)
     {
         Yii::info('Запуск функции GetEquipments' . serialize($like), __METHOD__);
 
@@ -386,12 +385,6 @@ class EquipmentsClass
             $params[':degree_wear_end'] = $degree_wear_end;
         }
 
-        if ($confirmed !== '') {
-            Yii::info('Параметр confirmed: ' . serialize($confirmed), __METHOD__);
-            $listFilter[] = 'confirmed=:confirmed';
-            $params[':confirmed'] = $confirmed;
-        }
-
         if ($like !== '' and $like !== null) {
             Yii::info('Параметр like: ' . serialize($like), __METHOD__);
             $like = mb_strtolower($like);
@@ -562,7 +555,6 @@ class EquipmentsClass
                 $result[] = [
                     'id' => $value->id,
                     'name' => $value->model,
-                    'stock' => $value->stock->name,
                     'count_demand' => $value->count_demand,
                 ];
             }
@@ -941,7 +933,6 @@ class EquipmentsClass
             'frequency_hits' => $equipment->equipmentsInfos[0]->frequency_hits,
             'comment' => $equipment->equipmentsInfos[0]->comment,
             'change_history' => $change_history,
-            'confirmed' => $equipment->confirmed,
             'change_history_status' => $change_history_status,
             'count' => +$equipment->count,
             'count_hire' => +$equipment->count_hire,
@@ -1224,11 +1215,10 @@ class EquipmentsClass
      * @param $photo
      * @param $photo_alias
      * @param $comment
-     * @param $confirmed
      * @param $count
      * @return array|bool
      */
-    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $confirmed, $count)
+    public static function AddEquipment($model, $mark, $status, $stock, $equipmentsType, $equipmentsCategory, $tool_number, $selling, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $repairs, $repairs_sum, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo, $photo_alias, $comment, $count)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1309,7 +1299,6 @@ class EquipmentsClass
             $newEquipment->payback_ratio = $payback_ratio;
             $newEquipment->photo = $photo;
             $newEquipment->photo_alias = $photo_alias;
-            $newEquipment->confirmed = $confirmed;
             $newEquipment->date_create = date('Y-m-d H:i:s');
 
             try {
@@ -1503,11 +1492,10 @@ class EquipmentsClass
      * @param $amount_repair
      * @param $cash_box
      * @param $sale_amount
-     * @param $confirmed
      * @return array|bool
      * @throws \yii\base\InvalidConfigException
      */
-    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount, $confirmed)
+    public static function changeEquipment($id, $model, $mark, $new_stock, $old_stock, $reason_change_stock, $equipmentsType, $equipmentsCategory, $count, $tool_number, $selling_price, $price_per_day, $revenue, $degree_wear, $discount, $rentals, $profit, $payback_ratio, $power_energy, $length, $network_cord, $power, $frequency_hits, $photo_alias, $new_status, $old_status, $reason_change_status, $amount_repair, $cash_box, $sale_amount)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1654,7 +1642,6 @@ class EquipmentsClass
         $equipment->profit = $profit;
         $equipment->payback_ratio = $payback_ratio;
         $equipment->photo_alias = $photo_alias;
-        $equipment->confirmed = $confirmed;
 
         try {
             if (!$equipment->save(false)) {
