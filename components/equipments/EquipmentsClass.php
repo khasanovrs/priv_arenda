@@ -1436,10 +1436,9 @@ class EquipmentsClass
     /**
      * Функция добавления оборудования для спроса
      * @param $model
-     * @param $stock
      * @return array|bool
      */
-    public static function AddEquipmentMini($model, $stock)
+    public static function AddEquipmentMini($model)
     {
         if ($model === '') {
             Yii::error('Не передано модель оборудования, model: ' . serialize($model), __METHOD__);
@@ -1449,17 +1448,9 @@ class EquipmentsClass
             ];
         }
 
-        if ($stock === '') {
-            Yii::error('Не передан идентификатор склада, stock: ' . serialize($stock), __METHOD__);
-            return [
-                'status' => 'ERROR',
-                'msg' => 'Не передан идентификатор склада',
-            ];
-        }
-
         $newEquipment = new EquipmentsDemand();
+        $newEquipment->confirmed = 1;
         $newEquipment->model = $model;
-        $newEquipment->stock_id = $stock;
 
         try {
             if (!$newEquipment->save(false)) {
