@@ -1449,7 +1449,6 @@ class EquipmentsClass
         }
 
         $newEquipment = new EquipmentsDemand();
-        $newEquipment->confirmed = 1;
         $newEquipment->model = $model;
 
         try {
@@ -2608,6 +2607,71 @@ class EquipmentsClass
         return [
             'status' => 'SUCCESS',
             'msg' => 'Оборудование успешно изменено'
+        ];
+    }
+
+    /**
+     * Объединение оборудований
+     * @param $unification
+     * @param $new_name
+     * @return array|bool
+     */
+    public static function unification($unification, $new_name)
+    {
+        Yii::info('Запуск объединения оборудований', __METHOD__);
+
+        if (!is_array($unification) || empty($unification)) {
+            Yii::error('Ни переданы идентификаторы записей', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни переданы идентификаторы записей',
+            ];
+        }
+
+        if ($new_name === '') {
+            Yii::error('Ни передана новое имя', __METHOD__);
+
+            return [
+                'status' => 'ERROR',
+                'msg' => 'Ни передана новое имя',
+            ];
+        }
+
+        $count = EquipmentsDemand::find()->where(['in', 'id', $unification])->sum('count_demand');
+
+        $newField = new EquipmentsDemand();
+        $newField->model = $new_name;
+        $newField->count_demand = $count;
+
+        try {
+            if (!$newField->save(false)) {
+                Yii::error('Ошибка при сохранении новой записи: ' . serialize($newField->getErrors()), __METHOD__);
+                return false;
+            }
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при сохранении новой записи: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        try {
+            ApplicationsDemand::updateAll(['eq_id' => $newField->id], ['in', 'eq_id', $unification]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при обновлении записей: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+        try {
+            EquipmentsDemand::deleteAll(['in', 'id', $unification]);
+        } catch (\Exception $e) {
+            Yii::error('Поймали Exception при удалении записей: ' . serialize($e->getMessage()), __METHOD__);
+            return false;
+        }
+
+
+        return [
+            'status' => 'SUCCESS',
+            'msg' => 'Оборудование успешно объединены'
         ];
     }
 }

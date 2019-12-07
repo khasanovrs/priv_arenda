@@ -264,6 +264,9 @@ class ApiController extends Controller
             'delete-equipment' => [
                 'class' => 'app\components\actions\equipments\DeleteEquipmentAction',
             ],
+            'send-unification' => [
+                'class' => 'app\components\actions\equipments\UnificationAction',
+            ],
             /**
              * Управление заявками
              */

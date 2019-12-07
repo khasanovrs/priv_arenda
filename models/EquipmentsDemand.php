@@ -9,7 +9,6 @@ use Yii;
  *
  * @property int $id
  * @property string $model
- * @property string $confirmed 0- не подтвержден,1-подтвержден
  * @property int $count_demand Количество запросов
  *
  * @property ApplicationsDemand[] $applicationsDemands
@@ -30,9 +29,9 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['model', 'confirmed'], 'required'],
+            [['model'], 'required'],
             [['count_demand'], 'integer'],
-            [['model', 'confirmed'], 'string', 'max' => 150],
+            [['model'], 'string', 'max' => 150],
         ];
     }
 
@@ -44,7 +43,6 @@ class EquipmentsDemand extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'model' => 'Model',
-            'confirmed' => 'Confirmed',
             'count_demand' => 'Count Demand',
         ];
     }
